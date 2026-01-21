@@ -1,0 +1,2580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 5</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page4.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page6.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 5)</h1>
+
+<!-- ================= Q1 ================= -->
+<div class="question">
+<pre>
+41) A company recently deployed an application on AWS. The application uses Amazon DynamoDB. The company measured the application load and configured the RCUs and WCUs on the DynamoDB table to match the expected peak load. The peak load occurs once a week for a 4-hour period and is double the average load. The peak load occurs once a week for a 4-hour period and is double the average load. The application load is close to the average load for the rest of the week. The access pattern includes many more writes to the table than reads of the table.
+
+A solutions architect needs to implement a solution to minimize the cost of the table.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q1">
+A. Use AWS Application Auto Scaling to increase capacity during the peak period. Purchase reserved RCUs and WCUs to match the average load.
+</label>
+
+<label>
+<input type="radio" name="q1">
+B. Configure on-demand capacity mode for the table.
+</label>
+
+<label>
+<input type="radio" name="q1">
+C. Configure DynamoDB Accelerator (DAX) in front of the table. Reduce the provisioned read capacity to match the new peak load on the table.
+</label>
+
+<label>
+<input type="radio" name="q1">
+D. Configure DynamoDB Accelerator (DAX) in front of the table. Configure on-demand capacity mode for the table.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question focuses on <b>cost optimization for DynamoDB tables with predictable, periodic spikes in traffic</b>.
+
+<br><br>
+
+<b>Workload Characteristics:</b>
+<ul>
+<li>Peak load: Once per week for 4 hours (2x average load)</li>
+<li>Normal load: 164 hours per week at average load</li>
+<li>Access pattern: Write-heavy (many more writes than reads)</li>
+<li>Currently provisioned for peak load (wasteful during non-peak)</li>
+</ul>
+
+<br>
+
+<b>DynamoDB Capacity Modes:</b>
+
+<br><br>
+
+<b>1. Provisioned Capacity:</b>
+<ul>
+<li>Specify RCUs (Read Capacity Units) and WCUs (Write Capacity Units)</li>
+<li>Pay per hour for provisioned capacity</li>
+<li>Can purchase Reserved Capacity for cost savings (1-year commitment)</li>
+<li>Can use Auto Scaling to adjust capacity dynamically</li>
+<li>Best for predictable, consistent traffic</li>
+</ul>
+
+<br>
+
+<b>2. On-Demand Capacity:</b>
+<ul>
+<li>Pay per request</li>
+<li>No capacity planning needed</li>
+<li>Automatically scales up/down</li>
+<li>~5x more expensive per request than provisioned</li>
+<li>Best for unpredictable, sporadic traffic</li>
+</ul>
+
+<br>
+
+<b>Option A is correct:</b>
+
+<br><br>
+
+<b>Component 1: Reserved Capacity for Average Load</b>
+
+<br><br>
+
+<b>Reserved Capacity Benefits:</b>
+<ul>
+<li>Commit to baseline capacity for 1 year</li>
+<li>Significant discount: ~50-75% savings vs. standard provisioned</li>
+<li>Applied automatically to your DynamoDB usage</li>
+<li>Perfect for the 164 hours/week of average load</li>
+</ul>
+
+<br>
+
+<b>Example Cost Calculation:</b>
+<pre>
+Average Load: 100 WCUs, 50 RCUs
+
+Without Reserved Capacity:
+  WCU: 100 × $0.00065/hour × 730 hours = $47.45/month
+  RCU: 50 × $0.00013/hour × 730 hours = $4.75/month
+  Total: $52.20/month
+
+With Reserved Capacity (assume 50% discount):
+  WCU: 100 × $0.000325/hour × 730 hours = $23.73/month
+  RCU: 50 × $0.000065/hour × 730 hours = $2.37/month
+  Total: $26.10/month
+  
+Savings: $26.10/month for baseline capacity
+</pre>
+
+<br>
+
+<b>Component 2: AWS Application Auto Scaling for Peak Period</b>
+
+<br><br>
+
+<b>Auto Scaling Configuration:</b>
+<pre>
+Base Capacity (Reserved):
+  - Min: 100 WCUs, 50 RCUs
+  - Covers average load
+
+Auto Scaling Policy:
+  - Target Utilization: 70%
+  - Scale up when utilization > 70%
+  - Scale down when utilization < 70%
+  
+Peak Capacity:
+  - Auto Scaling adds: +100 WCUs, +50 RCUs
+  - Total during peak: 200 WCUs, 100 RCUs
+  - Only for 4 hours/week
+</pre>
+
+<br>
+
+<b>How Auto Scaling Works:</b>
+<ol>
+<li><b>Monitoring:</b> CloudWatch tracks consumed capacity</li>
+<li><b>Threshold Detection:</b> Load approaches 70% of provisioned capacity</li>
+<li><b>Scale Up:</b> Auto Scaling increases WCUs/RCUs</li>
+<li><b>Peak Handling:</b> Additional capacity handles 2x load</li>
+<li><b>Scale Down:</b> After peak, Auto Scaling reduces capacity back to baseline</li>
+</ol>
+
+<br>
+
+<b>Cost Analysis for Peak Capacity:</b>
+<pre>
+Additional Capacity During Peak:
+  +100 WCUs for 4 hours/week = 16 hours/month
+  +50 RCUs for 4 hours/week = 16 hours/month
+
+Peak Cost (Standard Provisioned Rate):
+  WCU: 100 × $0.00065/hour × 16 hours = $1.04/month
+  RCU: 50 × $0.00013/hour × 16 hours = $0.10/month
+  Total Peak Cost: $1.14/month
+</pre>
+
+<br>
+
+<b>Total Monthly Cost with Option A:</b>
+<pre>
+Reserved Capacity (baseline): $26.10
+Auto Scaling (peak): $1.14
+Total: $27.24/month
+</pre>
+
+<br>
+
+<b>Why This Minimizes Cost:</b>
+
+<br>
+
+<ul>
+<li><b>Reserved Capacity:</b> 50%+ discount on baseline (164 hours/week)</li>
+<li><b>Minimal Auto Scaling:</b> Only pay for extra capacity 4 hours/week</li>
+<li><b>No Over-Provisioning:</b> Capacity matches actual demand</li>
+<li><b>Predictable Costs:</b> Reserved commitment + small variable cost</li>
+</ul>
+
+<br>
+
+<b>Comparison with Other Options:</b>
+
+<br><br>
+
+<b>Option B - On-Demand Capacity:</b>
+<pre>
+On-Demand Pricing:
+  - WCU: $1.25 per million write requests
+  - RCU: $0.25 per million read requests
+  
+Assuming 100 writes/sec average, 200 writes/sec peak:
+  - Average: 100 writes/sec × 164 hours × 3,600 sec = 59M writes
+  - Peak: 200 writes/sec × 4 hours × 3,600 sec = 2.9M writes
+  - Total: 61.9M writes/month
+  
+Write Cost: 61.9 × $1.25 = $77.38/month
+
+This is ~3x more expensive than Option A ($77.38 vs. $27.24)
+</pre>
+
+<br>
+
+<b>When On-Demand Makes Sense:</b>
+<ul>
+<li>Unpredictable traffic patterns</li>
+<li>New applications with unknown load</li>
+<li>Serverless applications with sporadic usage</li>
+<li>NOT this scenario (predictable weekly peak)</li>
+</ul>
+
+<br>
+
+<b>Option C/D - DynamoDB Accelerator (DAX):</b>
+
+<br>
+
+<b>What is DAX:</b>
+<ul>
+<li>In-memory cache for DynamoDB</li>
+<li>Microsecond read latency (vs. milliseconds for DynamoDB)</li>
+<li>Reduces read load on DynamoDB table</li>
+<li><b>Does NOT help with writes</b></li>
+</ul>
+
+<br>
+
+<b>Why DAX Doesn't Help Here:</b>
+<ul>
+<li>Access pattern is <b>write-heavy</b></li>
+<li>DAX only caches reads, doesn't reduce write load</li>
+<li>DAX costs: $0.04-$0.30+/hour per node (expensive)</li>
+<li>Adds operational complexity</li>
+<li>Doesn't address the core issue: over-provisioned capacity</li>
+</ul>
+
+<br>
+
+<b>Complete Solution Implementation:</b>
+
+<br><br>
+
+<b>Step 1: Purchase Reserved Capacity</b>
+<pre>
+Console: DynamoDB → Reserved Capacity → Purchase
+  Region: us-east-1
+  Table: my-table
+  WCU: 100 units
+  RCU: 50 units
+  Term: 1 year
+  
+This provides baseline capacity at ~50% discount
+</pre>
+
+<br>
+
+<b>Step 2: Configure Auto Scaling</b>
+<pre>
+Console: DynamoDB → Tables → my-table → Additional settings → Auto Scaling
+
+Write Capacity:
+  Minimum: 100 (covered by reserved capacity)
+  Maximum: 200 (2x for peak)
+  Target Utilization: 70%
+  
+Read Capacity:
+  Minimum: 50 (covered by reserved capacity)
+  Maximum: 100 (2x for peak)
+  Target Utilization: 70%
+</pre>
+
+<br>
+
+<b>Step 3: Monitor and Adjust</b>
+<pre>
+CloudWatch Metrics to Monitor:
+  - ConsumedWriteCapacityUnits
+  - ConsumedReadCapacityUnits
+  - UserErrors (throttling)
+  - ProvisionedWriteCapacityUnits
+  
+Set Alarms:
+  - Alert if throttling occurs
+  - Alert if utilization consistently > 80%
+  - Alert before peak period
+</pre>
+
+<br>
+
+<b>Auto Scaling Behavior During Peak:</b>
+
+<br>
+
+<pre>
+Timeline:
+09:00 - Normal load (100 WCU)
+10:00 - Load starts increasing
+10:15 - Utilization hits 70% → Auto Scaling triggered
+10:20 - Capacity increased to 150 WCU
+10:30 - Load continues → Utilization 70% again
+10:35 - Capacity increased to 200 WCU
+11:00-14:00 - Capacity stable at 200 WCU (peak period)
+14:00 - Load decreasing
+14:30 - Utilization drops < 70%
+15:00 - Capacity decreased to 150 WCU
+16:00 - Capacity decreased to 100 WCU (baseline)
+</pre>
+
+<br>
+
+<b>Benefits of This Approach:</b>
+
+<br>
+
+<ul>
+<li><b>Cost-Optimized:</b> Reserved capacity for baseline, pay-as-you-go for peaks</li>
+<li><b>Automatic:</b> No manual intervention during peaks</li>
+<li><b>Responsive:</b> Scales in minutes to handle load</li>
+<li><b>Predictable:</b> Known costs for baseline + small variable cost</li>
+<li><b>No Over-Provisioning:</b> Don't pay for unused capacity 164 hours/week</li>
+<li><b>Write-Optimized:</b> Directly addresses write-heavy workload</li>
+</ul>
+
+<br>
+
+<b>Additional Cost Optimization Tips:</b>
+
+<br>
+
+<ul>
+<li>Use DynamoDB Standard-IA table class if items are infrequently accessed</li>
+<li>Enable TTL to automatically delete expired items</li>
+<li>Use batch writes (BatchWriteItem) to reduce write costs</li>
+<li>Consider archiving old data to S3 with DynamoDB exports</li>
+<li>Monitor Free Tier usage (25 GB storage, 25 RCU, 25 WCU always free)</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> On-demand capacity is convenient but significantly more expensive for predictable traffic patterns. With a known weekly peak, on-demand would cost ~3x more than provisioned capacity with Auto Scaling. On-demand is best for unpredictable or sporadic workloads, not for regular weekly patterns.<br>
+<b>Option C:</b> DAX is a caching layer for reads, but this workload is write-heavy. DAX won't reduce write costs at all. Additionally, DAX nodes cost $0.04-$0.30+/hour each, adding $30-$220+/month for no write benefit. The problem isn't read performance, it's over-provisioned write capacity.<br>
+<b>Option D:</b> Combines two expensive options: DAX (adds cost without write benefit) and on-demand (3x more expensive than provisioned). This would be the most expensive solution, not the most cost-effective.
+</div>
+</div>
+
+
+<!-- ================= Q2 ================= -->
+<div class="question">
+<pre>
+42) A solutions architect needs to advise a company on how to migrate its on-premises data processing application to the AWS Cloud. 
+Currently, users upload input files through a web portal. The web server then stores the uploaded files on NAS and messages the processing server over a message queue. Each media file can take up to 1 hour to process. 
+The company has determined that the number of media files awaiting processing is significantly higher during business hours, with the number of files rapidly declining after business hours.
+
+Which solution should the solutions architect recommend?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q2">
+A. Create a queue using Amazon SQS. Configure the existing web server to publish to the new queue. When there are messages in the queue, invoke an AWS Lambda function to pull requests from the queue and process the files. Store the processed files in an Amazon S3 bucket.
+</label>
+
+<label>
+<input type="radio" name="q2">
+B. Create a queue using Amazon MQ. Configure the existing web server to publish to the new queue. When there are messages in the queue, create a new Amazon EC2 instance to pull requests from the queue and process the files. Store the processed files in Amazon EFS. Shut down the EC2 instance after the task is complete.
+</label>
+
+<label>
+<input type="radio" name="q2">
+C. Create a queue using Amazon MQ. Configure the existing web server to publish to the new queue. When there are messages in the queue, invoke an AWS Lambda function to pull requests from the queue and process the files. Store the processed files in Amazon EFS.
+</label>
+
+<label>
+<input type="radio" name="q2">
+D. Create a queue using Amazon SQS. Configure the existing web server to publish to the new queue. Use Amazon EC2 instances in an EC2 Auto Scaling group to pull requests from the queue and process the files. Scale the EC2 instances based on the SQS queue length. Store the processed files in an Amazon S3 bucket.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question addresses <b>migrating a data processing workload to AWS with elastic scaling based on queue depth</b>.
+
+<br><br>
+
+<b>Current Architecture:</b>
+<ul>
+<li>Web portal for file uploads</li>
+<li>NAS for file storage</li>
+<li>Message queue for task coordination</li>
+<li>Processing server for media processing (up to 1 hour per file)</li>
+<li>Variable load: High during business hours, low after hours</li>
+</ul>
+
+<br>
+
+<b>Key Requirements:</b>
+<ul>
+<li>Handle long-running tasks (up to 1 hour)</li>
+<li>Scale processing capacity based on demand</li>
+<li>Higher load during business hours</li>
+<li>Cost-effective during low-demand periods</li>
+</ul>
+
+<br>
+
+<b>Option D is correct:</b>
+
+<br><br>
+
+<b>Component 1: Amazon SQS Queue</b>
+
+<br><br>
+
+<b>Why SQS over Amazon MQ:</b>
+
+<br>
+
+<b>Amazon SQS:</b>
+<ul>
+<li>Fully managed, serverless queue service</li>
+<li>Automatic scaling (handles any volume)</li>
+<li>No infrastructure to manage</li>
+<li>Native AWS integration (EC2, Lambda, CloudWatch)</li>
+<li>Very low cost ($0.40 per million requests after free tier)</li>
+<li>Retention: Up to 14 days</li>
+<li>Message size: Up to 256 KB</li>
+<li>Perfect for cloud-native applications</li>
+</ul>
+
+<br>
+
+<b>Amazon MQ:</b>
+<ul>
+<li>Managed message broker (ActiveMQ, RabbitMQ)</li>
+<li>Requires broker instance (costs even when idle)</li>
+<li>Best for migrating existing apps with specific protocols (JMS, AMQP)</li>
+<li>More expensive than SQS</li>
+<li>More operational overhead (patches, upgrades)</li>
+<li>Only needed for protocol compatibility</li>
+</ul>
+
+<br>
+
+<b>For New Cloud Migrations → Use SQS unless specific protocol required</b>
+
+<br><br>
+
+<b>SQS Configuration:</b>
+<pre>
+Queue Type: Standard (high throughput) or FIFO (ordered processing)
+
+For this use case: Standard Queue
+  - Order doesn't matter for independent file processing
+  - Higher throughput
+  - Lower cost
+
+Settings:
+  - Visibility Timeout: 1 hour + buffer (e.g., 75 minutes)
+    (Prevents other workers from processing same file)
+  - Message Retention: 4-14 days
+  - Dead Letter Queue: For failed processing attempts
+  - Maximum Receives: 3 (retry 3 times before DLQ)
+</pre>
+
+<br>
+
+<b>Component 2: EC2 Auto Scaling Group for Processing</b>
+
+<br><br>
+
+<b>Why EC2 over Lambda:</b>
+
+<br>
+
+<b>Lambda Limitations:</b>
+<ul>
+<li><b>Maximum execution time: 15 minutes</b></li>
+<li>Files can take up to 1 hour → Lambda CANNOT handle this</li>
+<li>Memory limit: 10 GB</li>
+<li>Ephemeral storage: 10 GB</li>
+<li>Best for short-lived, stateless functions</li>
+</ul>
+
+<br>
+
+<b>EC2 Benefits for Long-Running Tasks:</b>
+<ul>
+<li>No execution time limits</li>
+<li>Can process files for hours if needed</li>
+<li>More memory and storage options</li>
+<li>Can install custom software</li>
+<li>Better for CPU/memory-intensive processing</li>
+</ul>
+
+<br>
+
+<b>Auto Scaling Group Configuration:</b>
+
+<br>
+
+<pre>
+Launch Template:
+  AMI: Amazon Linux 2 or custom AMI with processing software
+  Instance Type: c5.large (compute-optimized for media processing)
+  User Data Script:
+    #!/bin/bash
+    # Install processing software
+    yum update -y
+    # Install dependencies
+    # Start processing daemon
+    
+Auto Scaling Group:
+  Min Instances: 0 (no cost when no work)
+  Desired Instances: Managed by scaling policy
+  Max Instances: 20 (based on expected peak)
+  
+  Availability Zones: Multi-AZ for reliability
+  Health Check Type: EC2
+  Health Check Grace Period: 300 seconds
+</pre>
+
+<br>
+
+<b>Component 3: SQS-Based Auto Scaling</b>
+
+<br><br>
+
+<b>Target Tracking Scaling Policy:</b>
+
+<br>
+
+The genius of this solution is scaling based on queue depth:
+
+<br><br>
+
+<pre>
+Custom CloudWatch Metric: ApproximateNumberOfMessagesVisible
+
+Scaling Logic:
+  - Target: 5 messages per instance
+  - If queue has 50 messages and 5 instances → Add 5 more instances
+  - If queue has 10 messages and 10 instances → Remove 5 instances
+
+Formula:
+  Desired Capacity = Queue Depth / Target Messages Per Instance
+</pre>
+
+<br>
+
+<b>CloudWatch Alarm Configuration:</b>
+<pre>
+Scale-Up Alarm:
+  Metric: ApproximateNumberOfMessagesVisible
+  Threshold: > (Current Instances × 5)
+  Action: Add 2 instances
+  
+Scale-Down Alarm:
+  Metric: ApproximateNumberOfMessagesVisible
+  Threshold: < (Current Instances × 3)
+  Action: Remove 1 instance
+  Cooldown: 15 minutes (allow instances to process)
+</pre>
+
+<br>
+
+<b>Target Tracking Scaling Policy (Simplified):</b>
+<pre>
+aws autoscaling put-scaling-policy \
+  --policy-name sqs-queue-depth-scaling \
+  --auto-scaling-group-name media-processing-asg \
+  --policy-type TargetTrackingScaling \
+  --target-tracking-configuration '{
+    "CustomizedMetricSpecification": {
+      "MetricName": "ApproximateNumberOfMessagesVisible",
+      "Namespace": "AWS/SQS",
+      "Dimensions": [{
+        "Name": "QueueName",
+        "Value": "media-processing-queue"
+      }],
+      "Statistic": "Average"
+    },
+    "TargetValue": 5.0
+  }'
+</pre>
+
+<br>
+
+<b>Component 4: Amazon S3 for Storage</b>
+
+<br><br>
+
+<b>Why S3 over EFS:</b>
+
+<br>
+
+<b>Amazon S3:</b>
+<ul>
+<li>Object storage (perfect for media files)</li>
+<li>Unlimited scalability</li>
+<li>Much lower cost ($0.023/GB vs. EFS $0.30/GB)</li>
+<li>Integrated with web applications (pre-signed URLs)</li>
+<li>Lifecycle policies (archive to Glacier)</li>
+<li>Versioning, replication, durability (11 nines)</li>
+<li>CDN integration (CloudFront)</li>
+</ul>
+
+<br>
+
+<b>Amazon EFS:</b>
+<ul>
+<li>File system (for shared file access)</li>
+<li>More expensive</li>
+<li>Needed when multiple processes need simultaneous file access</li>
+<li>Not needed for independent media file processing</li>
+</ul>
+
+<br>
+
+<b>Complete Architecture:</b>
+
+<br>
+
+<pre>
+┌─────────────┐
+│ Web Portal  │ (Upload files)
+└──────┬──────┘
+       │
+       ├─→ Upload file to S3 bucket (input/)
+       └─→ Send message to SQS queue
+              ↓
+       ┌──────────────┐
+       │  SQS Queue   │ (Messages = file references)
+       └──────┬───────┘
+              │
+       ┌──────┴──────────────────────────┐
+       │                                  │
+       ↓                                  ↓
+   ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐
+   │ EC2-1  │  │ EC2-2  │  │ EC2-3  │  │ EC2-N  │
+   └───┬────┘  └───┬────┘  └───┬────┘  └───┬────┘
+       │           │           │           │
+       └───────────┴───────────┴───────────┘
+                      │
+                      ↓
+       ┌──────────────────────────────┐
+       │   S3 Bucket (processed/)     │
+       └──────────────────────────────┘
+
+Auto Scaling: Adjusts EC2 count based on queue depth
+</pre>
+
+<br>
+
+<b>Processing Workflow:</b>
+
+<br>
+
+<ol>
+<li><b>File Upload:</b>
+   <ul>
+     <li>User uploads file via web portal</li>
+     <li>Web server uploads file to S3: s3://bucket/input/file123.mp4</li>
+     <li>Web server sends SQS message: {"s3Key": "input/file123.mp4"}</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Auto Scaling:</b>
+   <ul>
+     <li>CloudWatch monitors queue depth</li>
+     <li>If messages accumulate, Auto Scaling launches EC2 instances</li>
+     <li>Instances start and register with Auto Scaling group</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Processing:</b>
+   <ul>
+     <li>EC2 instance polls SQS for messages</li>
+     <li>Receives message with S3 key</li>
+     <li>Downloads file from S3 input/ folder</li>
+     <li>Processes file (up to 1 hour)</li>
+     <li>Uploads processed file to S3 output/ folder</li>
+     <li>Deletes message from SQS (marks complete)</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Scale Down:</b>
+   <ul>
+     <li>Queue empties after business hours</li>
+     <li>Auto Scaling reduces instance count to 0</li>
+     <li>No EC2 costs when idle</li>
+   </ul>
+</li>
+</ol>
+
+<br>
+
+<b>Example Processing Code (EC2 Instance):</b>
+
+<br>
+
+<pre>
+import boto3
+import time
+
+sqs = boto3.client('sqs')
+s3 = boto3.client('s3')
+
+QUEUE_URL = 'https://sqs.us-east-1.amazonaws.com/123456/media-queue'
+BUCKET = 'media-processing-bucket'
+
+while True:
+    # Poll SQS
+    response = sqs.receive_message(
+        QueueUrl=QUEUE_URL,
+        MaxNumberOfMessages=1,
+        VisibilityTimeout=4500  # 75 minutes
+    )
+    
+    if 'Messages' not in response:
+        time.sleep(20)  # Wait if no messages
+        continue
+    
+    for message in response['Messages']:
+        # Parse message
+        s3_key = json.loads(message['Body'])['s3Key']
+        
+        # Download from S3
+        s3.download_file(BUCKET, s3_key, '/tmp/input.mp4')
+        
+        # Process file
+        process_media_file('/tmp/input.mp4', '/tmp/output.mp4')
+        
+        # Upload result
+        output_key = s3_key.replace('input/', 'output/')
+        s3.upload_file('/tmp/output.mp4', BUCKET, output_key)
+        
+        # Delete message (success)
+        sqs.delete_message(
+            QueueUrl=QUEUE_URL,
+            ReceiptHandle=message['ReceiptHandle']
+        )
+</pre>
+
+<br>
+
+<b>Cost Benefits:</b>
+
+<br>
+
+<pre>
+Business Hours (10 hours/day, 5 days/week):
+  High load: 10 EC2 instances × 50 hours/week
+  
+After Hours:
+  Low/no load: 0 EC2 instances
+  
+Monthly EC2 Cost:
+  c5.large: $0.085/hour
+  50 hours/week × 4 weeks × 10 instances × $0.085 = $170/month
+  
+Compare to Always-On:
+  10 instances × 730 hours × $0.085 = $620/month
+  
+Savings: $450/month (73% reduction)
+</pre>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Lambda has a maximum execution time of 15 minutes. Media files can take up to 1 hour to process. Lambda cannot handle this requirement. Using Lambda would result in timeout errors and failed processing jobs.<br>
+<b>Option B:</b> Amazon MQ requires running broker instances that cost money even when idle. Creating/shutting down EC2 instances for each task is extremely inefficient - startup time, configuration overhead, and no benefit over Auto Scaling. EFS is more expensive than S3 for this use case. This is operationally complex and costly.<br>
+<b>Option C:</b> Combines two problems: Lambda's 15-minute timeout (can't handle 1-hour tasks) and Amazon MQ's unnecessary complexity and cost. EFS adds expense without benefit. This solution simply won't work for the 1-hour processing requirement.
+</div>
+</div>
+
+
+<!-- ================= Q3 ================= -->
+<div class="question">
+<pre>
+43) A company is using Amazon OpenSearch Service to analyze data. The company loads data into an OpenSearch Service cluster with 10 data nodes from an Amazon S3 bucket that uses S3 Standard storage. The data resides in the cluster for 1 month for read-only analysis. After 1 month, the company deletes the index that contains the data from the cluster. For compliance purposes, the company must retain a copy of all input data.
+
+The company is concerned about ongoing costs and asks a solutions architect to recommend a new solution.
+
+Which solution will meet these requirements MOST cost-effectively?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q3">
+A. Replace all the data nodes with UltraWarm nodes to handle the expected capacity. Transition the input data from S3 Standard to S3 Glacier Deep Archive when the company loads the data into the cluster.
+</label>
+
+<label>
+<input type="radio" name="q3">
+B. Reduce the number of data nodes in the cluster to 2. Add UltraWarm nodes to handle the expected capacity. Configure the indexes to transition to UltraWarm when OpenSearch Service ingests the data. Transition the input data to S3 Glacier Deep Archive after 1 month by using an S3 Lifecycle policy.
+</label>
+
+<label>
+<input type="radio" name="q3">
+C. Reduce the number of data nodes in the cluster to 2. Add UltraWarm nodes to handle the expected capacity. Configure the indexes to transition to UltraWarm when OpenSearch Service ingests the data. Add cold storage nodes to the cluster. Transition the indexes from UltraWarm to cold storage. Delete the input data from the S3 bucket after 1 month by using an S3 Lifecycle policy.
+</label>
+
+<label>
+<input type="radio" name="q3">
+D. Reduce the number of data nodes in the cluster to 2. Add instance-backed data nodes to handle the expected capacity. Transition the input data from S3 Standard to S3 Glacier Deep Archive when the company loads the data into the cluster.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question focuses on <b>cost optimization for Amazon OpenSearch Service using storage tiers and S3 lifecycle policies</b>.
+
+<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>10 data nodes (expensive)</li>
+<li>Data used for read-only analysis (1 month)</li>
+<li>After 1 month, index deleted from cluster (but data must be retained)</li>
+<li>S3 Standard storage (more expensive than needed for long-term retention)</li>
+</ul>
+
+<br>
+
+<b>OpenSearch Service Storage Tiers:</b>
+
+<br><br>
+
+<b>1. Hot Storage (Data Nodes):</b>
+<ul>
+<li>Fastest performance (SSD or instance storage)</li>
+<li>Most expensive (~$0.10-$0.30+/GB-month)</li>
+<li>Best for: Actively queried data, writes, complex analytics</li>
+<li>Current setup: 10 data nodes</li>
+</ul>
+
+<br>
+
+<b>2. UltraWarm Storage:</b>
+<ul>
+<li>S3-backed storage with caching layer</li>
+<li>~10x cheaper than hot storage (~$0.024/GB-month)</li>
+<li>Slower than hot, but still performant for reads</li>
+<li>Best for: Read-only analysis, older logs, cost optimization</li>
+<li>Requires compute nodes (UltraWarm instances)</li>
+</ul>
+
+<br>
+
+<b>3. Cold Storage:</b>
+<ul>
+<li>Pure S3 storage (no compute)</li>
+<li>Cheapest (~$0.023/GB-month)</li>
+<li>Must "attach" to cluster to query (slow)</li>
+<li>Best for: Infrequent access, compliance retention</li>
+</ul>
+
+<br>
+
+<b>Option B is correct:</b>
+
+<br><br>
+
+<b>Component 1: Reduce Data Nodes to 2</b>
+
+<br><br>
+
+<b>Why Reduce:</b>
+<ul>
+<li>Data is read-only after ingestion</li>
+<li>Don't need high-performance indexing after initial load</li>
+<li>2 data nodes provide minimal hot storage for:
+  <ul>
+    <li>System indexes</li>
+    <li>Active data during ingestion</li>
+    <li>Cluster management</li>
+  </ul>
+</li>
+<li>Reduces hot storage costs by 80%</li>
+</ul>
+
+<br>
+
+<b>Cost Savings:</b>
+<pre>
+Before: 10 data nodes (r6g.large.search)
+  10 × $0.141/hour × 730 hours = $1,029/month
+
+After: 2 data nodes
+  2 × $0.141/hour × 730 hours = $206/month
+  
+Savings: $823/month on compute
+</pre>
+
+<br>
+
+<b>Component 2: Add UltraWarm Nodes</b>
+
+<br><br>
+
+<b>UltraWarm Architecture:</b>
+<ul>
+<li>Data stored in S3 (durable, cheap)</li>
+<li>UltraWarm nodes provide caching layer</li>
+<li>Query performance ~10x slower than hot, but acceptable for analytics</li>
+<li>Perfect for read-only workloads</li>
+</ul>
+
+<br>
+
+<b>UltraWarm Configuration:</b>
+<pre>
+UltraWarm Node Type: ultrawarm1.medium.search
+  vCPU: 2
+  Memory: 12 GB
+  Cost: ~$0.246/hour
+  
+Number of Nodes: 3-5 (based on data volume and query load)
+
+Storage: S3-backed (pay for S3 storage separately)
+</pre>
+
+<br>
+
+<b>Cost Comparison:</b>
+<pre>
+Hot Storage (10 data nodes):
+  Assume 1 TB data
+  Instance cost: $1,029/month
+  Storage: Included in instance
+  Total: $1,029/month
+
+UltraWarm (3 nodes + S3):
+  Instance cost: 3 × $0.246/hour × 730 = $539/month
+  S3 storage: 1,000 GB × $0.024/GB = $24/month
+  Total: $563/month
+  
+Savings: $466/month (45% reduction)
+</pre>
+
+<br>
+
+<b>Component 3: Transition Indexes to UltraWarm When Ingested</b>
+
+<br><br>
+
+<b>Index Lifecycle Management (ISM):</b>
+
+<br>
+
+<pre>
+ISM Policy:
+{
+  "policy": {
+    "description": "Move to UltraWarm after ingestion",
+    "states": [
+      {
+        "name": "hot",
+        "actions": [],
+        "transitions": [
+          {
+            "state_name": "warm",
+            "conditions": {
+              "min_index_age": "1d"  // 1 day after creation
+            }
+          }
+        ]
+      },
+      {
+        "name": "warm",
+        "actions": [
+          {
+            "warm_migration": {}  // Move to UltraWarm
+          }
+        ],
+        "transitions": []
+      }
+    ]
+  }
+}
+</pre>
+
+<br>
+
+<b>How It Works:</b>
+<ol>
+<li>Data loaded into hot storage (fast indexing on 2 data nodes)</li>
+<li>After 1 day (data fully indexed), ISM triggers</li>
+<li>Index automatically migrated to UltraWarm</li>
+<li>Index accessible for read-only queries for 1 month</li>
+<li>After 1 month, index deleted from cluster</li>
+</ol>
+
+<br>
+
+<b>Component 4: S3 Lifecycle Policy for Long-Term Retention</b>
+
+<br><br>
+
+<b>Why This is Critical:</b>
+<ul>
+<li>Compliance requires retaining input data</li>
+<li>After 1 month, index deleted from OpenSearch</li>
+<li>Original data still in S3 (but in expensive S3 Standard)</li>
+<li>Transition to Glacier Deep Archive for ~95% storage savings</li>
+</ul>
+
+<br>
+
+<b>S3 Storage Classes:</b>
+<pre>
+S3 Standard: $0.023/GB-month (first 50 TB)
+S3 Glacier Instant Retrieval: $0.004/GB-month
+S3 Glacier Flexible Retrieval: $0.0036/GB-month
+S3 Glacier Deep Archive: $0.00099/GB-month (cheapest)
+</pre>
+
+<br>
+
+<b>S3 Lifecycle Policy:</b>
+<pre>
+{
+  "Rules": [
+    {
+      "Id": "TransitionToDeepArchive",
+      "Status": "Enabled",
+      "Transitions": [
+        {
+          "Days": 30,
+          "StorageClass": "DEEP_ARCHIVE"
+        }
+      ]
+    }
+  ]
+}
+</pre>
+
+<br>
+
+<b>Lifecycle Behavior:</b>
+<ol>
+<li>Day 0: Data uploaded to S3 Standard (fast access for OpenSearch)</li>
+<li>Day 0-30: OpenSearch analyzes data (indexes in UltraWarm)</li>
+<li>Day 30: S3 lifecycle transitions data to Glacier Deep Archive</li>
+<li>Day 30+: Data retained for compliance (very low cost)</li>
+</ol>
+
+<br>
+
+<b>Long-Term Storage Cost:</b>
+<pre>
+S3 Standard (1 TB, 1 month):
+  1,000 GB × $0.023 = $23/month × 1 month = $23
+
+Glacier Deep Archive (1 TB, years):
+  1,000 GB × $0.00099 = $0.99/month
+  
+Annual retention cost: $0.99 × 12 = $11.88/year
+
+Compare to keeping in S3 Standard:
+  $23 × 12 = $276/year
+  
+Savings: $264/year per TB (96% reduction)
+</pre>
+
+<br>
+
+<b>Complete Architecture:</b>
+
+<br>
+
+<pre>
+Data Ingestion:
+  S3 (Standard) → OpenSearch (Hot - 2 nodes)
+  Day 1: → Transition to UltraWarm (ISM policy)
+  Day 1-30: Read-only analysis in UltraWarm
+  Day 30: Delete index from OpenSearch
+  
+S3 Retention:
+  Day 0-30: S3 Standard ($0.023/GB-month)
+  Day 30+: Glacier Deep Archive ($0.00099/GB-month)
+</pre>
+
+<br>
+
+<b>Total Cost Analysis:</b>
+
+<br>
+
+<pre>
+Before (10 Hot Data Nodes):
+  Compute: $1,029/month
+  Storage: Included
+  S3 (long-term): $23/month per TB
+  Total: $1,052/month
+
+After (Option B):
+  2 Data Nodes: $206/month
+  3 UltraWarm Nodes: $539/month
+  UltraWarm S3 (active data): $24/month
+  S3 Glacier (compliance): $0.99/month per TB
+  Total: $770/month
+  
+Monthly Savings: $282 (27% reduction)
+Annual Savings: $3,384
+</pre>
+
+<br>
+
+<b>Additional Benefits:</b>
+
+<br>
+
+<ul>
+<li><b>Scalability:</b> UltraWarm can handle much more data than hot storage</li>
+<li><b>Compliance:</b> Data retained in Glacier for years at minimal cost</li>
+<li><b>Performance:</b> UltraWarm still provides good query performance for analytics</li>
+<li><b>Automation:</b> ISM and S3 lifecycle policies handle transitions automatically</li>
+</ul>
+
+<br>
+
+<b>Query Performance Comparison:</b>
+
+<br>
+
+<pre>
+Hot Storage: < 100ms typical query
+UltraWarm: 500ms - 2s typical query (10-20x slower, but acceptable)
+Cold Storage: Minutes (must attach to cluster first)
+</pre>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Replacing all data nodes with UltraWarm nodes doesn't work - you need some data nodes for cluster management and active indexing. UltraWarm can't handle writes efficiently. Transitioning data to Glacier Deep Archive immediately when loading prevents OpenSearch from accessing it (Glacier requires hours for retrieval). This architecture is fundamentally broken.<br>
+<b>Option C:</b> This option deletes the input data from S3 after 1 month, violating the compliance requirement to "retain a copy of all input data." While cold storage is cost-effective, the data deletion makes this non-compliant. Also, adding both UltraWarm and cold storage adds unnecessary complexity when the requirement is only 1 month of analysis.<br>
+<b>Option D:</b> "Instance-backed data nodes" is the same as regular hot storage - not a cost optimization. Transitioning to Glacier immediately when loading the data makes it inaccessible to OpenSearch (Glacier retrieval takes hours). This doesn't solve the cost problem and breaks the data loading process.
+</div>
+</div>
+
+
+<!-- ================= Q4 ================= -->
+<div class="question">
+<pre>
+44) A company has 10 accounts that are part of an organization in AWS Organizations. AWS Config is configured in each account. All accounts belong to either the Prod OU or the NonProd OU.
+
+The company has set up an Amazon EventBridge rule in each AWS account to notify an Amazon Simple Notification Service (Amazon SNS) topic when an Amazon EC2 security group inbound rule is created with 0.0.0.0/0 as the source. The company's security team is subscribed to the SNS topic.
+
+For all accounts in the NonProd OU, the security team needs to remove the ability to create a security group inbound rule that includes 0.0.0.0/0 as the source.
+
+Which solution will meet this requirement with the LEAST operational overhead?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q4">
+A. Modify the EventBridge rule to invoke an AWS Lambda function to remove the security group inbound rule and to publish to the SNS topic. Deploy the updated rule to the NonProd OU.
+</label>
+
+<label>
+<input type="radio" name="q4">
+B. Add the vpc-sg-open-only-to-authorized-ports AWS Config managed rule to the NonProd OU.
+</label>
+
+<label>
+<input type="radio" name="q4">
+C. Configure an SCP to allow the ec2:AuthorizeSecurityGroupIngress action when the value of the aws:SourceIp condition key is not 0.0.0.0/0. Apply the SCP to the NonProd OU.
+</label>
+
+<label>
+<input type="radio" name="q4">
+D. Configure an SCP to deny the ec2:AuthorizeSecurityGroupIngress action when the value of the aws:SourceIp condition key is 0.0.0.0/0. Apply the SCP to the NonProd OU.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question tests <b>preventive controls using Service Control Policies (SCPs) in AWS Organizations</b>.<br><br>
+
+<b>Requirement:</b> <i>Prevent</i> (not just detect) creation of security group rules with 0.0.0.0/0 source in NonProd OU.<br><br>
+
+<b>Service Control Policies (SCPs):</b>
+<ul>
+<li>Organization-wide permission guardrails</li>
+<li>Applied to OUs or accounts</li>
+<li>Maximum permissions boundary (even for root user)</li>
+<li>Can DENY or ALLOW specific actions</li>
+<li><b>Preventive control</b> - stops actions before they happen</li>
+</ul><br>
+
+<b>Option D SCP Configuration:</b><br>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": "ec2:AuthorizeSecurityGroupIngress",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:SourceIp": "0.0.0.0/0"
+        }
+      }
+    }
+  ]
+}
+</pre><br>
+
+<b>How This Works:</b>
+<ol>
+<li>User attempts: <code>aws ec2 authorize-security-group-ingress --cidr 0.0.0.0/0</code></li>
+<li>SCP evaluates condition: Is source IP 0.0.0.0/0?</li>
+<li>If yes: <b>Access Denied</b> (action blocked)</li>
+<li>If no (e.g., 10.0.0.0/8): Action allowed</li>
+</ol><br>
+
+<b>Benefits:</b>
+<ul>
+<li><b>Preventive:</b> Blocks action at API level</li>
+<li><b>Immediate:</b> Takes effect instantly</li>
+<li><b>OU-Level:</b> Applies to all accounts in NonProd OU</li>
+<li><b>No Infrastructure:</b> No Lambda, EventBridge, or Config rules needed</li>
+<li><b>Least Operational Overhead:</b> Single policy, centrally managed</li>
+</ul><br>
+
+<b>SCP vs. Other Options:</b><br>
+<pre>
+Detective Controls (detect after):
+  - EventBridge: Notifies after rule created
+  - AWS Config: Evaluates compliance after creation
+  
+Preventive Controls (stop before):
+  - SCP: Blocks API call
+  - Permission boundary: User-level block
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> This is a reactive/remediation approach. Lambda removes the rule AFTER it's created. There's a time gap where the vulnerable rule exists (even if seconds). This is detective + remediation, not preventive. Also adds operational complexity (Lambda function, EventBridge integration) compared to a simple SCP.<br>
+<b>Option B:</b> AWS Config rules are detective controls - they evaluate compliance AFTER resources are created. The vpc-sg-open-only-to-authorized-ports rule would flag violations but wouldn't prevent the rule from being created in the first place. Doesn't meet the requirement to "remove the ability."<br>
+<b>Option C:</b> The condition key is wrong. <code>aws:SourceIp</code> refers to the IP address making the API request (e.g., the admin's workstation), NOT the CIDR in the security group rule. The correct condition key is <code>ec2:SourceIp</code> or evaluation of the CIDR parameter. This SCP would not work as intended.
+</div>
+</div>
+
+
+<!-- ================= Q5 ================= -->
+<div class="question">
+<pre>
+45) A company hosts a Git repository in an on-premises data center. The company uses webhooks to invoke functionality that runs in the AWS Cloud. The company hosts the webhook logic on a set of Amazon EC2 instances in an Auto Scaling group that the company set as a target for an Application Load Balancer (ALB).
+The Git server calls the ALB for the configured webhooks. The company wants to move the solution to a serverless architecture.
+
+Which solution will meet these requirements with the LEAST operational overhead?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q5">
+A. For each webhook, create and configure an AWS Lambda function URL. Update the Git servers to call the individual Lambda function URLs.
+</label>
+
+<label>
+<input type="radio" name="q5">
+B. Create an Amazon API Gateway HTTP API. Implement each webhook logic in a separate AWS Lambda function. Update the Git servers to call the API Gateway endpoint.
+</label>
+
+<label>
+<input type="radio" name="q5">
+C. Deploy the webhook logic to AWS App Runner. Create an ALB, and set App Runner as the target. Update the Git servers to call the ALB endpoint.
+</label>
+
+<label>
+<input type="radio" name="q5">
+D. Containerize the webhook logic. Create an Amazon Elastic Container Service (Amazon ECS) cluster, and run the webhook logic in AWS Fargate. Create an Amazon API Gateway REST API, and set Fargate as the target. Update the Git servers to call the API Gateway endpoint.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question evaluates <b>serverless architecture design for webhook handling with proper routing and management</b>.<br><br>
+
+<b>Current Architecture:</b>
+<ul>
+<li>On-premises Git server → AWS ALB → EC2 Auto Scaling Group</li>
+<li>Multiple webhooks (likely different endpoints/logic)</li>
+<li>Not serverless (EC2 instances require management)</li>
+</ul><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Move to serverless</li>
+<li>Least operational overhead</li>
+<li>Handle multiple webhooks</li>
+</ul><br>
+
+<b>Option B Architecture:</b><br>
+<pre>
+Git Server
+    ↓
+API Gateway HTTP API
+    ├─→ /webhook/push → Lambda Function (push handler)
+    ├─→ /webhook/pr → Lambda Function (PR handler)
+    └─→ /webhook/merge → Lambda Function (merge handler)
+</pre><br>
+
+<b>Why API Gateway HTTP API:</b>
+<ul>
+<li><b>Centralized Endpoint:</b> Single URL for Git server configuration</li>
+<li><b>Routing:</b> Routes different webhooks to appropriate Lambda functions</li>
+<li><b>HTTP API Benefits:</b>
+  <ul>
+    <li>70% cheaper than REST API</li>
+    <li>Simpler configuration</li>
+    <li>Built-in CORS support</li>
+    <li>Better performance (lower latency)</li>
+  </ul>
+</li>
+<li><b>Features:</b> Rate limiting, auth, monitoring, logging</li>
+</ul><br>
+
+<b>Configuration Example:</b><br>
+<pre>
+API Gateway Routes:
+  POST /webhook/push
+    Integration: Lambda (push-handler)
+    
+  POST /webhook/pull-request
+    Integration: Lambda (pr-handler)
+    
+  POST /webhook/merge
+    Integration: Lambda (merge-handler)
+
+Git Server Configuration:
+  Push Webhook: https://api-id.execute-api.us-east-1.amazonaws.com/webhook/push
+  PR Webhook: https://api-id.execute-api.us-east-1.amazonaws.com/webhook/pull-request
+</pre><br>
+
+<b>Operational Overhead Comparison:</b><br>
+<pre>
+Option B (API Gateway + Lambda):
+  - Managed Services: 100% serverless
+  - Configuration: API Gateway routes (one-time)
+  - Monitoring: CloudWatch Logs (automatic)
+  - Scaling: Automatic
+  - Updates: Deploy Lambda functions
+  - Cost: Pay per request
+  
+Option A (Lambda URLs only):
+  - Need to manage multiple URLs
+  - Update Git server for each webhook
+  - No centralized routing/management
+  - Higher operational overhead
+</pre><br>
+
+<b>Cost Example:</b><br>
+<pre>
+API Gateway HTTP API:
+  $1.00 per million requests (after free tier)
+  
+Lambda:
+  $0.20 per 1 million requests
+  $0.0000166667 per GB-second
+  
+Assume 10,000 webhook calls/month:
+  API Gateway: 0.01 × $1.00 = $0.01
+  Lambda: 0.01 × $0.20 + compute = $0.05
+  Total: ~$0.06/month
+  
+vs. EC2 (c5.large):
+  $0.085/hour × 730 hours = $62/month
+  
+Savings: $61.94/month (99.9% reduction)
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Lambda function URLs work but create operational overhead. Each webhook needs a separate URL. If you have 10 webhooks, you must configure 10 different URLs in Git server. No centralized routing, monitoring, or rate limiting. If you need to add authentication or throttling later, you must implement it in each Lambda. More overhead than Option B.<br>
+<b>Option C:</b> App Runner + ALB is NOT serverless enough. App Runner is container-based (easier than ECS but still has overhead). ALB adds cost ($16+/month) and complexity. ALB is unnecessary - API Gateway provides better webhook handling. This is more operational overhead than Lambda + API Gateway.<br>
+<b>Option D:</b> Fargate + ECS + API Gateway REST API is the most complex option. Containerization adds overhead (Dockerfile, image registry, task definitions). ECS cluster management (even with Fargate). REST API is more expensive and complex than HTTP API. This has the HIGHEST operational overhead.
+</div>
+</div>
+
+
+<!-- ================= Q6 ================= -->
+<div class="question">
+<pre>
+46) A company is planning to migrate 1,000 on-premises servers to AWS. The servers run on several VMware clusters in the company's data center. 
+As part of the migration plan, the company wants to gather server metrics such as CPU details, RAM usage, operating system information, and running processes. 
+The company then wants to query and analyze the data.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q6">
+A. Deploy and configure the AWS Agentless Discovery Connector virtual appliance on the on-premises hosts. Configure Data Exploration in AWS Migration Hub. Use AWS Glue to perform an ETL job against the data. Query the data by using Amazon S3 Select.
+</label>
+
+<label>
+<input type="radio" name="q6">
+B. Export only the VM performance information from the on-premises hosts. Directly import the required data into AWS Migration Hub. Update any missing information in Migration Hub. Query the data by using Amazon QuickSight.
+</label>
+
+<label>
+<input type="radio" name="q6">
+C. Create a script to automatically gather the server information from the on-premises hosts. Use the AWS CLI to run the put-resource-attributes command to store the detailed server data in AWS Migration Hub. Query the data directly in the Migration Hub console.
+</label>
+
+<label>
+<input type="radio" name="q6">
+D. Deploy the AWS Application Discovery Agent to each on-premises server. Configure Data Exploration in AWS Migration Hub. Use Amazon Athena to run predefined queries against the data in Amazon S3.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question tests knowledge of <b>AWS Application Discovery Service for large-scale migration assessments</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Gather detailed server metrics (CPU, RAM, OS, processes)</li>
+<li>1,000 on-premises servers</li>
+<li>Query and analyze the data</li>
+</ul><br>
+
+<b>AWS Application Discovery Service Options:</b><br><br>
+
+<b>1. Agentless Discovery (Connector):</b>
+<ul>
+<li>VMware vCenter appliance</li>
+<li><b>Collects:</b> VM inventory, resource utilization, network dependencies</li>
+<li><b>Does NOT collect:</b> Running processes, detailed application info</li>
+<li>Good for: Quick infrastructure inventory</li>
+</ul><br>
+
+<b>2. Agent-Based Discovery:</b>
+<ul>
+<li>Installed on each server</li>
+<li><b>Collects:</b> Detailed system config, performance, processes, network connections</li>
+<li>Provides comprehensive data</li>
+<li>Required for: Detailed migration planning</li>
+</ul><br>
+
+<b>Comparison:</b><br>
+<pre>
+Data Collected       | Agentless | Agent-Based
+---------------------|-----------|-------------
+VM inventory         | ✓         | ✓
+CPU/Memory usage     | ✓         | ✓
+OS information       | Basic     | ✓ Detailed
+Running processes    | ✗         | ✓
+Network connections  | ✓         | ✓ Detailed
+Installed software   | ✗         | ✓
+</pre><br>
+
+<b>Since requirement includes "running processes" → Agent-Based required</b><br><br>
+
+<b>Option D Implementation:</b><br><br>
+
+<b>Step 1: Deploy Application Discovery Agent</b><br>
+<pre>
+On each server (Linux/Windows):
+
+Linux:
+  wget https://s3.us-west-2.amazonaws.com/aws-discovery-agent.us-west-2/linux/latest/aws-discovery-agent.tar.gz
+  tar -xzf aws-discovery-agent.tar.gz
+  sudo bash install -r us-west-2 -k ACCESS_KEY -s SECRET_KEY
+  
+Windows:
+  Download installer from S3
+  Run: AWSDiscoveryAgentInstaller.exe
+  Configure with AWS credentials
+  
+Agent collects:
+  - System configuration
+  - Performance metrics (every 15 min)
+  - Running processes
+  - Network activity
+</pre><br>
+
+<b>Step 2: Data Collection</b><br>
+<pre>
+Agents send data to AWS Application Discovery Service:
+  - Continuous monitoring
+  - Data stored in AWS
+  - Sent over HTTPS (TLS 1.2)
+  
+Data retention: 90 days
+</pre><br>
+
+<b>Step 3: Data Exploration in Migration Hub</b><br>
+<pre>
+Console: Migration Hub → Discover → Data Exploration
+
+Enable Data Exploration:
+  - Exports discovered data to Amazon S3
+  - Creates Athena tables automatically
+  - Enables SQL queries
+  
+S3 Bucket Structure:
+  s3://aws-application-discovery-service-{account-id}/
+    ├─ servers/
+    ├─ processes/
+    ├─ network-connections/
+    └─ system-performance/
+</pre><br>
+
+<b>Step 4: Query with Amazon Athena</b><br>
+<pre>
+Athena provides predefined queries:
+
+-- Find Windows servers
+SELECT * FROM servers
+WHERE os_name LIKE '%Windows%'
+
+-- High CPU usage servers
+SELECT server_id, avg(cpu_used_pct) as avg_cpu
+FROM system_performance
+GROUP BY server_id
+HAVING avg_cpu > 80
+
+-- Identify SQL Server instances
+SELECT * FROM processes
+WHERE process_name LIKE '%sqlservr%'
+
+-- Network dependencies
+SELECT source_server, destination_server, COUNT(*) as connections
+FROM network_connections
+GROUP BY source_server, destination_server
+ORDER BY connections DESC
+</pre><br>
+
+<b>Data Exploration Features:</b>
+<ul>
+<li>Predefined Athena queries for common analysis</li>
+<li>Query results visualization</li>
+<li>Export to CSV for further analysis</li>
+<li>Integration with QuickSight for dashboards</li>
+</ul><br>
+
+<b>Complete Workflow:</b><br>
+<pre>
+1. Install agents on 1,000 servers (can be automated)
+2. Agents collect data for days/weeks
+3. Enable Data Exploration
+4. Data auto-exported to S3
+5. Use Athena to query and analyze
+6. Create migration waves based on insights
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Agentless Discovery Connector doesn't collect "running processes" - it only gathers VM-level metrics from vCenter. This fails the requirement. Also, using Glue ETL + S3 Select is overcomplicated when Migration Hub + Athena provides this out-of-the-box.<br>
+<b>Option B:</b> Manually exporting and importing data is not a scalable solution for 1,000 servers. No automated collection of running processes. QuickSight alone doesn't provide the querying capability - you need a data source first. This is operationally complex and incomplete.<br>
+<b>Option C:</b> Custom scripts for 1,000 servers is operationally intensive. put-resource-attributes is meant for metadata tagging, not detailed performance monitoring. Migration Hub console doesn't provide SQL query capability - you can't analyze data effectively. This doesn't meet the "query and analyze" requirement.
+</div>
+</div>
+
+
+<!-- ================= Q7 ================= -->
+<div class="question">
+<pre>
+47) A company is building a serverless application that runs on an AWS Lambda function that is attached to a VPC. The company needs to integrate the application with a new service from an external provider. The external provider supports only requests that come from public IPv4 addresses that are in an allow list.
+
+The company must provide a single public IP address to the external provider before the application can start using the new service.
+
+Which solution will give the application the ability to access the new service?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q7">
+A. Deploy a NAT gateway. Associate an Elastic IP address with the NAT gateway. Configure the VPC to use the NAT gateway.
+</label>
+
+<label>
+<input type="radio" name="q7">
+B. Deploy an egress-only internet gateway. Associate an Elastic IP address with the egress-only internet gateway. Configure the elastic network interface on the Lambda function to use the egress-only internet gateway.
+</label>
+
+<label>
+<input type="radio" name="q7">
+C. Deploy an internet gateway. Associate an Elastic IP address with the internet gateway. Configure the Lambda function to use the internet gateway.
+</label>
+
+<label>
+<input type="radio" name="q7">
+D. Deploy an internet gateway. Associate an Elastic IP address with the internet gateway. Configure the default route in the public VPC route table to use the internet gateway.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests <b>VPC networking for Lambda functions requiring static public IP addresses</b>.<br><br>
+
+<b>Problem:</b>
+<ul>
+<li>Lambda in VPC (private subnet)</li>
+<li>External API requires allow-listed public IP</li>
+<li>Need single, static public IP for outbound traffic</li>
+</ul><br>
+
+<b>Lambda VPC Networking Basics:</b>
+<ul>
+<li>Lambda in VPC uses ENIs (Elastic Network Interfaces)</li>
+<li>ENIs get private IPs from subnet</li>
+<li>By default, no internet access from private subnet</li>
+<li>Cannot directly assign Elastic IP to Lambda</li>
+</ul><br>
+
+<b>NAT Gateway Solution (Option A):</b><br><br>
+
+<b>Architecture:</b><br>
+<pre>
+Lambda Function (Private Subnet)
+    ↓ private IP (10.0.1.x)
+Route Table: 0.0.0.0/0 → NAT Gateway
+    ↓
+NAT Gateway (Public Subnet)
+  - Elastic IP: 54.123.45.67 (static)
+    ↓
+Internet Gateway
+    ↓
+External API (sees 54.123.45.67)
+</pre><br>
+
+<b>How NAT Gateway Works:</b>
+<ol>
+<li>Lambda makes outbound request to api.external.com</li>
+<li>Request routed to NAT Gateway (via route table)</li>
+<li>NAT Gateway translates private IP → Elastic IP</li>
+<li>Request leaves with source IP: 54.123.45.67</li>
+<li>External API sees consistent public IP</li>
+<li>Response routed back through NAT Gateway to Lambda</li>
+</ol><br>
+
+<b>Configuration Steps:</b><br>
+<pre>
+1. Create NAT Gateway:
+   - Location: Public subnet
+   - Allocate Elastic IP: 54.123.45.67
+   
+2. Update Private Subnet Route Table:
+   Destination: 0.0.0.0/0
+   Target: NAT Gateway (nat-0abc123def456)
+   
+3. Lambda Configuration:
+   - VPC: vpc-xxx
+   - Subnets: private-subnet-1, private-subnet-2
+   - Security Group: Allow outbound HTTPS
+   
+4. Provide to External Provider:
+   Allow-list IP: 54.123.45.67
+</pre><br>
+
+<b>NAT Gateway Benefits:</b>
+<ul>
+<li><b>Static IP:</b> Elastic IP never changes</li>
+<li><b>Managed Service:</b> AWS handles availability, scaling</li>
+<li><b>High Bandwidth:</b> Up to 45 Gbps</li>
+<li><b>Single IP:</b> All Lambda invocations use same IP</li>
+<li><b>No Management:</b> No instances to patch/update</li>
+</ul><br>
+
+<b>Multi-AZ Setup (Best Practice):</b><br>
+<pre>
+For high availability:
+
+AZ-1:
+  Private Subnet → NAT Gateway 1 (EIP: 1.2.3.4)
+  
+AZ-2:
+  Private Subnet → NAT Gateway 2 (EIP: 1.2.3.5)
+
+Provide both IPs to external provider:
+  Allow-list: 1.2.3.4, 1.2.3.5
+</pre><br>
+
+<b>Cost Consideration:</b><br>
+<pre>
+NAT Gateway Pricing (us-east-1):
+  - $0.045/hour (~$33/month)
+  - $0.045/GB processed
+  
+Example:
+  1 NAT Gateway × 730 hours = $33/month
+  10 GB data processed = $0.45/month
+  Total: ~$33.45/month
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Egress-only internet gateways are ONLY for IPv6 traffic, not IPv4. You cannot associate an Elastic IP (IPv4) with an egress-only internet gateway. This solution is fundamentally incompatible with the requirement for a public IPv4 address.<br>
+<b>Option C:</b> You cannot directly associate an Elastic IP with an Internet Gateway - that's not how IGWs work. Lambda functions cannot directly use an Elastic IP either. This configuration is technically impossible. IGWs don't provide NAT functionality.<br>
+<b>Option D:</b> Internet Gateway alone doesn't provide NAT or static source IP. Lambda in private subnet with IGW route still uses dynamic public IPs (if any). Lambda cannot have Elastic IPs directly attached. This doesn't solve the "single static IP" requirement.
+</div>
+</div>
+
+
+<!-- ================= Q8 ================= -->
+<div class="question">
+<pre>
+48) A solutions architect has developed a web application that uses an Amazon API Gateway Regional endpoint and an AWS Lambda function. The consumers of the web application are all close to the AWS Region where the application will be deployed. The Lambda function only queries an Amazon Aurora MySQL database. The solutions architect has configured the database to have three read replicas.
+
+During testing, the application does not meet performance requirements. Under high load, the application opens a large number of database connections. The solutions architect must improve the application's performance.
+
+Which actions should the solutions architect take to meet these requirements? (Choose two.)
+</pre>
+
+<div class="options">
+<label>
+<input type="checkbox" name="q8">
+A. Use the cluster endpoint of the Aurora database.
+</label>
+
+<label>
+<input type="checkbox" name="q8">
+B. Use RDS Proxy to set up a connection pool to the reader endpoint of the Aurora database.
+</label>
+
+<label>
+<input type="checkbox" name="q8">
+C. Use the Lambda Provisioned Concurrency feature.
+</label>
+
+<label>
+<input type="checkbox" name="q8">
+D. Move the code for opening the database connection in the Lambda function outside of the event handler.
+</label>
+
+<label>
+<input type="checkbox" name="q8">
+E. Change the API Gateway endpoint to an edge-optimized endpoint.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1,3])">Check Answer</button>
+<button onclick="showAnswer(this,[1,3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B, D</b><br><br>
+
+This question addresses <b>database connection management for Lambda functions with Aurora</b>.<br><br>
+
+<b>Problem Identified:</b>
+<ul>
+<li>High load → many Lambda invocations</li>
+<li>Each invocation opens database connection</li>
+<li>Too many connections overwhelm database</li>
+<li>Read-heavy workload (queries only)</li>
+</ul><br>
+
+<b>Aurora Connection Limits:</b><br>
+<pre>
+Aurora MySQL default max connections:
+  Formula: {DBInstanceClassMemory/12582880}
+  
+Example (db.r5.large - 16 GB RAM):
+  (16 × 1024³) / 12582880 ≈ 1,351 connections
+  
+But recommended to use much less:
+  - Connection overhead
+  - Connection pool limits
+  - Performance degradation with too many connections
+</pre><br>
+
+<b>Lambda Concurrent Executions:</b><br>
+<pre>
+Default account limit: 1,000 concurrent executions
+High traffic scenario: 500 concurrent Lambda invocations
+  
+Without connection pooling:
+  500 Lambda × 1 connection each = 500 connections
+  
+With connection reuse problems:
+  Could spike to 1,000+ connections
+</pre><br>
+
+<b>Option B: RDS Proxy for Connection Pooling</b><br><br>
+
+<b>What is RDS Proxy:</b>
+<ul>
+<li>Managed database proxy service</li>
+<li>Sits between Lambda and Aurora</li>
+<li>Pools and shares database connections</li>
+<li>Reduces connection overhead</li>
+</ul><br>
+
+<b>RDS Proxy Architecture:</b><br>
+<pre>
+Lambda Functions (500 concurrent)
+    ↓
+RDS Proxy (connection pool)
+  - Max connections to Aurora: 100
+  - Multiplexes Lambda connections
+    ↓
+Aurora Reader Endpoint
+  - Actual connections: ~100 (vs 500+)
+</pre><br>
+
+<b>RDS Proxy Benefits:</b>
+<ul>
+<li><b>Connection Pooling:</b> Reuses connections across Lambda invocations</li>
+<li><b>Reduced Overhead:</b> Fewer connections to database</li>
+<li><b>Failover:</b> <1 minute failover (vs 60+ seconds)</li>
+<li><b>IAM Authentication:</b> No hardcoded passwords</li>
+<li><b>Built for Serverless:</b> Designed for Lambda + RDS/Aurora</li>
+</ul><br>
+
+<b>Configuration:</b><br>
+<pre>
+RDS Proxy Settings:
+  Target: Aurora reader endpoint (for read-only queries)
+  Max connections: 100% of Aurora max (e.g., 1,000)
+  Idle client timeout: 1,800 seconds
+  
+Lambda Configuration:
+  Database endpoint: rds-proxy-endpoint.proxy-xxx.region.rds.amazonaws.com
+  (instead of direct Aurora endpoint)
+  
+Connection Pool Size:
+  RDS Proxy maintains pool
+  Lambda doesn't need to manage connections
+</pre><br>
+
+<b>Performance Impact:</b><br>
+<pre>
+Without RDS Proxy:
+  - 500 concurrent Lambda = 500+ connections
+  - Connection establishment: 50-100ms each
+  - Database overwhelmed
+  - Query latency: 500ms+
+  
+With RDS Proxy:
+  - 500 concurrent Lambda → 100 pooled connections
+  - Connection reuse: <10ms overhead
+  - Database healthy
+  - Query latency: 50-100ms
+</pre><br><br>
+
+<b>Option D: Move Connection Code Outside Handler</b><br><br>
+
+<b>Lambda Execution Context Reuse:</b>
+<ul>
+<li>Lambda containers are reused for multiple invocations</li>
+<li>Code outside handler runs once per container</li>
+<li>Variables outside handler persist across invocations</li>
+<li>Use this for expensive operations (DB connections)</li>
+</ul><br>
+
+<b>Bad Pattern (Connection Inside Handler):</b><br>
+<pre>
+import pymysql
+
+def lambda_handler(event, context):
+    # ❌ Creates new connection EVERY invocation
+    connection = pymysql.connect(
+        host='aurora-endpoint.rds.amazonaws.com',
+        user='admin',
+        password='password',
+        database='mydb'
+    )
+    
+    cursor = connection.cursor()
+    cursor.execute("SELECT * FROM users")
+    result = cursor.fetchall()
+    
+    connection.close()  # Closes connection
+    return result
+
+Problem:
+  - Each invocation: New connection (slow)
+  - High load: 500 invocations = 500 new connections
+  - Connection overhead: 50-100ms per invocation
+</pre><br>
+
+<b>Good Pattern (Connection Outside Handler):</b><br>
+<pre>
+import pymysql
+
+# ✅ Connection created ONCE per container
+connection = None
+
+def get_connection():
+    global connection
+    if connection is None or not connection.open:
+        connection = pymysql.connect(
+            host='aurora-endpoint.rds.amazonaws.com',
+            user='admin',
+            password='password',
+            database='mydb'
+        )
+    return connection
+
+def lambda_handler(event, context):
+    # Reuses existing connection
+    conn = get_connection()
+    
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users")
+    result = cursor.fetchall()
+    
+    # DON'T close connection (reuse for next invocation)
+    return result
+
+Benefits:
+  - First invocation: Creates connection
+  - Next 100-1000 invocations: Reuses connection
+  - Connection overhead: Only first invocation
+  - Massive performance improvement
+</pre><br>
+
+<b>Connection Reuse Metrics:</b><br>
+<pre>
+Scenario: 1,000 requests in 60 seconds
+
+Without Connection Reuse:
+  - 1,000 connections created
+  - Overhead: 1,000 × 100ms = 100 seconds
+  - Database connections: Peaks at 200+
+  
+With Connection Reuse (10 Lambda containers):
+  - 10 connections created
+  - Overhead: 10 × 100ms = 1 second
+  - Database connections: Stable at 10
+  
+Performance improvement: 99% reduction in connection overhead
+</pre><br>
+
+<b>Combined Solution (B + D):</b><br>
+<pre>
+Lambda Code with RDS Proxy:
+
+import pymysql
+import os
+
+# Outside handler - connection reuse
+connection = None
+
+def get_connection():
+    global connection
+    if connection is None or not connection.open:
+        connection = pymysql.connect(
+            host=os.environ['RDS_PROXY_ENDPOINT'],  # RDS Proxy
+            user=os.environ['DB_USER'],
+            password=os.environ['DB_PASSWORD'],
+            database='mydb'
+        )
+    return connection
+
+def lambda_handler(event, context):
+    conn = get_connection()  # Reused connection
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users")
+    return cursor.fetchall()
+
+Result:
+  - Lambda reuses connections (Option D)
+  - RDS Proxy pools connections (Option B)
+  - Database sees ~10-20 total connections
+  - High performance under load
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Aurora cluster endpoint points to the WRITER instance (primary). The application only queries (read-only), so it should use the READER endpoint to distribute load across read replicas. Using cluster endpoint would send all queries to the writer, not utilizing the 3 read replicas. This doesn't address the connection pooling problem either.<br>
+<b>Option C:</b> Provisioned Concurrency keeps Lambda containers "warm" (reduces cold starts), but doesn't solve the database connection problem. In fact, it could WORSEN the issue by maintaining more concurrent containers, each potentially holding connections. This doesn't reduce connection count and costs more.<br>
+<b>Option E:</b> Edge-optimized endpoint uses CloudFront for global distribution. The consumers are "all close to the AWS Region" - no need for global distribution. This adds latency (extra CloudFront hop) and cost without solving the database connection problem. Regional endpoint is correct for this use case.
+</div>
+</div>
+
+
+<!-- ================= Q9 ================= -->
+<div class="question">
+<pre>
+49) A company is planning to host a web application on AWS and wants to load balance the traffic across a group of Amazon EC2 instances. One of the security requirements is to enable end-to-end encryption in transit between the client and the web server.
+
+Which solution will meet this requirement?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q9">
+A. Place the EC2 instances behind an Application Load Balancer (ALB). Provision an SSL certificate using AWS Certificate Manager (ACM), and associate the SSL certificate with the ALB. Export the SSL certificate and install it on each EC2 instance. Configure the ALB to listen on port 443 and to forward traffic to port 443 on the instances.
+</label>
+
+<label>
+<input type="radio" name="q9">
+B. Associate the EC2 instances with a target group. Provision an SSL certificate using AWS Certificate Manager (ACM). Create an Amazon CloudFront distribution and configure it to use the SSL certificate. Set CloudFront to use the target group as the origin server.
+</label>
+
+<label>
+<input type="radio" name="q9">
+C. Place the EC2 instances behind an Application Load Balancer (ALB). Provision an SSL certificate using AWS Certificate Manager (ACM), and associate the SSL certificate with the ALB. Provision a third-party SSL certificate and install it on each EC2 instance. Configure the ALB to listen on port 443 and to forward traffic to port 443 on the instances.
+</label>
+
+<label>
+<input type="radio" name="q9">
+D. Place the EC2 instances behind a Network Load Balancer (NLB). Provision a third-party SSL certificate and install it on the NLB and on each EC2 instance. Configure the NLB to listen on port 443 and to forward traffic to port 443 on the instances.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests understanding of <b>end-to-end encryption with Application Load Balancers</b>.<br><br>
+
+<b>Key Requirement:</b> "End-to-end encryption in transit between client and web server"<br><br>
+
+<b>End-to-End Encryption Means:</b>
+<ul>
+<li><b>Client → Load Balancer:</b> HTTPS (encrypted)</li>
+<li><b>Load Balancer → EC2:</b> HTTPS (encrypted)</li>
+<li><b>NO unencrypted segment in the path</b></li>
+</ul><br>
+
+<b>TLS/SSL Termination Options:</b><br><br>
+
+<b>1. SSL Termination (NOT end-to-end):</b><br>
+<pre>
+Client → (HTTPS) → ALB → (HTTP) → EC2
+          ✓ encrypted    ✗ unencrypted
+
+Problem: ALB decrypts traffic, forwards unencrypted to EC2
+Not end-to-end encryption
+</pre><br>
+
+<b>2. SSL Pass-Through (NLB only):</b><br>
+<pre>
+Client → (HTTPS) → NLB → (HTTPS) → EC2
+          ✓ encrypted     ✓ encrypted
+
+NLB forwards encrypted packets without terminating
+EC2 decrypts traffic
+True end-to-end, but limited features
+</pre><br>
+
+<b>3. SSL Re-Encryption (ALB + backend HTTPS):</b><br>
+<pre>
+Client → (HTTPS) → ALB → (HTTPS) → EC2
+          ✓ encrypted     ✓ encrypted
+
+ALB terminates client connection (uses ACM cert)
+ALB creates new HTTPS connection to EC2 (uses EC2 cert)
+End-to-end encryption maintained
+</pre><br>
+
+<b>Option C Implementation:</b><br><br>
+
+<b>Component 1: ALB with ACM Certificate (Client → ALB)</b><br>
+<pre>
+1. Provision Certificate in ACM:
+   Domain: www.example.com
+   Validation: DNS or Email
+   ACM manages renewal automatically
+   
+2. Create ALB:
+   Listener: HTTPS (port 443)
+   SSL Certificate: ACM certificate
+   Security Policy: ELBSecurityPolicy-TLS-1-2-2017-01
+   
+Client Connection:
+  Client → (TLS 1.2+) → ALB
+  Uses ACM certificate
+  Encrypted
+</pre><br>
+
+<b>Component 2: Third-Party Certificate on EC2 (ALB → EC2)</b><br>
+<pre>
+Why Third-Party Certificate:
+  - ACM certificates CANNOT be exported
+  - ACM only works with AWS services (ALB, CloudFront, API Gateway)
+  - EC2 needs exportable certificate
+  
+Options:
+  1. Purchase from CA (DigiCert, Let's Encrypt)
+  2. Self-signed certificate (testing only)
+  3. Let's Encrypt (free, automated)
+  
+Installation on EC2:
+  # Install certificate
+  sudo cp server.crt /etc/ssl/certs/
+  sudo cp server.key /etc/ssl/private/
+  
+  # Configure Apache
+  <VirtualHost *:443>
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/server.crt
+    SSLCertificateKeyFile /etc/ssl/private/server.key
+  </VirtualHost>
+  
+  # Configure Nginx
+  server {
+    listen 443 ssl;
+    ssl_certificate /etc/ssl/certs/server.crt;
+    ssl_certificate_key /etc/ssl/private/server.key;
+  }
+</pre><br>
+
+<b>Component 3: ALB Target Group Configuration</b><br>
+<pre>
+Target Group:
+  Protocol: HTTPS (port 443)
+  Health Check:
+    Protocol: HTTPS
+    Path: /health
+    Matcher: 200
+    
+ALB Listener Rule:
+  Port: 443 (HTTPS)
+  Action: Forward to target group
+  
+Security Group (EC2):
+  Inbound: Port 443 from ALB security group
+</pre><br>
+
+<b>Complete Flow:</b><br>
+<pre>
+1. Client initiates HTTPS request:
+   https://www.example.com
+   
+2. Client → ALB (HTTPS):
+   TLS handshake with ACM certificate
+   Encrypted with client's session key
+   
+3. ALB decrypts request:
+   Inspects request (routing, headers)
+   
+4. ALB → EC2 (HTTPS):
+   NEW TLS handshake with EC2's certificate
+   Encrypted with new session key
+   
+5. EC2 decrypts and processes:
+   Generates response
+   
+6. EC2 → ALB (HTTPS):
+   Encrypted response
+   
+7. ALB → Client (HTTPS):
+   Re-encrypted for client
+   
+Result: Entire path encrypted (end-to-end)
+</pre><br>
+
+<b>Why ACM Cannot Be Used on EC2:</b><br>
+<pre>
+ACM Certificate Limitations:
+  ✓ Can use with: ALB, NLB, CloudFront, API Gateway, Elastic Beanstalk
+  ✗ Cannot export private key
+  ✗ Cannot install on EC2
+  ✗ Cannot use with on-premises servers
+  
+This is why Option A is incorrect - you can't export ACM certificates
+</pre><br>
+
+<b>Why Third-Party Certificate Required:</b>
+<ul>
+<li>EC2 needs certificate with private key</li>
+<li>Third-party CAs provide exportable certificates</li>
+<li>Can be self-signed (not recommended for production)</li>
+<li>Can use Let's Encrypt (free, automated)</li>
+</ul><br>
+
+<b>Security Best Practices:</b><br>
+<pre>
+ALB:
+  - Use latest TLS policy (TLS 1.2+)
+  - Disable weak ciphers
+  - Enable HTTP to HTTPS redirect
+  
+EC2:
+  - Use strong cipher suites
+  - Enable HSTS headers
+  - Regular certificate rotation
+  - Secure private key storage
+  
+Network:
+  - ALB in public subnets
+  - EC2 in private subnets
+  - Security group: Only ALB can access EC2:443
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> ACM certificates CANNOT be exported. You cannot "export the SSL certificate and install it on each EC2 instance" - this is technically impossible. ACM holds the private keys and never exposes them. This option is invalid.<br>
+<b>Option B:</b> CloudFront with target group is not a standard configuration - CloudFront uses origins (ALB, S3, custom), not target groups directly. More importantly, this adds unnecessary complexity (CloudFront) when the requirement is just load balancing with encryption. Also doesn't specify EC2 backend encryption.<br>
+<b>Option D:</b> NLB with SSL certificates is possible, but operationally complex. You must install and manage certificates on both NLB and EC2 instances. NLB doesn't integrate with ACM (for TLS termination) as well as ALB. Option C is simpler: ACM handles ALB certificate automatically, only EC2 needs manual certificate management.
+</div>
+</div>
+
+
+<!-- ================= Q10 ================= -->
+<div class="question">
+<pre>
+50) A company wants to migrate its data analytics environment from on premises to AWS. The environment consists of two simple Node.js applications. One of the applications collects sensor data and loads it into a MySQL database. The other application aggregates the data into reports. When the aggregation jobs run, some of the load jobs fail to run correctly.
+
+The company must resolve the data loading issue. The company also needs the migration to occur without interruptions or changes for the company's customers.
+
+What should a solutions architect do to meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q10">
+A. Set up an Amazon Aurora MySQL database as a replication target for the on-premises database. Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica. Set up collection endpoints as AWS Lambda functions behind a Network Load Balancer (NLB), and use Amazon RDS Proxy to write to the Aurora MySQL database. When the databases are synced, disable the replication job and restart the Aurora Replica as the primary instance. Point the collector DNS record to the NLB.
+</label>
+
+<label>
+<input type="radio" name="q10">
+B. Set up an Amazon Aurora MySQL database. Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora. Move the aggregation jobs to run against the Aurora MySQL database. Set up collection endpoints behind an Application Load Balancer (ALB) as Amazon EC2 instances in an Auto Scaling group. When the databases are synced, point the collector DNS record to the ALB. Disable the AWS DMS sync task after the cutover from on premises to AWS.
+</label>
+
+<label>
+<input type="radio" name="q10">
+C. Set up an Amazon Aurora MySQL database. Use AWS Database Migration Service (AWS DMS) to perform continuous data replication from the on-premises database to Aurora. Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica. Set up collection endpoints as AWS Lambda functions behind an Application Load Balancer (ALB), and use Amazon RDS Proxy to write to the Aurora MySQL database. When the databases are synced, point the collector DNS record to the ALB. Disable the AWS DMS sync task after the cutover from on premises to AWS.
+</label>
+
+<label>
+<input type="radio" name="q10">
+D. Set up an Amazon Aurora MySQL database. Create an Aurora Replica for the Aurora MySQL database, and move the aggregation jobs to run against the Aurora Replica. Set up collection endpoints as an Amazon Kinesis data stream. Use Amazon Kinesis Data Firehose to replicate the data to the Aurora MySQL database. When the databases are synced, disable the replication job and restart the Aurora Replica as the primary instance. Point the collector DNS record to the Kinesis data stream.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests <b>database migration strategies with workload separation and zero-downtime cutover</b>.<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>App 1: Collects sensor data → MySQL (writes)</li>
+<li>App 2: Aggregates data → Reports (heavy reads)</li>
+<li>Problem: Aggregation jobs interfere with load jobs</li>
+<li>Root cause: Read/write contention on same database</li>
+</ul>
+
+<br>
+
+<b>Requirements:</b>
+<ul>
+<li>Resolve loading issue (read/write contention)</li>
+<li>Zero downtime migration</li>
+<li>No customer interruptions</li>
+</ul>
+
+<br>
+
+<b>Option C Solution Components:</b><br><br>
+
+<b>Component 1: AWS DMS for Continuous Replication</b><br>
+<pre>
+DMS Replication Instance:
+  Source: On-premises MySQL
+  Target: Aurora MySQL
+  Replication Type: Full Load + CDC (Change Data Capture)
+  
+Process:
+  1. Full load: Copy all existing data
+  2. CDC: Continuously replicate ongoing changes
+  3. Keep databases in sync during migration
+  4. Zero downtime cutover
+</pre>
+
+<br>
+
+<b>Why DMS:</b>
+<ul>
+<li>Continuous replication (databases stay synced)</li>
+<li>Minimal downtime (cutover takes seconds)</li>
+<li>Automatic schema conversion (if needed)</li>
+<li>Monitors replication lag</li>
+</ul>
+
+<br>
+
+<b>Component 2: Aurora Read Replica for Aggregation</b><br>
+<pre>
+Aurora Architecture:
+  Primary Instance (Writer):
+    - Handles sensor data writes
+    - Low latency for inserts
+    
+  Aurora Replica (Reader):
+    - Handles aggregation queries
+    - Reads don't impact writes
+    - Replication lag: < 100ms typically
+</pre>
+
+<br>
+
+<b>This Solves the Core Problem:</b>
+<ul>
+<li>Writes go to primary (App 1: data collection)</li>
+<li>Heavy reads go to replica (App 2: aggregation)</li>
+<li>No contention between workloads</li>
+<li>Load jobs no longer fail during aggregation</li>
+</ul>
+
+<br>
+
+<b>Component 3: Lambda + ALB for Collection Endpoints</b><br>
+<pre>
+Architecture:
+  Sensors → ALB → Lambda → RDS Proxy → Aurora Primary
+  
+Benefits:
+  - Lambda: Serverless, scales automatically
+  - ALB: Load distribution, health checks
+  - RDS Proxy: Connection pooling for Lambda
+</pre>
+
+<br>
+
+<b>Component 4: RDS Proxy for Write Optimization</b><br>
+<pre>
+Why RDS Proxy:
+  - Lambda creates many connections
+  - RDS Proxy pools connections
+  - Reduces connection overhead
+  - Improves write performance
+  - Handles failover automatically
+</pre>
+
+<br>
+
+<b>Migration Timeline:</b><br>
+<pre>
+Week 1-2: Setup
+  ├─ Create Aurora MySQL cluster
+  ├─ Create Aurora Replica
+  ├─ Set up DMS replication
+  └─ Deploy Lambda + ALB in AWS
+  
+Week 3-4: Testing
+  ├─ Test Lambda writes to Aurora
+  ├─ Test aggregation on replica
+  ├─ Verify DMS replication (lag < 1 sec)
+  └─ Monitor performance
+  
+Cutover Day:
+  09:00 - Verify DMS fully synced
+  09:30 - Update DNS: sensor-api.example.com → ALB
+  09:35 - Monitor: Sensor data flowing to AWS
+  10:00 - Move aggregation jobs to Aurora Replica
+  10:30 - Verify: Load jobs no longer fail
+  11:00 - Disable DMS task
+  11:15 - Decommission on-premises MySQL
+  
+Result: Zero downtime, seamless migration
+</pre>
+
+<br>
+
+<b>Complete Architecture:</b><br>
+<pre>
+On-Premises (Before Cutover):
+  Sensors → On-Prem API → MySQL
+             ↓ DMS Replication
+  
+AWS (After Cutover):
+  Sensors → ALB → Lambda → RDS Proxy → Aurora Primary
+                                            ↓ Replication
+                                        Aurora Replica
+                                            ↓
+                                      Aggregation Jobs
+</pre>
+
+<br>
+
+<b>Why This Resolves the Loading Issue:</b>
+<ol>
+<li><b>Workload Separation:</b> Writes and reads on different instances</li>
+<li><b>No Lock Contention:</b> Aggregation queries don't block writes</li>
+<li><b>Better Performance:</b> Each workload gets dedicated resources</li>
+<li><b>RDS Proxy:</b> Efficient connection management</li>
+</ol>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Uses NLB which is Layer 4 (TCP) - cannot route to Lambda functions effectively. "Restart Aurora Replica as primary" is complex and risky. No clear benefit over Option C. Option C's ALB + Lambda is simpler and more appropriate for HTTP/HTTPS endpoints.<br>
+<b>Option B:</b> Runs aggregation jobs against the PRIMARY Aurora instance. This doesn't solve the core problem - write/read contention will still occur. Load jobs can still fail when heavy aggregation runs. Also uses EC2 instead of serverless Lambda (more operational overhead).<br>
+<b>Option D:</b> Kinesis + Firehose for sensor data is overcomplicated. Firehose doesn't directly write to Aurora MySQL (would need Lambda or custom processing). "Point DNS to Kinesis" doesn't make sense - sensors need HTTP endpoints. This architecture is overly complex and doesn't properly address the requirements.
+</div>
+</div>
+
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0 20px 0;">
+  <a href="page4.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page6.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div> <!-- Close container -->
+
+<script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const isMultiSelect = q.querySelector('input[type="checkbox"]') !== null;
+  const inputs = q.querySelectorAll(isMultiSelect ? 'input[type="checkbox"]' : 'input[type="radio"]');
+  const labels = q.querySelectorAll("label");
+  const selected = [];
+
+  inputs.forEach((inp, idx) => {
+    if (inp.checked) selected.push(idx);
+  });
+
+  labels.forEach((label, idx) => {
+    label.classList.remove("user-correct", "user-wrong", "correct");
+    if (selected.includes(idx)) {
+      if (correct.includes(idx)) {
+        label.classList.add("user-correct");
+      } else {
+        label.classList.add("user-wrong");
+      }
+    }
+  });
+
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    q.appendChild(resultMsg);
+  }
+
+  const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+  if (isCorrect) {
+    resultMsg.textContent = "✔ Correct!";
+    resultMsg.style.color = "#10b981";
+    resultMsg.style.fontWeight = "600";
+  } else {
+    resultMsg.textContent = "✖ Incorrect. Try again or click 'Show Answer'.";
+    resultMsg.style.color = "#ef4444";
+    resultMsg.style.fontWeight = "600";
+  }
+  resultMsg.style.display = "block";
+}
+
+function showAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const labels = q.querySelectorAll("label");
+  
+  // Clear check answer feedback
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  // Show correct answers
+  correct.forEach(i => labels[i].classList.add("correct"));
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  // Hide result message if exists
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
+}
+</script>
+
+</body>
+</html>

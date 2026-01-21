@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 7</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page6.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page8.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 7)</h1>
+
+<!-- ================= Q1 ================= -->
+<div class="question">
+<pre>
+61) A finance company hosts a data lake in Amazon S3. The company receives financial data records over SFTP each night from several third parties. 
+The company runs its own SFTP server on an Amazon EC2 instance in a public subnet of a VPC. 
+After the files are uploaded, they are moved to the data lake by a cron job that runs on the same instance. 
+The SFTP server is reachable on DNS sftp.example.com through the use of Amazon Route 53.
+
+What should the solutions architect do to improve reliability and reduce operational overhead?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q1">
+A. Move the EC2 instance into an Auto Scaling group. Place the EC2 instance behind an Application Load Balancer (ALB). Update the DNS record sftp.example.com in Route 53 to point to the ALB.
+</label>
+
+<label>
+<input type="radio" name="q1">
+B. Migrate the SFTP server to AWS Transfer for SFTP. Update the DNS record sftp.example.com in Route 53 to point to the server endpoint hostname.
+</label>
+
+<label>
+<input type="radio" name="q1">
+C. Migrate the SFTP server to a file gateway in AWS Storage Gateway. Update the DNS record sftp.example.com in Route 53 to point to the file gateway endpoint.
+</label>
+
+<label>
+<input type="radio" name="q1">
+D. Place the EC2 instance behind a Network Load Balancer (NLB). Update the DNS record sftp.example.com in Route 53 to point to the NLB.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>migrating self-managed SFTP servers to AWS managed services</b>.<br><br>
+
+<b>Current Architecture Issues:</b>
+<ul>
+<li>Self-managed SFTP server on EC2 (operational overhead)</li>
+<li>Single point of failure</li>
+<li>Manual patching and maintenance required</li>
+<li>Custom cron job for file movement</li>
+<li>No built-in high availability</li>
+</ul><br>
+
+<b>AWS Transfer Family Overview:</b><br>
+AWS Transfer Family is a fully managed service that supports SFTP, FTPS, and FTP protocols directly into and out of Amazon S3 or Amazon EFS.<br><br>
+
+<b>Why Option B is Correct:</b><br>
+<b>AWS Transfer for SFTP Benefits:</b>
+<ul>
+<li><b>Fully Managed:</b> AWS handles infrastructure, patching, and scaling</li>
+<li><b>Direct S3 Integration:</b> Files uploaded via SFTP go directly to S3 (no cron job needed)</li>
+<li><b>High Availability:</b> Multi-AZ deployment automatically</li>
+<li><b>DNS Integration:</b> Custom hostname support via Route 53</li>
+<li><b>Authentication:</b> Supports service-managed users, Active Directory, or custom identity providers</li>
+<li><b>Compliance:</b> FIPS 140-2 validated, HIPAA eligible</li>
+<li><b>No Operational Overhead:</b> No servers to manage or patch</li>
+<li><b>Scalability:</b> Automatically scales to handle concurrent connections</li>
+</ul><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - ALB with Auto Scaling:</b>
+<ul>
+<li>❌ ALB is Layer 7 (HTTP/HTTPS) - doesn't support SFTP (Layer 4/TCP)</li>
+<li>❌ Still requires managing EC2 instances, patching, and cron jobs</li>
+<li>❌ Complex session management for SFTP with load balancing</li>
+<li>❌ Doesn't reduce operational overhead</li>
+</ul><br>
+
+<b>Option C - AWS Storage Gateway File Gateway:</b>
+<ul>
+<li>❌ File Gateway provides NFS/SMB file shares, not SFTP</li>
+<li>❌ Designed for hybrid cloud storage scenarios (on-premises to cloud)</li>
+<li>❌ Wrong use case - not meant for receiving files from third parties</li>
+<li>❌ Still requires gateway appliance management</li>
+</ul><br>
+
+<b>Option D - NLB with EC2:</b>
+<ul>
+<li>✓ NLB works with SFTP (Layer 4)</li>
+<li>❌ Still requires managing EC2 instances, OS patches, SFTP software</li>
+<li>❌ Must manage cron jobs and file movement logic</li>
+<li>❌ Doesn't reduce operational overhead significantly</li>
+<li>❌ Need to handle session persistence and state management</li>
+</ul><br>
+
+<b>Implementation Steps for Option B:</b>
+<ol>
+<li>Create AWS Transfer for SFTP server</li>
+<li>Configure S3 bucket as the storage backend</li>
+<li>Set up IAM roles for Transfer Family to access S3</li>
+<li>Create SFTP users or integrate with existing identity provider</li>
+<li>Update Route 53 DNS record sftp.example.com to point to Transfer server endpoint</li>
+<li>Migrate third-party connections to new endpoint</li>
+<li>Decommission EC2 instance and cron job</li>
+</ol><br>
+
+<b>Key Architectural Improvement:</b><br>
+Files go directly from SFTP → S3, eliminating the intermediate EC2 processing step and cron job completely.<br><br>
+
+<b>Cost Consideration:</b><br>
+While AWS Transfer for SFTP has hourly charges plus data transfer costs, it eliminates EC2 costs, operational overhead, and reduces complexity - often resulting in better TCO for managed file transfer use cases.
+</div>
+</div>
+
+<!-- ================= Q2 ================= -->
+<div class="question">
+<pre>
+62) A company wants to migrate an application to Amazon EC2 from VMware Infrastructure that runs in an on-premises data center.
+A solutions architect must preserve the software and configuration settings during the migration.
+
+What should the solutions architect do to meet these requirements?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q2">
+A. Configure the AWS DataSync agent to start replicating the data store to Amazon FSx for Windows File Server. Use the SMB share to host the VMware data store. Use VM Import/Export to move the VMs to Amazon EC2.
+</label>
+
+<label>
+<input type="radio" name="q2">
+B. Use the VMware vSphere client to export the application as an image in Open Virtualization Format (OVF) format. Create an Amazon S3 bucket to store the image in the destination AWS Region. Create and apply an IAM role for VM Import. Use the AWS CLI to run the EC2 import command.
+</label>
+
+<label>
+<input type="radio" name="q2">
+C. Configure AWS Storage Gateway for files service to export a Common Internet File System (CIFS) share. Create a backup copy to the shared folder. Sign in to the AWS Management Console and create an AMI from the backup copy. Launch an EC2 instance that is based on the AMI.
+</label>
+
+<label>
+<input type="radio" name="q2">
+D. Create a managed-instance activation for a hybrid environment in AWS Systems Manager. Download and install Systems Manager Agent on the on-premises VM. Register the VM with Systems Manager to be a managed instance. Use AWS Backup to create a snapshot of the VM and create an AMI. Launch an EC2 instance that is based on the AMI.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>VMware to AWS migration while preserving configuration</b>.<br><br>
+
+<b>Requirement Analysis:</b>
+<ul>
+<li>Migrate VMware VM from on-premises to EC2</li>
+<li>Preserve software and configuration settings</li>
+<li>Maintain application state and settings</li>
+</ul><br>
+
+<b>VM Import/Export Service:</b><br>
+AWS service that enables importing virtual machine images from your existing virtualization environment to Amazon EC2.<br><br>
+
+<b>Why Option B is Correct:</b><br>
+<b>Standard VM Migration Process:</b>
+<ol>
+<li><b>Export VM:</b> Use VMware vSphere client to export VM as OVF/OVA format</li>
+<li><b>Upload to S3:</b> Create S3 bucket and upload the VM image files</li>
+<li><b>Create IAM Role:</b> Role with permissions for VM Import (vmimport service role)</li>
+<li><b>Import VM:</b> Use AWS CLI command: <code>aws ec2 import-image</code></li>
+<li><b>Launch Instance:</b> Once imported, launch EC2 instance from resulting AMI</li>
+</ol><br>
+
+<b>Preservation Benefits:</b>
+<ul>
+<li>✓ Complete OS configuration preserved</li>
+<li>✓ Installed applications remain intact</li>
+<li>✓ Application settings and configurations maintained</li>
+<li>✓ System state preserved</li>
+<li>✓ No need to reinstall or reconfigure</li>
+</ul><br>
+
+<b>Supported Formats:</b>
+<ul>
+<li>OVF (Open Virtualization Format)</li>
+<li>OVA (Open Virtualization Archive)</li>
+<li>VMDK, VHD, VHDX (virtual disk formats)</li>
+</ul><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - DataSync + FSx:</b>
+<ul>
+<li>❌ AWS DataSync replicates data/files, not entire VMs</li>
+<li>❌ FSx is a file system service, not for VM storage</li>
+<li>❌ Overly complex approach</li>
+<li>❌ Doesn't preserve VM configuration as a unit</li>
+<li>❌ Would require manual VM recreation</li>
+</ul><br>
+
+<b>Option C - Storage Gateway + CIFS:</b>
+<ul>
+<li>❌ Storage Gateway is for hybrid storage scenarios</li>
+<li>❌ CIFS share doesn't support VM image format conversion</li>
+<li>❌ Cannot create AMI directly from CIFS backup copy</li>
+<li>❌ Not designed for VM migration</li>
+<li>❌ Doesn't provide VM-to-AMI conversion capability</li>
+</ul><br>
+
+<b>Option D - Systems Manager + AWS Backup:</b>
+<ul>
+<li>❌ AWS Backup doesn't support on-premises VMware VMs natively</li>
+<li>❌ Systems Manager hybrid instances are for management, not migration</li>
+<li>❌ Cannot create AMI from on-premises VM snapshots this way</li>
+<li>❌ Overly complex for this use case</li>
+<li>❌ Not the standard migration path</li>
+</ul><br>
+
+<b>IAM Role Requirements (vmimport):</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {"Service": "vmie.amazonaws.com"},
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+</pre><br>
+
+<b>Sample Import Command:</b>
+<pre>
+aws ec2 import-image \
+  --description "My VM" \
+  --disk-containers "file://containers.json"
+</pre><br>
+
+<b>Post-Migration Steps:</b>
+<ol>
+<li>Verify AMI creation</li>
+<li>Launch test EC2 instance</li>
+<li>Validate application functionality</li>
+<li>Install AWS Systems Manager agent (optional)</li>
+<li>Configure networking and security groups</li>
+<li>Update DNS records if needed</li>
+</ol><br>
+
+<b>Alternative Tools:</b>
+<ul>
+<li>AWS Application Migration Service (MGN) - for live migration</li>
+<li>CloudEndure Migration - continuous replication</li>
+<li>AWS Server Migration Service (SMS) - deprecated, use MGN instead</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q3 ================= -->
+<div class="question">
+<pre>
+63) A video processing company has an application that downloads images from an Amazon S3 bucket, processes the images, stores a transformed image in a second S3 bucket, and updates metadata about the image in an Amazon DynamoDB table. 
+The application is written in Node.js and runs by using an AWS Lambda function. The Lambda function is invoked when a new image is uploaded to Amazon S3.
+
+The application ran without incident for a while. However, the size of the images has grown significantly. 
+The Lambda function is now failing frequently with timeout errors. The function timeout is set to its maximum value. A solutions architect needs to refactor the application's architecture to prevent invocation failures. The company does not want to manage the underlying infrastructure.
+
+Which combination of steps should the solutions architect take to meet these requirements? (Choose two.)
+</pre>
+<div class="options">
+<label>
+<input type="checkbox" name="q3">
+A. Modify the application deployment by building a Docker image that contains the application code. Publish the image to Amazon Elastic Container Registry (Amazon ECR).
+</label>
+
+<label>
+<input type="checkbox" name="q3">
+B. Create a new Amazon Elastic Container Service (Amazon ECS) task definition with a compatibility type of AWS Fargate. Configure the task definition to use the new image in Amazon Elastic Container Registry (Amazon ECR). Adjust the Lambda function to invoke an ECS task by using the ECS task definition when a new file arrives in Amazon S3.
+</label>
+
+<label>
+<input type="checkbox" name="q3">
+C. Create an AWS Step Functions state machine with a Parallel state to invoke the Lambda function. Increase the provisioned concurrency of the Lambda function.
+</label>
+
+<label>
+<input type="checkbox" name="q3">
+D. Create a new Amazon Elastic Container Service (Amazon ECS) task definition with a compatibility type of Amazon EC2. Configure the task definition to use the new image in Amazon Elastic Container Registry (Amazon ECR). Adjust the Lambda function to invoke an ECS task by using the ECS task definition when a new file arrives in Amazon S3.
+</label>
+
+<label>
+<input type="checkbox" name="q3">
+E. Modify the application to store images on Amazon Elastic File System (Amazon EFS) and to store metadata on an Amazon RDS DB instance. Adjust the Lambda function to mount the EFS file share.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0,1])">Check Answer</button>
+<button onclick="showAnswer(this,[0,1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A, B</b><br><br>
+
+This question tests <b>handling Lambda timeout limitations with serverless alternatives</b>.<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>Lambda function processing images from S3</li>
+<li>Image sizes have grown significantly</li>
+<li>Lambda timing out (max 15 minutes already set)</li>
+<li>Processing now exceeds Lambda's maximum execution time</li>
+</ul><br>
+
+<b>Lambda Limitations:</b>
+<ul>
+<li>Maximum execution time: 15 minutes (900 seconds)</li>
+<li>Memory: Up to 10,240 MB</li>
+<li>Temporary storage (/tmp): 10,240 MB</li>
+<li>Cannot extend timeout beyond 15 minutes</li>
+</ul><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Handle longer processing times</li>
+<li>No infrastructure management (serverless)</li>
+<li>Prevent invocation failures</li>
+<li>Event-driven architecture (S3 triggers)</li>
+</ul><br>
+
+<b>Why Options A + B Are Correct:</b><br>
+
+<b>Option A - Containerize Application:</b>
+<ul>
+<li>✓ Package Node.js app into Docker container</li>
+<li>✓ Include all dependencies and libraries</li>
+<li>✓ Store in Amazon ECR (managed container registry)</li>
+<li>✓ Version control for container images</li>
+<li>✓ Foundation for running on ECS/Fargate</li>
+</ul><br>
+
+<b>Option B - ECS Fargate Execution:</b>
+<ul>
+<li>✓ <b>Serverless:</b> No infrastructure to manage (meets requirement)</li>
+<li>✓ <b>No Timeout Limits:</b> Can run for hours or days</li>
+<li>✓ <b>Scalable:</b> Each S3 upload triggers new task</li>
+<li>✓ <b>Resource Flexibility:</b> Up to 120 GB RAM, 16 vCPU</li>
+<li>✓ <b>Pay-per-use:</b> Only pay for task execution time</li>
+<li>✓ Lambda orchestrates (lightweight) → Fargate processes (heavy)</li>
+</ul><br>
+
+<b>Architecture Flow:</b>
+<pre>
+1. New image uploaded to S3
+2. S3 Event Notification triggers Lambda
+3. Lambda function invokes ECS Fargate task (RunTask API)
+4. Fargate task processes image (no time limit)
+5. Fargate task saves transformed image to S3
+6. Fargate task updates DynamoDB metadata
+7. Task completes and terminates
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option C - Step Functions + Parallel:</b>
+<ul>
+<li>❌ Step Functions don't extend Lambda timeout (still 15 min max)</li>
+<li>❌ Parallel state runs multiple branches concurrently (wrong use case)</li>
+<li>❌ Provisioned concurrency affects cold starts, not timeout</li>
+<li>❌ Doesn't solve the fundamental timeout problem</li>
+<li>❌ Would need to break processing into chunks (complex)</li>
+</ul><br>
+
+<b>Option D - ECS on EC2:</b>
+<ul>
+<li>❌ <b>Requires infrastructure management:</b> EC2 instances, scaling, patching</li>
+<li>❌ Violates "no infrastructure management" requirement</li>
+<li>❌ Need to manage cluster capacity</li>
+<li>❌ More operational overhead than Fargate</li>
+<li>❌ Cost inefficient (pay for running instances even when idle)</li>
+</ul><br>
+
+<b>Option E - EFS + RDS:</b>
+<ul>
+<li>❌ Doesn't solve Lambda timeout issue</li>
+<li>❌ EFS mount doesn't extend processing time</li>
+<li>❌ Adds complexity without addressing root cause</li>
+<li>❌ Lambda still limited to 15 minutes</li>
+<li>❌ RDS instead of DynamoDB adds unnecessary change</li>
+</ul><br>
+
+<b>Lambda RunTask Example:</b>
+<pre>
+const ecs = new AWS.ECS();
+
+const params = {
+  cluster: 'my-cluster',
+  taskDefinition: 'image-processor:1',
+  launchType: 'FARGATE',
+  networkConfiguration: {
+    awsvpcConfiguration: {
+      subnets: ['subnet-xxx'],
+      securityGroups: ['sg-xxx'],
+      assignPublicIp: 'ENABLED'
+    }
+  },
+  overrides: {
+    containerOverrides: [{
+      name: 'processor',
+      environment: [
+        { name: 'S3_BUCKET', value: bucketName },
+        { name: 'S3_KEY', value: objectKey }
+      ]
+    }]
+  }
+};
+
+await ecs.runTask(params).promise();
+</pre><br>
+
+<b>Fargate Task Definition:</b>
+<ul>
+<li>CPU: 0.25 vCPU to 16 vCPU</li>
+<li>Memory: 0.5 GB to 120 GB</li>
+<li>Container image from ECR</li>
+<li>Task role for S3 and DynamoDB access</li>
+<li>CloudWatch Logs for monitoring</li>
+</ul><br>
+
+<b>Cost Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Service</th><th>Pricing Model</th><th>Idle Cost</th></tr>
+<tr><td>Lambda</td><td>Per request + duration</td><td>$0</td></tr>
+<tr><td>Fargate</td><td>Per second (vCPU + memory)</td><td>$0</td></tr>
+<tr><td>ECS on EC2</td><td>EC2 instance hours</td><td>$$$ (instances always running)</td></tr>
+</table><br>
+
+<b>Benefits Summary:</b>
+<ul>
+<li>✓ Eliminates timeout errors completely</li>
+<li>✓ Maintains serverless architecture</li>
+<li>✓ Scales automatically with workload</li>
+<li>✓ No infrastructure management</li>
+<li>✓ Cost-efficient (pay only when processing)</li>
+<li>✓ Lambda as lightweight orchestrator</li>
+<li>✓ Fargate for heavy, long-running processing</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q4 ================= -->
+<div class="question">
+<pre>
+64) A company has an organization in AWS Organizations. The company is using AWS Control Tower to deploy a landing zone for the organization. 
+The company wants to implement governance and policy enforcement. 
+The company must implement a policy that will detect Amazon RDS DB instances that are not encrypted at rest in the company's production OU.
+
+Which solution will meet this requirement?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q4">
+A. Turn on mandatory guardrails in AWS Control Tower. Apply the mandatory guardrails to the production OU.
+</label>
+
+<label>
+<input type="radio" name="q4">
+B. Enable the appropriate guardrail from the list of strongly recommended guardrails in AWS Control Tower. Apply the guardrail to the production OU.
+</label>
+
+<label>
+<input type="radio" name="q4">
+C. Use AWS Config to create a new mandatory guardrail. Apply the rule to all accounts in the production OU.
+</label>
+
+<label>
+<input type="radio" name="q4">
+D. Create a custom SCP in AWS Control Tower. Apply the SCP to the production OU.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>AWS Control Tower guardrails for governance and compliance</b>.<br><br>
+
+<b>AWS Control Tower Overview:</b><br>
+AWS Control Tower provides governance and compliance through guardrails - pre-configured rules that enforce policies across your AWS organization.<br><br>
+
+<b>Types of Guardrails:</b><br>
+
+<b>1. Mandatory Guardrails:</b>
+<ul>
+<li>Automatically enabled in all registered OUs</li>
+<li>Cannot be disabled</li>
+<li>Enforce fundamental AWS best practices</li>
+<li>Examples:
+  <ul>
+  <li>Disallow public write access to S3 buckets</li>
+  <li>Disallow changes to CloudWatch Logs retention</li>
+  <li>Enable CloudTrail in all regions</li>
+  </ul>
+</li>
+<li><b>Do NOT include RDS encryption detection by default</b></li>
+</ul><br>
+
+<b>2. Strongly Recommended Guardrails:</b>
+<ul>
+<li>Based on AWS best practices</li>
+<li>Optional - can be selectively enabled/disabled</li>
+<li>Detective and preventive controls</li>
+<li><b>Include RDS encryption detection:</b>
+  <ul>
+  <li>"Detect whether RDS database instances are encrypted at rest"</li>
+  <li>Detective control using AWS Config</li>
+  </ul>
+</li>
+<li>Can be applied to specific OUs</li>
+</ul><br>
+
+<b>3. Elective Guardrails:</b>
+<ul>
+<li>Additional optional controls</li>
+<li>Enable based on specific needs</li>
+<li>Organization-specific requirements</li>
+</ul><br>
+
+<b>Control Types:</b><br>
+
+<b>Preventive Controls:</b>
+<ul>
+<li>Implemented using Service Control Policies (SCPs)</li>
+<li>Block actions before they happen</li>
+<li>Examples: Prevent unencrypted S3 uploads</li>
+</ul><br>
+
+<b>Detective Controls:</b>
+<ul>
+<li>Implemented using AWS Config Rules</li>
+<li>Monitor and report non-compliance</li>
+<li>Don't prevent actions, but detect violations</li>
+<li><b>RDS encryption check is DETECTIVE</b></li>
+</ul><br>
+
+<b>Why Option B is Correct:</b>
+<ul>
+<li>✓ Strongly recommended guardrails include RDS encryption detection</li>
+<li>✓ Can be selectively enabled for specific OUs (production OU)</li>
+<li>✓ Uses AWS Config rule: <code>rds-storage-encrypted</code></li>
+<li>✓ Detects unencrypted RDS instances</li>
+<li>✓ Provides compliance dashboard in Control Tower</li>
+<li>✓ Native Control Tower feature - simple to enable</li>
+</ul><br>
+
+<b>Implementation Steps:</b>
+<ol>
+<li>Navigate to AWS Control Tower console</li>
+<li>Go to Guardrails section</li>
+<li>Find "Detect whether RDS database instances are encrypted at rest"</li>
+<li>Enable guardrail</li>
+<li>Apply to production OU</li>
+<li>Monitor compliance in Control Tower dashboard</li>
+</ol><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Mandatory Guardrails:</b>
+<ul>
+<li>❌ Mandatory guardrails are already turned on (can't be toggled)</li>
+<li>❌ They don't include RDS encryption detection</li>
+<li>❌ Can't selectively apply mandatory guardrails (apply to all OUs)</li>
+<li>❌ Doesn't meet the specific requirement</li>
+</ul><br>
+
+<b>Option C - AWS Config Custom Guardrail:</b>
+<ul>
+<li>❌ AWS Config rules are not called "guardrails" outside Control Tower</li>
+<li>❌ More complex than using built-in Control Tower guardrails</li>
+<li>❌ Would need to manually create and manage Config rule</li>
+<li>❌ Bypasses Control Tower's governance framework</li>
+<li>❌ Doesn't integrate with Control Tower compliance dashboard</li>
+</ul><br>
+
+<b>Option D - Custom SCP:</b>
+<ul>
+<li>❌ SCPs are preventive, not detective</li>
+<li>❌ Can't detect existing unencrypted RDS instances</li>
+<li>❌ Can only prevent new unencrypted RDS creation</li>
+<li>❌ Doesn't provide compliance reporting</li>
+<li>❌ Question asks to "detect", not "prevent"</li>
+<li>❌ More complex than using existing guardrail</li>
+</ul><br>
+
+<b>Guardrail Detection Output:</b>
+<ul>
+<li>Compliant: RDS instance is encrypted</li>
+<li>Non-compliant: RDS instance is not encrypted</li>
+<li>Not applicable: No RDS instances in account</li>
+</ul><br>
+
+<b>AWS Config Rule Details:</b>
+<pre>
+Rule: rds-storage-encrypted
+Resource Type: AWS::RDS::DBInstance
+Trigger: Configuration changes
+Compliance: NON_COMPLIANT if StorageEncrypted = false
+</pre><br>
+
+<b>Remediation Options:</b>
+<ul>
+<li>Detective guardrail identifies issue</li>
+<li>Manual remediation: Create encrypted snapshot → Restore to new encrypted instance</li>
+<li>Can set up automated remediation using AWS Systems Manager Automation</li>
+<li>Can configure SNS notifications for non-compliance</li>
+</ul><br>
+
+<b>Best Practice Architecture:</b>
+<pre>
+AWS Organization
+└─ Root
+   ├─ Production OU
+   │  ├─ Strongly Recommended Guardrails Enabled
+   │  │  └─ RDS Encryption Detection
+   │  └─ Accounts with RDS instances
+   ├─ Development OU
+   └─ Sandbox OU
+</pre><br>
+
+<b>Control Tower Benefits:</b>
+<ul>
+<li>Centralized governance across organization</li>
+<li>Pre-built compliance controls</li>
+<li>Automated compliance monitoring</li>
+<li>Integration with AWS Config and CloudTrail</li>
+<li>Unified compliance dashboard</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q5 ================= -->
+<div class="question">
+<pre>
+65) A startup company hosts a fleet of Amazon EC2 instances in private subnets using the latest Amazon Linux 2 AMI. The company's engineers rely heavily on SSH access to the instances for troubleshooting.
+
+The company's existing architecture includes the following:
+
+• A VPC with private and public subnets, and a NAT gateway.
+• Site-to-Site VPN for connectivity with the on-premises environment.
+• EC2 security groups with direct SSH access from the on-premises environment.
+
+The company needs to increase security controls around SSH access and provide auditing of commands run by the engineers.
+
+Which strategy should a solutions architect use?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q5">
+A. Install and configure EC2 Instance Connect on the fleet of EC2 instances. Remove all security group rules attached to EC2 instances that allow inbound TCP on port 22. Advise the engineers to remotely access the instances by using the EC2 Instance Connect CLI.
+</label>
+
+<label>
+<input type="radio" name="q5">
+B. Update the EC2 security groups to only allow inbound TCP on port 22 to the IP addresses of the engineer's devices. Install the Amazon CloudWatch agent on all EC2 instances and send operating system audit logs to CloudWatch Logs.
+</label>
+
+<label>
+<input type="radio" name="q5">
+C. Update the EC2 security groups to only allow inbound TCP on port 22 to the IP addresses of the engineer's devices. Enable AWS Config for EC2 security group resource changes. Enable AWS Firewall Manager and apply a security group policy that automatically remediates changes to rules.
+</label>
+
+<label>
+<input type="radio" name="q5">
+D. Create an IAM role with the AmazonSSMManagedInstanceCore managed policy attached. Attach the IAM role to all the EC2 instances. Remove all security group rules attached to the EC2 instances that allow inbound TCP on port 22. Have the engineers install the AWS Systems Manager Session Manager plugin for their devices and remotely access the instances by using the start-session API call from Systems Manager.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question tests <b>secure and auditable EC2 access without SSH</b>.<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>Security groups allow SSH (port 22) from on-premises</li>
+<li>Traditional SSH access - hard to audit individual commands</li>
+<li>SSH keys to manage and rotate</li>
+<li>Direct network access required</li>
+<li>No centralized command logging</li>
+</ul><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Increase security controls around SSH access</li>
+<li>Provide auditing of commands run by engineers</li>
+<li>Maintain troubleshooting capability</li>
+</ul><br>
+
+<b>Why Option D is Correct:</b><br>
+
+<b>AWS Systems Manager Session Manager Benefits:</b><br>
+
+<b>1. Enhanced Security:</b>
+<ul>
+<li>✓ No inbound ports required (no port 22 needed)</li>
+<li>✓ No SSH keys to manage or rotate</li>
+<li>✓ No bastion hosts required</li>
+<li>✓ IAM-based access control</li>
+<li>✓ Works in private subnets (no public IP needed)</li>
+<li>✓ Traffic encrypted with TLS 1.2</li>
+</ul><br>
+
+<b>2. Comprehensive Auditing:</b>
+<ul>
+<li>✓ All sessions logged to CloudWatch Logs</li>
+<li>✓ Session history stored in S3</li>
+<li>✓ Every command executed is recorded</li>
+<li>✓ Integration with CloudTrail for API calls</li>
+<li>✓ Who accessed what instance and when</li>
+<li>✓ Complete audit trail for compliance</li>
+</ul><br>
+
+<b>3. IAM Integration:</b>
+<ul>
+<li>✓ Granular permissions per user/role</li>
+<li>✓ Can restrict which instances users can access</li>
+<li>✓ MFA enforcement possible</li>
+<li>✓ Temporary credentials via STS</li>
+<li>✓ No shared credentials</li>
+</ul><br>
+
+<b>Architecture Flow:</b>
+<pre>
+Engineer → Session Manager Plugin → Systems Manager Service → EC2 Instance
+    |                                                              |
+    └──── IAM Authentication                                     |
+                                                                  |
+                                          SSM Agent ←─────────┘
+                                               |
+                                          CloudWatch Logs (audit)
+                                          S3 (session history)
+</pre><br>
+
+<b>Implementation Components:</b><br>
+
+<b>1. IAM Role (AmazonSSMManagedInstanceCore):</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:UpdateInstanceInformation",
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetEncryptionConfiguration"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+</pre><br>
+
+<b>2. Security Group Changes:</b>
+<ul>
+<li>Remove all inbound rules for port 22</li>
+<li>No inbound access needed</li>
+<li>Outbound to Systems Manager endpoints (HTTPS/443)</li>
+</ul><br>
+
+<b>3. Session Manager Configuration:</b>
+<pre>
+aws ssm start-session --target i-1234567890abcdef0
+
+# Session preferences can include:
+- CloudWatch Logs group
+- S3 bucket for session logs
+- KMS key for encryption
+- Idle timeout settings
+- Shell preferences
+</pre><br>
+
+<b>4. Audit Logging Example:</b>
+<pre>
+# CloudWatch Logs captures:
+- Session ID
+- User ARN (who)
+- Instance ID (where)  
+- Start/End time (when)
+- Every command executed
+- Command output
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - EC2 Instance Connect:</b>
+<ul>
+<li>❌ Still uses SSH (port 22 temporarily opened)</li>
+<li>❌ Limited auditing compared to Session Manager</li>
+<li>❌ Requires public IP or bastion for private instances</li>
+<li>❌ Only works in public subnets or with bastion</li>
+<li>❌ Doesn't log individual commands comprehensively</li>
+<li>❌ Not suitable for Site-to-Site VPN scenario</li>
+</ul><br>
+
+<b>Option B - CloudWatch Agent + IP Restriction:</b>
+<ul>
+<li>❌ Still exposes SSH port (security risk)</li>
+<li>❌ IP-based restrictions can be bypassed</li>
+<li>❌ SSH keys still need management</li>
+<li>❌ OS audit logs are reactive, not preventive</li>
+<li>❌ Engineer IPs may change (VPN, home, office)</li>
+<li>❌ Doesn't improve security controls significantly</li>
+</ul><br>
+
+<b>Option C - Config + Firewall Manager:</b>
+<ul>
+<li>❌ Still allows SSH access (port 22 open)</li>
+<li>❌ Focuses on security group compliance, not access auditing</li>
+<li>❌ No command-level audit trail</li>
+<li>❌ Doesn't solve SSH key management</li>
+<li>❌ Doesn't provide enhanced security for access</li>
+<li>❌ Missing the core auditing requirement</li>
+</ul><br>
+
+<b>Additional Session Manager Features:</b>
+<ul>
+<li>Port forwarding without SSH tunnels</li>
+<li>Run Command for automation</li>
+<li>Cross-account access</li>
+<li>Session termination controls</li>
+<li>Restricts commands users can run</li>
+</ul><br>
+
+<b>IAM Policy for Engineers:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:StartSession"
+      ],
+      "Resource": [
+        "arn:aws:ec2:*:*:instance/*"
+      ],
+      "Condition": {
+        "StringLike": {
+          "ssm:resourceTag/Environment": "production"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ssm:TerminateSession",
+        "ssm:ResumeSession"
+      ],
+      "Resource": "arn:aws:ssm:*:*:session/${aws:username}-*"
+    }
+  ]
+}
+</pre><br>
+
+<b>Compliance Benefits:</b>
+<ul>
+<li>SOC 2 compliance (audit trails)</li>
+<li>PCI DSS (restricted access, logging)</li>
+<li>HIPAA (encryption, access control)</li>
+<li>ISO 27001 (access management)</li>
+</ul><br>
+
+<b>Cost Considerations:</b>
+<ul>
+<li>Session Manager: No additional cost</li>
+<li>CloudWatch Logs: Pay for log storage</li>
+<li>S3: Pay for session log storage</li>
+<li>Data transfer: Standard rates apply</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q6 ================= -->
+<div class="question">
+<pre>
+66) A company that uses AWS Organizations allows developers to experiment on AWS. As part of the landing zone that the company has deployed, developers use their company email address to request an account. The company wants to ensure that developers are not launching costly services or running services unnecessarily. The company must give developers a fixed monthly budget to limit their AWS costs.
+
+Which combination of steps will meet these requirements? (Choose three.)
+</pre>
+<div class="options">
+<label>
+<input type="checkbox" name="q6">
+A. Create an SCP to set a fixed monthly account usage limit. Apply the SCP to the developer accounts.
+</label>
+
+<label>
+<input type="checkbox" name="q6">
+B. Use AWS Budgets to create a fixed monthly budget for each developer's account as part of the account creation process.
+</label>
+
+<label>
+<input type="checkbox" name="q6">
+C. Create an SCP to deny access to costly services and components. Apply the SCP to the developer accounts.
+</label>
+
+<label>
+<input type="checkbox" name="q6">
+D. Create an IAM policy to deny access to costly services and components. Apply the IAM policy to the developer accounts.
+</label>
+
+<label>
+<input type="checkbox" name="q6">
+E. Create an AWS Budgets alert action to terminate services when the budgeted amount is reached. Configure the action to terminate all services.
+</label>
+
+<label>
+<input type="checkbox" name="q6">
+F. Create an AWS Budgets alert action to send an Amazon Simple Notification Service (Amazon SNS) notification when the budgeted amount is reached. Invoke an AWS Lambda function to terminate all services.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1,2,5])">Check Answer</button>
+<button onclick="showAnswer(this,[1,2,5])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B, C, F</b><br><br>
+
+This question tests <b>cost control and governance for developer sandbox accounts in AWS Organizations</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Fixed monthly budget per developer account</li>
+<li>Prevent costly services from being launched</li>
+<li>Limit AWS costs for experimentation</li>
+<li>Automated enforcement</li>
+</ul><br>
+
+<b>Why Options B, C, F Are Correct:</b><br>
+
+<b>Option B - AWS Budgets:</b>
+<ul>
+<li>✓ <b>Cost Tracking:</b> Set fixed monthly budget per account (e.g., $100/month)</li>
+<li>✓ <b>Alerts:</b> Notify when 50%, 80%, 100% threshold reached</li>
+<li>✓ <b>Forecasting:</b> Predict if budget will be exceeded</li>
+<li>✓ <b>Per-Account:</b> Individual budgets for each developer</li>
+<li>✓ <b>Automation Ready:</b> Can trigger actions via SNS</li>
+<li>✓ <b>Granular:</b> Track by service, tag, or linked account</li>
+</ul><br>
+
+<b>AWS Budget Configuration Example:</b>
+<pre>
+Budget Name: dev-account-monthly-limit
+Budget Amount: $100 USD
+Period: Monthly
+Scope: Linked Account (developer account)
+Alerts:
+  - 80% threshold → Email notification
+  - 100% threshold → SNS topic (trigger Lambda)
+</pre><br>
+
+<b>Option C - SCP to Deny Costly Services:</b>
+<ul>
+<li>✓ <b>Preventive Control:</b> Block expensive services before launch</li>
+<li>✓ <b>Organization-Wide:</b> Apply to developer OU</li>
+<li>✓ <b>Inheritance:</b> All accounts in OU inherit the policy</li>
+<li>✓ <b>Examples:</b> Deny large EC2 instances, expensive RDS, Redshift</li>
+<li>✓ <b>Centrally Managed:</b> No per-account configuration needed</li>
+</ul><br>
+
+<b>Example SCP:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Action": [
+        "ec2:RunInstances"
+      ],
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringNotEquals": {
+          "ec2:InstanceType": [
+            "t2.micro",
+            "t2.small",
+            "t3.micro",
+            "t3.small"
+          ]
+        }
+      }
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "rds:CreateDBInstance"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "rds:DatabaseClass": [
+            "db.t2.micro",
+            "db.t3.micro"
+          ]
+        }
+      }
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "redshift:CreateCluster",
+        "sagemaker:CreateNotebookInstance",
+        "eks:CreateCluster"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+</pre><br>
+
+<b>Option F - Budget Action with Lambda:</b>
+<ul>
+<li>✓ <b>Automated Response:</b> When budget reached, automatic action</li>
+<li>✓ <b>SNS Notification:</b> Triggers Lambda function</li>
+<li>✓ <b>Custom Logic:</b> Lambda can stop/terminate resources</li>
+<li>✓ <b>Flexible:</b> Can implement various enforcement strategies</li>
+<li>✓ <b>Audit Trail:</b> CloudWatch Logs + SNS records</li>
+</ul><br>
+
+<b>Lambda Function Example:</b>
+<pre>
+import boto3
+import json
+
+ec2 = boto3.client('ec2')
+rds = boto3.client('rds')
+
+def lambda_handler(event, context):
+    # Parse SNS message from Budget alert
+    message = json.loads(event['Records'][0]['Sns']['Message'])
+    account_id = message['accountId']
+    
+    # Stop all running EC2 instances
+    instances = ec2.describe_instances(
+        Filters=[{'Name': 'instance-state-name', 'Values': ['running']}]
+    )
+    
+    for reservation in instances['Reservations']:
+        for instance in reservation['Instances']:
+            ec2.stop_instances(InstanceIds=[instance['InstanceId']])
+            print(f"Stopped instance {instance['InstanceId']}")
+    
+    # Stop RDS instances
+    db_instances = rds.describe_db_instances()
+    for db in db_instances['DBInstances']:
+        if db['DBInstanceStatus'] == 'available':
+            rds.stop_db_instance(DBInstanceIdentifier=db['DBInstanceIdentifier'])
+            print(f"Stopped RDS {db['DBInstanceIdentifier']}")
+    
+    return {
+        'statusCode': 200,
+        'body': 'Resources stopped due to budget threshold'
+    }
+</pre><br>
+
+<b>Complete Architecture:</b>
+<pre>
+Developer Account
+  ├─ AWS Budget ($100/month)
+  │   ├─ 80% Alert → Email Warning
+  │   └─ 100% Alert → SNS Topic
+  │
+  ├─ SCP (Preventive)
+  │   ├─ Block large EC2 types
+  │   ├─ Block expensive RDS
+  │   └─ Block Redshift, SageMaker
+  │
+  └─ SNS → Lambda (Reactive)
+      └─ Stop/Terminate all resources
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - SCP for Spending Limit:</b>
+<ul>
+<li>❌ <b>SCPs don't support spending limits</b></li>
+<li>❌ SCPs control API actions, not costs</li>
+<li>❌ Cannot set budget amounts in SCPs</li>
+<li>❌ Wrong tool for cost management</li>
+</ul><br>
+
+<b>Option D - IAM Policy:</b>
+<ul>
+<li>❌ IAM policies apply within an account</li>
+<li>❌ Developers could modify or detach IAM policies</li>
+<li>❌ Need to apply to every user/role in account</li>
+<li>❌ Not centrally enforced like SCPs</li>
+<li>❌ Can be bypassed by account admin</li>
+<li>✓ <b>SCPs (Option C) are superior:</b> Cannot be overridden by account</li>
+</ul><br>
+
+<b>Option E - Native Budget Termination:</b>
+<ul>
+<li>❌ <b>AWS Budgets doesn't have built-in termination action</b></li>
+<li>❌ No native "terminate all services" feature</li>
+<li>❌ Can only send notifications or apply SCPs/IAM policies</li>
+<li>❌ Would need Lambda for custom actions (Option F)</li>
+</ul><br>
+
+<b>AWS Budgets Action Types (Actual):</b>
+<ul>
+<li>Apply IAM policy</li>
+<li>Apply SCP</li>
+<li>Target specific EC2/RDS instances (not "all services")</li>
+<li>Send SNS notification (for custom Lambda actions)</li>
+</ul><br>
+
+<b>Implementation Steps:</b>
+<ol>
+<li><b>Create Developer OU</b> in AWS Organizations</li>
+<li><b>Create SCP</b> to restrict costly services</li>
+<li><b>Attach SCP</b> to Developer OU</li>
+<li><b>Create AWS Budget</b> for each developer account ($100/month)</li>
+<li><b>Configure Budget Alerts:</b>
+   - 80%: Email notification
+   - 100%: SNS notification</li>
+<li><b>Create SNS Topic</b> for budget alerts</li>
+<li><b>Create Lambda Function</b> to stop/terminate resources</li>
+<li><b>Subscribe Lambda</b> to SNS topic</li>
+<li><b>Test</b> budget alerting and automation</li>
+</ol><br>
+
+<b>Additional Controls:</b>
+<ul>
+<li><b>Service Quotas:</b> Limit maximum instances per region</li>
+<li><b>Trusted Advisor:</b> Monitor cost optimization</li>
+<li><b>Cost Anomaly Detection:</b> ML-based unusual spend alerts</li>
+<li><b>Reserved Instances:</b> Not suitable for sandbox accounts</li>
+</ul><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Set budgets lower than actual acceptable spend (buffer)</li>
+<li>Multiple threshold alerts (50%, 80%, 100%)</li>
+<li>Notify developers before taking automated action</li>
+<li>Log all automated actions for audit</li>
+<li>Periodic review of SCP restrictions</li>
+<li>Tag resources for better cost tracking</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q7 ================= -->
+<div class="question">
+<pre>
+67) A company has applications in an AWS account that is named Source. The account is in an organization in AWS Organizations. One of the applications uses AWS Lambda functions and stores inventory data in an Amazon Aurora database. The application deploys the Lambda functions by using a deployment package. The company has configured automated backups for Aurora.
+
+The company wants to migrate the Lambda functions and the Aurora database to a new AWS account that is named Target. The application processes critical data, so the company must minimize downtime.
+
+Which solution will meet these requirements?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q7">
+A. Download the Lambda function deployment package from the Source account. Use the deployment package and create new Lambda functions in the Target account. Share the automated Aurora DB cluster snapshot with the Target account.
+</label>
+
+<label>
+<input type="radio" name="q7">
+B. Download the Lambda function deployment package from the Source account. Use the deployment package and create new Lambda functions in the Target account. Share the Aurora DB cluster with the Target account by using AWS Resource Access Manager (AWS RAM). Grant the Target account permission to clone the Aurora DB cluster.
+</label>
+
+<label>
+<input type="radio" name="q7">
+C. Use AWS Resource Access Manager (AWS RAM) to share the Lambda functions and the Aurora DB cluster with the Target account. Grant the Target account permission to clone the Aurora DB cluster.
+</label>
+
+<label>
+<input type="radio" name="q7">
+D. Use AWS Resource Access Manager (AWS RAM) to share the Lambda functions with the Target account. Share the automated Aurora DB cluster snapshot with the Target account.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>cross-account resource migration within AWS Organizations</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Migrate Lambda functions from Source to Target account</li>
+<li>Migrate Aurora database from Source to Target account</li>
+<li>Minimize downtime (critical data)</li>
+<li>Both accounts in same AWS Organization</li>
+</ul><br>
+
+<b>Why Option B is Correct:</b><br>
+
+<b>1. Lambda Migration (Download Deployment Package):</b>
+<ul>
+<li>✓ Download .zip deployment package from Source account</li>
+<li>✓ Recreate Lambda functions in Target account</li>
+<li>✓ Include:
+  <ul>
+  <li>Function code</li>
+  <li>Runtime configuration</li>
+  <li>Environment variables</li>
+  <li>IAM role/permissions</li>
+  <li>VPC configuration</li>
+  <li>Layers and dependencies</li>
+  </ul>
+</li>
+<li>✓ Quick process - minimal downtime</li>
+</ul><br>
+
+<b>Lambda Export Process:</b>
+<pre>
+# Download deployment package
+aws lambda get-function --function-name myFunction \
+  --query 'Code.Location' --output text | xargs curl -o function.zip
+
+# Create in Target account
+aws lambda create-function \
+  --function-name myFunction \
+  --runtime nodejs18.x \
+  --role arn:aws:iam::TARGET:role/lambda-role \
+  --handler index.handler \
+  --zip-file fileb://function.zip \
+  --profile target-account
+</pre><br>
+
+<b>2. Aurora Migration via AWS RAM Cloning:</b>
+<ul>
+<li>✓ <b>AWS RAM sharing:</b> Share Aurora cluster cross-account</li>
+<li>✓ <b>Clone operation:</b> Fast, copy-on-write mechanism</li>
+<li>✓ <b>Minimal downtime:</b> Clone is much faster than snapshot restore</li>
+<li>✓ <b>Data consistency:</b> Point-in-time consistent copy</li>
+<li>✓ <b>Within organization:</b> Simplified sharing process</li>
+</ul><br>
+
+<b>Aurora Clone Benefits:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>Clone</th><th>Snapshot Restore</th></tr>
+<tr><td>Speed</td><td>Minutes</td><td>Hours (depends on size)</td></tr>
+<tr><td>Storage</td><td>Copy-on-write (shared initially)</td><td>Full copy required</td></tr>
+<tr><td>Downtime</td><td>Minimal</td><td>Significant</td></tr>
+<tr><td>Cost</td><td>Lower (shared storage)</td><td>Higher (full copy)</td></tr>
+</table><br>
+
+<b>Aurora Clone Process:</b>
+<pre>
+1. Source Account:
+   - Share Aurora cluster via AWS RAM
+   - Grant clone permissions to Target account
+
+2. Target Account:
+   - Accept RAM share
+   - Clone the shared cluster
+   
+aws rds restore-db-cluster-to-point-in-time \
+  --source-db-cluster-identifier source-cluster \
+  --db-cluster-identifier target-cluster \
+  --restore-type copy-on-write \
+  --use-latest-restorable-time
+</pre><br>
+
+<b>Migration Architecture:</b>
+<pre>
+Source Account                    Target Account
+│
+├─ Lambda Functions              →  Lambda Functions (recreated)
+│  ├─ Deployment package           ├─ Same code
+│  ├─ Configuration                ├─ Same config  
+│  └─ Environment vars             └─ Same vars
+│
+└─ Aurora Cluster
+   │
+   ├─── AWS RAM Share ───→ Aurora Clone (copy-on-write)
+   │                         ├─ Same data
+   │                         ├─ Same schema
+   │                         └─ Independent cluster
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Snapshot Instead of Clone:</b>
+<ul>
+<li>❌ Snapshot restore takes much longer (hours vs minutes)</li>
+<li>❌ Doesn't minimize downtime as required</li>
+<li>❌ Full data copy required (slower, more expensive)</li>
+<li>❌ Not optimal for critical data with downtime requirements</li>
+<li>✓ Lambda migration part is correct</li>
+</ul><br>
+
+<b>Snapshot vs Clone Comparison:</b>
+<pre>
+Database Size: 1 TB
+
+Snapshot Restore:
+- Create snapshot: 30-60 minutes
+- Share snapshot: < 1 minute  
+- Restore snapshot: 2-4 hours
+<b>Total: 3-5 hours downtime</b>
+
+Clone:
+- Share cluster: < 1 minute
+- Clone cluster: 5-15 minutes
+<b>Total: ~15 minutes downtime</b>
+</pre><br>
+
+<b>Option C - RAM for Lambda:</b>
+<ul>
+<li>❌ <b>AWS RAM doesn't support sharing Lambda functions</b></li>
+<li>❌ Lambda functions cannot be shared cross-account via RAM</li>
+<li>❌ Must download and recreate Lambda functions</li>
+<li>✓ Aurora sharing part would work</li>
+</ul><br>
+
+<b>AWS RAM Supported Resources:</b>
+<ul>
+<li>✓ Aurora DB clusters</li>
+<li>✓ VPC subnets</li>
+<li>✓ Transit Gateway</li>
+<li>✓ License Manager configurations</li>
+<li>✓ Resource Groups</li>
+<li>❌ <b>NOT Lambda functions</b></li>
+<li>❌ NOT Lambda layers (different sharing mechanism)</li>
+</ul><br>
+
+<b>Option D - RAM for Lambda + Snapshot:</b>
+<ul>
+<li>❌ AWS RAM doesn't support Lambda functions</li>
+<li>❌ Snapshot is slower than clone</li>
+<li>❌ Combines two incorrect approaches</li>
+</ul><br>
+
+<b>Complete Migration Steps:</b>
+<ol>
+<li><b>Prepare Target Account:</b>
+   - Create VPC and subnets
+   - Create IAM roles for Lambda
+   - Set up security groups
+</li>
+<li><b>Migrate Lambda:</b>
+   - Export deployment packages
+   - Document configuration
+   - Create functions in Target
+   - Test function execution
+</li>
+<li><b>Share Aurora Cluster:</b>
+   - Create RAM resource share in Source
+   - Share Aurora cluster
+   - Specify Target account
+</li>
+<li><b>Clone Aurora:</b>
+   - Accept RAM share in Target
+   - Create clone of shared cluster
+   - Wait for clone completion (minutes)
+   - Verify data integrity
+</li>
+<li><b>Update Configuration:</b>
+   - Update Lambda to point to new Aurora endpoint
+   - Update connection strings
+   - Test end-to-end functionality
+</li>
+<li><b>Cutover:</b>
+   - Switch traffic to Target account
+   - Monitor for issues
+   - Decommission Source resources
+</li>
+</ol><br>
+
+<b>Downtime Minimization Strategy:</b>
+<pre>
+Total Downtime Breakdown:
+
+1. Lambda recreation:        5-10 minutes
+2. Aurora clone:             5-15 minutes  
+3. Configuration updates:    5 minutes
+4. Testing and validation:   10 minutes
+5. DNS/traffic cutover:      2-5 minutes
+
+<b>Total Estimated Downtime: 30-45 minutes</b>
+
+Vs. Snapshot approach: 3-5 hours
+</pre><br>
+
+<b>Post-Migration Validation:</b>
+<ul>
+<li>Verify Lambda functions execute correctly</li>
+<li>Check Aurora cluster connectivity</li>
+<li>Validate data integrity and completeness</li>
+<li>Test application workflows end-to-end</li>
+<li>Monitor CloudWatch metrics and logs</li>
+<li>Verify IAM permissions and security groups</li>
+</ul><br>
+
+<b>Cost Considerations:</b>
+<ul>
+<li>Aurora clone: Only pay for changed data (copy-on-write)</li>
+<li>Lambda: No migration cost, pay per invocation</li>
+<li>Data transfer: Within organization, minimal cost</li>
+<li>Snapshot: Would require full storage copy</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q8 ================= -->
+<div class="question">
+<pre>
+68) A company runs a Python script on an Amazon EC2 instance to process data. The script runs every 10 minutes. The script ingests files from an Amazon S3 bucket and processes the files. On average, the script takes approximately 5 minutes to process each file The script will not reprocess a file that the script has already processed.
+
+The company reviewed Amazon CloudWatch metrics and noticed that the EC2 instance is idle for approximately 40% of the time because of the file processing speed. The company wants to make the workload highly available and scalable. The company also wants to reduce long-term management overhead.
+
+Which solution will meet these requirements MOST cost-effectively?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q8">
+A. Migrate the data processing script to an AWS Lambda function. Use an S3 event notification to invoke the Lambda function to process the objects when the company uploads the objects.
+</label>
+
+<label>
+<input type="radio" name="q8">
+B. Create an Amazon Simple Queue Service (Amazon SQS) queue. Configure Amazon S3 to send event notifications to the SQS queue. Create an EC2 Auto Scaling group with a minimum size of one instance. Update the data processing script to poll the SQS queue. Process the S3 objects that the SQS message identifies.
+</label>
+
+<label>
+<input type="radio" name="q8">
+C. Migrate the data processing script to a container image. Run the data processing container on an EC2 instance. Configure the container to poll the S3 bucket for new objects and to process the resulting objects.
+</label>
+
+<label>
+<input type="radio" name="q8">
+D. Migrate the data processing script to a container image that runs on Amazon Elastic Container Service (Amazon ECS) on AWS Fargate. Create an AWS Lambda function that calls the Fargate RunTask API operation when the container processes the file. Use an S3 event notification to invoke the Lambda function.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests <b>cost optimization and serverless event-driven architectures</b>.<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>EC2 instance runs continuously (24/7)</li>
+<li>Script runs every 10 minutes via cron</li>
+<li>Average 5 minutes processing per file</li>
+<li>EC2 idle ~40% of the time</li>
+<li>Paying for idle compute resources</li>
+<li>Manual scaling management</li>
+</ul><br>
+
+<b>Utilization Analysis:</b>
+<pre>
+Script runs every 10 minutes:
+- Processing: ~5 minutes (50%)
+- Idle: ~5 minutes (50%)
+
+Actual observation: 40% idle time
+
+Monthly costs:
+- EC2 t3.medium: $0.0416/hour × 730 hours = ~$30/month
+- Always running, but only needed 60% of time
+- Wasted cost: ~$12/month on idle time
+</pre><br>
+
+<b>Requirements:</b>
+<ul>
+<li>High availability</li>
+<li>Scalability</li>
+<li>Reduce management overhead</li>
+<li>Cost-effective solution</li>
+</ul><br>
+
+<b>Why Option A is Correct:</b><br>
+
+<b>AWS Lambda Event-Driven Architecture:</b>
+<ul>
+<li>✓ <b>Zero Idle Cost:</b> Pay only when processing files</li>
+<li>✓ <b>Event-Driven:</b> S3 automatically triggers Lambda on upload</li>
+<li>✓ <b>Highly Available:</b> Multi-AZ by default</li>
+<li>✓ <b>Auto-Scaling:</b> Concurrent executions scale automatically</li>
+<li>✓ <b>No Infrastructure:</b> Zero management overhead</li>
+<li>✓ <b>Built-in Idempotency:</b> Can track processed files via metadata</li>
+</ul><br>
+
+<b>Lambda Architecture:</b>
+<pre>
+S3 Bucket (File Upload)
+    │
+    │ Event Notification
+    ↓
+Lambda Function
+    ├── Check if processed (S3 metadata/DynamoDB)
+    ├── Download file from S3
+    ├── Process file (~5 minutes)
+    ├── Upload results
+    └── Mark as processed
+</pre><br>
+
+<b>Lambda Configuration:</b>
+<pre>
+Runtime: Python 3.11
+Memory: 2048 MB (adjust based on processing needs)
+Timeout: 15 minutes (max, sufficient for 5-min processing)
+Concurrency: Unreserved (auto-scales)
+Ephemeral Storage: 512 MB - 10 GB
+Trigger: S3 Event (ObjectCreated)
+</pre><br>
+
+<b>Cost Comparison:</b>
+<table border="1" cellpadding="5">
+<tr>
+  <th>Solution</th>
+  <th>Compute Cost/Month</th>
+  <th>Management</th>
+  <th>Scalability</th>
+</tr>
+<tr>
+  <td>EC2 (Current)</td>
+  <td>$30 (always on)</td>
+  <td>High</td>
+  <td>Manual</td>
+</tr>
+<tr>
+  <td>Lambda</td>
+  <td>$5-10 (pay-per-use)</td>
+  <td>None</td>
+  <td>Automatic</td>
+</tr>
+<tr>
+  <td>ECS Fargate</td>
+  <td>$15-20</td>
+  <td>Low</td>
+  <td>Manual/Auto</td>
+</tr>
+<tr>
+  <td>EC2 Auto Scaling</td>
+  <td>$20-25</td>
+  <td>Medium</td>
+  <td>Automatic</td>
+</tr>
+</table><br>
+
+<b>Lambda Cost Calculation:</b>
+<pre>
+Assumptions:
+- 100 files/day
+- 5 minutes processing per file
+- 2 GB memory allocation
+
+Monthly:
+- Requests: 100 × 30 = 3,000
+- Duration: 3,000 × 300 seconds = 900,000 seconds
+- GB-seconds: 900,000 × 2 GB = 1,800,000
+
+Pricing:
+- Requests: 3,000 × $0.0000002 = $0.60
+- Compute: 1,800,000 × $0.0000166667 = $30.00
+
+<b>Total: ~$30/month (similar to EC2)</b>
+
+BUT:
+- No idle time waste
+- No management overhead
+- Auto-scaling included
+- High availability included
+
+Effective savings from reduced operational overhead: $$$
+</pre><br>
+
+<b>Lambda Implementation:</b>
+<pre>
+import boto3
+import json
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    # Get S3 event details
+    for record in event['Records']:
+        bucket = record['s3']['bucket']['name']
+        key = record['s3']['object']['key']
+        
+        # Check if already processed
+        try:
+            metadata = s3.head_object(Bucket=bucket, Key=key)
+            if metadata.get('Metadata', {}).get('processed') == 'true':
+                print(f"File {key} already processed")
+                return
+        except:
+            pass
+        
+        # Download and process file
+        response = s3.get_object(Bucket=bucket, Key=key)
+        file_content = response['Body'].read()
+        
+        # Process the file
+        processed_data = process_file(file_content)
+        
+        # Mark as processed
+        s3.put_object_tagging(
+            Bucket=bucket,
+            Key=key,
+            Tagging={'TagSet': [{'Key': 'processed', 'Value': 'true'}]}
+        )
+        
+        print(f"Successfully processed {key}")
+
+def process_file(content):
+    # Your processing logic here
+    pass
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option B - SQS + Auto Scaling EC2:</b>
+<ul>
+<li>❌ Minimum 1 instance always running (idle cost)</li>
+<li>❌ Still managing EC2 instances (patching, scaling)</li>
+<li>❌ More complex than Lambda (SQS + ASG + EC2)</li>
+<li>❌ Higher operational overhead</li>
+<li>❌ Not the MOST cost-effective</li>
+<li>✓ Would work but overly complex for this use case</li>
+</ul><br>
+
+<b>Option C - Containerized EC2:</b>
+<ul>
+<li>❌ Still running EC2 instance continuously</li>
+<li>❌ Polling S3 is inefficient (API calls every interval)</li>
+<li>❌ No improvement over current architecture</li>
+<li>❌ Still paying for idle time</li>
+<li>❌ Manual scaling management</li>
+<li>❌ Doesn't address any of the requirements</li>
+</ul><br>
+
+<b>Option D - Fargate + Lambda Orchestration:</b>
+<ul>
+<li>❌ Overly complex architecture</li>
+<li>❌ Lambda can process directly (no need for Fargate)</li>
+<li>❌ Higher cost (Fargate tasks + Lambda orchestrator)</li>
+<li>❌ Longer startup time (Fargate task launch)</li>
+<li>❌ More moving parts = more management</li>
+<li>✓ Would work for files exceeding 15-min processing</li>
+</ul><br>
+
+<b>When to Use Each Option:</b>
+<table border="1" cellpadding="5">
+<tr><th>Scenario</th><th>Best Solution</th></tr>
+<tr><td>Processing < 15 minutes</td><td>Lambda (Option A)</td></tr>
+<tr><td>Processing > 15 minutes</td><td>Fargate (Option D)</td></tr>
+<tr><td>Complex dependencies</td><td>ECS/Fargate</td></tr>
+<tr><td>Large memory (>10 GB)</td><td>Fargate or EC2</td></tr>
+<tr><td>Stateful processing</td><td>EC2 with Auto Scaling</td></tr>
+</table><br>
+
+<b>Lambda Advantages for This Use Case:</b>
+<ul>
+<li>✓ Processing time (5 min) well within limits (15 min)</li>
+<li>✓ Intermittent workload (files arrive periodically)</li>
+<li>✓ Stateless processing</li>
+<li>✓ Files don't need reprocessing (idempotent)</li>
+<li>✓ No complex dependencies</li>
+<li>✓ Event-driven trigger (S3 upload)</li>
+</ul><br>
+
+<b>High Availability:</b>
+<ul>
+<li>Lambda runs across multiple AZs automatically</li>
+<li>No single point of failure</li>
+<li>Automatic retries on failure</li>
+<li>Dead letter queue for persistent failures</li>
+</ul><br>
+
+<b>Scalability:</b>
+<ul>
+<li>Concurrent executions: Up to 1000 (default)</li>
+<li>Can request increase to thousands</li>
+<li>Each file processed independently</li>
+<li>Burst traffic handled automatically</li>
+</ul><br>
+
+<b>Additional Benefits:</b>
+<ul>
+<li>AWS X-Ray for tracing</li>
+<li>CloudWatch Logs automatic</li>
+<li>CloudWatch Metrics built-in</li>
+<li>VPC integration if needed</li>
+<li>Secrets Manager integration</li>
+<li>No OS patching required</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q9 ================= -->
+<div class="question">
+<pre>
+69) A financial services company in North America plans to release a new online web application to its customers on AWS. 
+The company will launch the application in the us-east-1 Region on Amazon EC2 instances. 
+The application must be highly available and must dynamically scale to meet user traffic. The company also wants to implement a disaster recovery environment for the application in the us-west-1 Region by using active-passive failover.
+
+Which solution will meet these requirements?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q9">
+A. Create a VPC in us-east-1 and a VPC in us-west-1. Configure VPC peering. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in both VPCs. Create an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in both VPCs. Place the Auto Scaling group behind the ALB.
+</label>
+
+<label>
+<input type="radio" name="q9">
+B. Create a VPC in us-east-1 and a VPC in us-west-1. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in that VPC. Create an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in the us-east-1 VPC. Place the Auto Scaling group behind the ALB. Set up the same configuration in the us-west-1 VPC. Create an Amazon Route 53 hosted zone. Create separate records for each ALB. Enable health checks to ensure high availability between Regions.
+</label>
+
+<label>
+<input type="radio" name="q9">
+C. Create a VPC in us-east-1 and a VPC in us-west-1. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in that VPC. Create an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in the us-east-1 VPC. Place the Auto Scaling group behind the ALB. Set up the same configuration in the us-west-1 VPC. Create an Amazon Route 53 hosted zone. Create separate records for each ALB. Enable health checks and configure a failover routing policy for each record.
+</label>
+
+<label>
+<input type="radio" name="q9">
+D. Create a VPC in us-east-1 and a VPC in us-west-1. Configure VPC peering. In the us-east-1 VPC, create an Application Load Balancer (ALB) that extends across multiple Availability Zones in both VPCs. Create an Auto Scaling group that deploys the EC2 instances across the multiple Availability Zones in both VPCs. Place the Auto Scaling group behind the ALB. Create an Amazon Route 53 hosted zone. Create a record for the ALB.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests <b>multi-region active-passive disaster recovery architecture with Route 53 failover</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Web application in us-east-1 (primary/active region)</li>
+<li>High availability within primary region</li>
+<li>Dynamic scaling based on traffic</li>
+<li>Disaster recovery in us-west-1 (passive region)</li>
+<li>Active-passive failover mechanism</li>
+</ul><br>
+
+<b>Why Option C is Correct:</b><br>
+
+<b>Multi-Region Architecture Components:</b><br>
+
+<b>1. us-east-1 (Active/Primary):</b>
+<ul>
+<li>✓ VPC with multiple Availability Zones</li>
+<li>✓ Application Load Balancer across multiple AZs</li>
+<li>✓ Auto Scaling group across multiple AZs</li>
+<li>✓ Handles all production traffic normally</li>
+</ul><br>
+
+<b>2. us-west-1 (Passive/DR):</b>
+<ul>
+<li>✓ Identical VPC setup</li>
+<li>✓ Application Load Balancer across multiple AZs</li>
+<li>✓ Auto Scaling group (can be scaled to minimum or warmed)</li>
+<li>✓ Ready to take over if primary fails</li>
+</ul><br>
+
+<b>3. Route 53 Failover Routing:</b>
+<ul>
+<li>✓ <b>Primary Record:</b> Points to us-east-1 ALB</li>
+<li>✓ <b>Secondary Record:</b> Points to us-west-1 ALB</li>
+<li>✓ <b>Health Checks:</b> Monitor primary region health</li>
+<li>✓ <b>Automatic Failover:</b> Switch to secondary on failure</li>
+<li>✓ <b>Failback:</b> Return to primary when healthy</li>
+</ul><br>
+
+<b>Route 53 Failover Configuration:</b>
+<pre>
+# Primary Record (us-east-1)
+Name: www.example.com
+Type: A (Alias)
+Value: us-east-1-alb.elb.amazonaws.com
+Routing Policy: Failover
+Failover Record Type: Primary
+Health Check: ALB-us-east-1-health
+Evaluate Target Health: Yes
+
+# Secondary Record (us-west-1)
+Name: www.example.com
+Type: A (Alias)
+Value: us-west-1-alb.elb.amazonaws.com
+Routing Policy: Failover
+Failover Record Type: Secondary
+Health Check: Not required (receives traffic only on primary failure)
+Evaluate Target Health: Yes
+</pre><br>
+
+<b>Architecture Diagram:</b>
+<pre>
+                       Route 53
+                   (Failover Policy)
+                          │
+                          │ Health Check
+          ┌───────────╪───────────┐
+          │ Primary            │ Secondary
+          │ (Active)           │ (Passive)
+          ↓                    ↓
+    us-east-1 ALB        us-west-1 ALB
+      (Multi-AZ)          (Multi-AZ)
+          │                    │
+    ┌────╪────┐          ┌────╪────┐
+    │         │          │         │
+  AZ-1a    AZ-1b      AZ-1a    AZ-1b
+  EC2      EC2        EC2      EC2
+  ASG      ASG        ASG      ASG
+</pre><br>
+
+<b>High Availability Within Region:</b>
+<ul>
+<li>ALB distributes traffic across multiple AZs</li>
+<li>Auto Scaling maintains desired capacity</li>
+<li>Automatic recovery from AZ failures</li>
+<li>Health checks remove unhealthy instances</li>
+</ul><br>
+
+<b>Failover Behavior:</b>
+<pre>
+<b>Normal Operation:</b>
+1. Route 53 health check monitors us-east-1 ALB
+2. Health check passes
+3. All traffic routed to us-east-1 (primary)
+4. us-west-1 idle or running at minimal capacity
+
+<b>Failure Scenario:</b>
+1. Regional failure in us-east-1
+2. Route 53 health check fails (3 consecutive failures)
+3. Route 53 automatically updates DNS
+4. Traffic routed to us-west-1 ALB (secondary)
+5. Auto Scaling in us-west-1 scales up if needed
+6. Application continues serving from DR region
+
+<b>Recovery:</b>
+1. us-east-1 issues resolved
+2. Health check passes again
+3. Route 53 fails back to primary
+4. Traffic returns to us-east-1
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Single ALB Across Regions:</b>
+<ul>
+<li>❌ <b>ALB cannot span regions</b></li>
+<li>❌ ALB is a regional service (can span AZs within a region only)</li>
+<li>❌ VPC peering doesn't enable cross-region ALB</li>
+<li>❌ Architecturally impossible</li>
+<li>❌ No disaster recovery capability</li>
+</ul><br>
+
+<b>Option B - Missing Failover Policy:</b>
+<ul>
+<li>✓ Correct multi-region setup</li>
+<li>✓ Separate ALBs in each region</li>
+<li>✓ Health checks enabled</li>
+<li>❌ <b>Doesn't specify failover routing policy</b></li>
+<li>❌ "Separate records" without failover = active-active or manual failover</li>
+<li>❌ Doesn't meet "active-passive" requirement</li>
+<li>❌ No automatic failover mechanism described</li>
+</ul><br>
+
+<b>Routing Policies Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Policy</th><th>Use Case</th><th>Behavior</th></tr>
+<tr><td>Failover (Option C)</td><td>Active-Passive DR</td><td>Automatic failover to secondary</td></tr>
+<tr><td>Weighted</td><td>A/B testing, gradual migration</td><td>Distribute traffic by percentage</td></tr>
+<tr><td>Latency</td><td>Performance optimization</td><td>Route to lowest latency</td></tr>
+<tr><td>Geolocation</td><td>Content localization</td><td>Route based on user location</td></tr>
+<tr><td>Simple (Option B)</td><td>Single resource</td><td>No failover logic</td></tr>
+</table><br>
+
+<b>Option D - Single ALB Across Regions (Same as A):</b>
+<ul>
+<li>❌ ALB cannot span multiple regions</li>
+<li>❌ VPC peering doesn't change this limitation</li>
+<li>❌ No multi-region resilience</li>
+<li>❌ Single point of failure (one region)</li>
+</ul><br>
+
+<b>Active-Passive DR Strategies:</b><br>
+
+<b>1. Pilot Light:</b>
+<ul>
+<li>Minimal resources in DR region</li>
+<li>Database replication active</li>
+<li>Scale up on failover</li>
+<li>Lower cost, higher RTO</li>
+</ul><br>
+
+<b>2. Warm Standby (Recommended for this scenario):</b>
+<ul>
+<li>Scaled-down version running in DR</li>
+<li>Can handle traffic immediately</li>
+<li>Scale up for full capacity</li>
+<li>Balance of cost and RTO</li>
+</ul><br>
+
+<b>3. Hot Standby:</b>
+<ul>
+<li>Full capacity in both regions</li>
+<li>Immediate failover</li>
+<li>Highest cost, lowest RTO</li>
+</ul><br>
+
+<b>Health Check Configuration:</b>
+<pre>
+Protocol: HTTPS
+Path: /health or /
+Port: 443
+Interval: 30 seconds
+Failure Threshold: 3 consecutive failures
+Success Threshold: 3 consecutive successes
+Timeout: 10 seconds
+String Matching: Optional (check for specific response)
+</pre><br>
+
+<b>Data Replication Considerations:</b>
+<ul>
+<li>RDS: Cross-region read replicas or Aurora Global Database</li>
+<li>S3: Cross-region replication (CRR)</li>
+<li>DynamoDB: Global tables</li>
+<li>EBS: Regular snapshots copied to DR region</li>
+</ul><br>
+
+<b>Failover Time Estimates:</b>
+<pre>
+DNS TTL: 60 seconds (recommended for failover)
+Health Check Detection: 60-90 seconds (3 failures at 30s interval)
+DNS Propagation: 60-120 seconds
+Application Scaling: 2-5 minutes (if warm standby)
+
+<b>Total RTO: 5-10 minutes</b>
+</pre><br>
+
+<b>Testing Failover:</b>
+<ol>
+<li>Simulate primary region failure</li>
+<li>Monitor Route 53 health check status</li>
+<li>Verify traffic switches to secondary</li>
+<li>Test application functionality in DR region</li>
+<li>Measure actual RTO/RPO</li>
+<li>Restore primary and test failback</li>
+</ol><br>
+
+<b>Cost Optimization:</b>
+<ul>
+<li>Primary: Full capacity Auto Scaling</li>
+<li>DR: Minimal capacity (e.g., 25% of primary)</li>
+<li>Scale DR on demand during failover</li>
+<li>Use reserved instances in primary</li>
+<li>Use on-demand in DR for flexibility</li>
+</ul><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Regular DR drills (monthly/quarterly)</li>
+<li>Monitor health checks continuously</li>
+<li>Keep DR environment synchronized</li>
+<li>Document failover procedures</li>
+<li>Set up alerting for health check failures</li>
+<li>Use infrastructure as code (CloudFormation/Terraform)</li>
+<li>Test application dependencies in DR</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q10 ================= -->
+<div class="question">
+<pre>
+70) A company has an environment that has a single AWS account. A solutions architect is reviewing the environment to recommend what the company could improve specifically in terms of access to the AWS Management Console. The company's IT support workers currently access the console for administrative tasks, authenticating with named IAM users that have been mapped to their job role.
+
+The IT support workers no longer want to maintain both their Active Directory and IAM user accounts. They want to be able to access the console by using their existing Active Directory credentials. The solutions architect is using AWS IAM Identity Center (AWS Single Sign-On) to implement this functionality.
+
+Which solution will meet these requirements MOST cost-effectively?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q10">
+A. Create an organization in AWS Organizations. Turn on the IAM Identity Center feature in Organizations. Create and configure a directory in AWS Directory Service for Microsoft Active Directory (AWS Managed Microsoft AD) with a two-way trust to the company's on-premises Active Directory. Configure IAM Identity Center and set the AWS Managed Microsoft AD directory as the identity source. Create permission sets and map them to the existing groups within the AWS Managed Microsoft AD directory.
+</label>
+
+<label>
+<input type="radio" name="q10">
+B. Create an organization in AWS Organizations. Turn on the IAM Identity Center feature in Organizations. Create and configure an AD Connector to connect to the company's on-premises Active Directory. Configure IAM Identity Center and select the AD Connector as the identity source. Create permission sets and map them to the existing groups within the company's Active Directory.
+</label>
+
+<label>
+<input type="radio" name="q10">
+C. Create an organization in AWS Organizations. Turn on all features for the organization. Create and configure a directory in AWS Directory Service for Microsoft Active Directory (AWS Managed Microsoft AD) with a two-way trust to the company's on-premises Active Directory. Configure IAM Identity Center and select the AWS Managed Microsoft AD directory as the identity source. Create permission sets and map them to the existing groups within the AWS Managed Microsoft AD directory.
+</label>
+
+<label>
+<input type="radio" name="q10">
+D. Create an organization in AWS Organizations. Turn on all features for the organization. Create and configure an AD Connector to connect to the company's on-premises Active Directory. Configure IAM Identity Center and set the AD Connector as the identity source. Create permission sets and map them to the existing groups within the company's Active Directory.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>AWS IAM Identity Center (SSO) integration with on-premises Active Directory</b>.<br><br>
+
+<b>Current State:</b>
+<ul>
+<li>Single AWS account</li>
+<li>IT workers use named IAM users</li>
+<li>IAM users mapped to job roles</li>
+<li>Active Directory for on-premises authentication</li>
+<li>Maintaining two sets of credentials (AD + IAM)</li>
+</ul><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Use existing Active Directory credentials for AWS Console access</li>
+<li>Eliminate dual credential maintenance</li>
+<li>Enable Single Sign-On (SSO)</li>
+<li>Most cost-effective solution</li>
+</ul><br>
+
+<b>Why Option B is Correct:</b><br>
+
+<b>AWS AD Connector Overview:</b>
+<ul>
+<li>✓ <b>Directory Proxy:</b> Redirects authentication requests to on-premises AD</li>
+<li>✓ <b>No Replication:</b> Doesn't copy or sync directory data</li>
+<li>✓ <b>Read-Only:</b> Queries existing AD (no write operations)</li>
+<li>✓ <b>Low Cost:</b> Pay only for connector (no directory hosting)</li>
+<li>✓ <b>Simple Setup:</b> Point-and-click configuration</li>
+<li>✓ <b>Existing Groups:</b> Use current AD groups directly</li>
+</ul><br>
+
+<b>Architecture:</b>
+<pre>
+IT Worker
+    │
+    │ 1. Access AWS Console
+    ↓
+IAM Identity Center
+    │
+    │ 2. Authenticate
+    ↓
+AD Connector (AWS)
+    │
+    │ 3. Proxy authentication
+    ↓
+On-Premises Active Directory
+    │
+    │ 4. Validate credentials
+    ↓
+IAM Identity Center
+    │
+    │ 5. Grant AWS access via permission sets
+    ↓
+AWS Console Access
+</pre><br>
+
+<b>AD Connector Characteristics:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>AD Connector</th><th>AWS Managed AD</th></tr>
+<tr><td>Cost</td><td>$36/month (small)</td><td>$146/month (small)</td></tr>
+<tr><td>Data Storage</td><td>None (proxy only)</td><td>Full AD replica in AWS</td></tr>
+<tr><td>Setup Complexity</td><td>Low</td><td>Medium-High</td></tr>
+<tr><td>Trust Relationship</td><td>Not needed</td><td>Required (two-way)</td></tr>
+<tr><td>Latency</td><td>Depends on connectivity</td><td>Low (local to AWS)</td></tr>
+<tr><td>High Availability</td><td>Two connectors</td><td>Multi-AZ automatic</td></tr>
+</table><br>
+
+<b>Implementation Steps:</b>
+<ol>
+<li><b>Create AWS Organization</b> (if not exists)</li>
+<li><b>Enable IAM Identity Center</b>
+   - Automatic when you enable it in Organizations</li>
+<li><b>Deploy AD Connector:</b>
+   <pre>
+   - Select VPC and subnets
+   - Provide on-premises AD DNS name
+   - Provide service account credentials
+   - Configure DNS forwarding
+   - Deploy in multiple AZs for HA
+   </pre>
+</li>
+<li><b>Configure IAM Identity Center:</b>
+   - Set identity source to AD Connector
+   - Sync AD groups to Identity Center
+</li>
+<li><b>Create Permission Sets:</b>
+   <pre>
+   Examples:
+   - AdminAccess: AdministratorAccess policy
+   - DeveloperAccess: PowerUserAccess policy
+   - ReadOnlyAccess: ReadOnlyAccess policy
+   </pre>
+</li>
+<li><b>Assign Permissions:</b>
+   - Map AD groups to permission sets
+   - Assign to AWS accounts
+</li>
+</ol><br>
+
+<b>Permission Set Mapping Example:</b>
+<pre>
+AD Group: IT-Admins
+  → Permission Set: AdminAccess
+  → AWS Account: Production
+
+AD Group: IT-Support
+  → Permission Set: ReadOnlyAccess  
+  → AWS Account: Production
+
+AD Group: Developers
+  → Permission Set: DeveloperAccess
+  → AWS Account: Development
+</pre><br>
+
+<b>Network Requirements:</b>
+<ul>
+<li>VPN or Direct Connect to on-premises</li>
+<li>Network connectivity to AD domain controllers</li>
+<li>Port 389 (LDAP) open</li>
+<li>Port 636 (LDAPS) for secure connection</li>
+<li>DNS resolution for AD domain</li>
+</ul><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - AWS Managed Microsoft AD:</b>
+<ul>
+<li>❌ <b>Higher Cost:</b> $146/month vs $36/month for AD Connector</li>
+<li>❌ <b>Unnecessary Complexity:</b> Full AD deployment not needed</li>
+<li>❌ <b>Two-Way Trust:</b> Complex to set up and maintain</li>
+<li>❌ <b>Replication:</b> Syncs data to AWS (not required)</li>
+<li>❌ <b>More Management:</b> Need to maintain AWS AD instance</li>
+<li>✓ Only needed if: Hosting AD-aware apps in AWS, need AD in AWS for latency</li>
+</ul><br>
+
+<b>When to Use AWS Managed AD:</b>
+<ul>
+<li>Running AD-integrated applications in AWS</li>
+<li>Need local AD for performance (low latency)</li>
+<li>Want to reduce dependency on on-premises AD</li>
+<li>Building AD forest in AWS</li>
+<li>Hybrid AD architecture requirements</li>
+</ul><br>
+
+<b>Option C - Managed AD + All Features:</b>
+<ul>
+<li>❌ Same as Option A (expensive, complex)</li>
+<li>❌ "All features" not required for IAM Identity Center</li>
+<li>❌ IAM Identity Center works without all Org features enabled</li>
+</ul><br>
+
+<b>Option D - AD Connector + All Features:</b>
+<ul>
+<li>✓ AD Connector part is correct (cost-effective)</li>
+<li>❌ "Turn on all features" is unnecessary</li>
+<li>❌ IAM Identity Center doesn't require all Organizations features</li>
+<li>❌ Adds complexity without benefit</li>
+</ul><br>
+
+<b>AWS Organizations Features:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>Consolidated Billing</th><th>All Features</th></tr>
+<tr><td>Billing consolidation</td><td>✓</td><td>✓</td></tr>
+<tr><td>Service Control Policies</td><td>❌</td><td>✓</td></tr>
+<tr><td>Tag policies</td><td>❌</td><td>✓</td></tr>
+<tr><td>IAM Identity Center</td><td>✓</td><td>✓</td></tr>
+<tr><td>Account management</td><td>Limited</td><td>Full</td></tr>
+</table><br>
+
+<b>Note:</b> IAM Identity Center works with just "Consolidated Billing" mode, though "All Features" provides additional governance capabilities.<br><br>
+
+<b>Cost Breakdown (Annual):</b>
+<pre>
+<b>Option B (AD Connector):</b>
+- AD Connector Small: $36/month × 12 = $432/year
+- IAM Identity Center: Free
+- Data transfer: Minimal
+<b>Total: ~$432/year</b>
+
+<b>Option A/C (Managed AD):</b>
+- AWS Managed AD Small: $146/month × 12 = $1,752/year
+- IAM Identity Center: Free
+- Data transfer: Minimal
+<b>Total: ~$1,752/year</b>
+
+<b>Savings with Option B: $1,320/year (75% less)</b>
+</pre><br>
+
+<b>AD Connector Service Account:</b>
+<pre>
+Required Permissions (minimum):
+- Read users and groups
+- Read group memberships
+- Validate user credentials
+
+Does NOT need:
+- Write permissions
+- Schema admin
+- Domain admin
+</pre><br>
+
+<b>User Experience:</b>
+<ol>
+<li>User navigates to AWS access portal URL</li>
+<li>Enters AD username and password</li>
+<li>IAM Identity Center validates via AD Connector</li>
+<li>User sees available AWS accounts</li>
+<li>Clicks account to access console</li>
+<li>Temporary credentials generated (no IAM user needed)</li>
+</ol><br>
+
+<b>Benefits Summary:</b>
+<ul>
+<li>✓ <b>Single Credential Set:</b> Only AD password to remember</li>
+<li>✓ <b>Centralized Management:</b> Manage access via AD groups</li>
+<li>✓ <b>No IAM Users:</b> Eliminate named IAM users</li>
+<li>✓ <b>Audit Trail:</b> CloudTrail logs all access</li>
+<li>✓ <b>MFA Support:</b> Can enforce MFA via Identity Center</li>
+<li>✓ <b>Temporary Credentials:</b> Auto-rotating, time-limited</li>
+<li>✓ <b>Cost-Effective:</b> Minimal additional cost</li>
+</ul><br>
+
+<b>Security Best Practices:</b>
+<ul>
+<li>Enable MFA in IAM Identity Center</li>
+<li>Use least privilege permission sets</li>
+<li>Regularly review group memberships</li>
+<li>Enable CloudTrail for all accounts</li>
+<li>Use session duration limits</li>
+<li>Implement network restrictions if needed</li>
+</ul><br>
+
+<b>Migration Path:</b>
+<ol>
+<li>Set up AD Connector and IAM Identity Center</li>
+<li>Create permission sets matching current IAM roles</li>
+<li>Assign users/groups to permission sets</li>
+<li>Test access with pilot group</li>
+<li>Train users on new access method</li>
+<li>Migrate all users</li>
+<li>Disable/delete old IAM users</li>
+<li>Monitor and adjust permissions as needed</li>
+</ol>
+</div>
+</div>
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 30px 0;">
+  <a href="page6.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page8.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div> <!-- end container -->
+
+<script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const isMultiSelect = q.querySelector('input[type="checkbox"]') !== null;
+  const inputs = q.querySelectorAll(isMultiSelect ? 'input[type="checkbox"]' : 'input[type="radio"]');
+  const labels = q.querySelectorAll("label");
+  const selected = [];
+
+  inputs.forEach((inp, idx) => {
+    if (inp.checked) selected.push(idx);
+  });
+
+  labels.forEach((label, idx) => {
+    label.classList.remove("user-correct", "user-wrong", "correct");
+    if (selected.includes(idx)) {
+      if (correct.includes(idx)) {
+        label.classList.add("user-correct");
+      } else {
+        label.classList.add("user-wrong");
+      }
+    }
+  });
+
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    q.appendChild(resultMsg);
+  }
+
+  const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+  if (isCorrect) {
+    resultMsg.textContent = "✔ Correct!";
+    resultMsg.style.color = "#10b981";
+    resultMsg.style.fontWeight = "600";
+  } else {
+    resultMsg.textContent = "✖ Incorrect. Try again or click 'Show Answer'.";
+    resultMsg.style.color = "#ef4444";
+    resultMsg.style.fontWeight = "600";
+  }
+  resultMsg.style.display = "block";
+}
+
+function showAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const labels = q.querySelectorAll("label");
+  
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  correct.forEach(i => labels[i].classList.add("correct"));
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
+}
+</script>
+
+</body>
+</html>

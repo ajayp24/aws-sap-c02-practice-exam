@@ -1,0 +1,1971 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 6</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page5.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page7.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 6)</h1>
+
+<!-- ================= Q1 ================= -->
+<div class="question">
+<pre>
+51) A health insurance company stores personally identifiable information (PII) in an Amazon S3 bucket. 
+The company uses server-side encryption with S3 managed encryption keys (SSE-S3) to encrypt the objects. 
+According to a new requirement, all current and future objects in the S3 bucket must be encrypted by keys that the company's security team manages. 
+The S3 bucket does not have versioning enabled.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q1">
+A. In the S3 bucket properties, change the default encryption to SSE-S3 with a customer managed key. Use the AWS CLI to re-upload all objects in the S3 bucket. Set an S3 bucket policy to deny unencrypted PutObject requests.
+</label>
+
+<label>
+<input type="radio" name="q1">
+B. In the S3 bucket properties, change the default encryption to server-side encryption with AWS KMS managed encryption keys (SSE-KMS). Set an S3 bucket policy to deny unencrypted PutObject requests. Use the AWS CLI to re-upload all objects in the S3 bucket.
+</label>
+
+<label>
+<input type="radio" name="q1">
+C. In the S3 bucket properties, change the default encryption to server-side encryption with AWS KMS managed encryption keys (SSE-KMS). Set an S3 bucket policy to automatically encrypt objects on GetObject and PutObject requests.
+</label>
+
+<label>
+<input type="radio" name="q1">
+D. In the S3 bucket properties, change the default encryption to AES-256 with a customer managed key. Attach a policy to deny unencrypted PutObject requests to any entities that access the S3 bucket. Use the AWS CLI to re-upload all objects in the S3 bucket.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>migrating S3 encryption from AWS-managed keys to customer-managed KMS keys</b>.<br><br>
+
+<b>Current State:</b>
+<ul>
+<li>S3 bucket with PII data</li>
+<li>Encrypted with SSE-S3 (AWS-managed keys)</li>
+<li>No versioning enabled</li>
+</ul><br>
+
+<b>New Requirement:</b> Security team must manage encryption keys<br><br>
+
+<b>S3 Encryption Options:</b><br><br>
+
+<b>1. SSE-S3 (Server-Side Encryption with S3-Managed Keys):</b>
+<ul>
+<li>AWS manages encryption keys</li>
+<li>Uses AES-256 encryption</li>
+<li>No customer control over keys</li>
+<li>No key rotation visibility</li>
+<li>No audit trail for key usage</li>
+</ul><br>
+
+<b>2. SSE-KMS (Server-Side Encryption with AWS KMS):</b>
+<ul>
+<li>Customer controls encryption keys via KMS</li>
+<li>Can use AWS-managed KMS key or customer-managed KMS key</li>
+<li>Full audit trail via CloudTrail</li>
+<li>Key rotation policies</li>
+<li>Granular access controls</li>
+<li>Meets compliance requirements</li>
+</ul><br>
+
+<b>3. SSE-C (Server-Side Encryption with Customer-Provided Keys):</b>
+<ul>
+<li>Customer provides encryption key with each request</li>
+<li>AWS doesn't store the key</li>
+<li>Operational overhead (key management)</li>
+</ul><br>
+
+<b>Option B Solution Breakdown:</b><br><br>
+
+<b>Step 1: Change Default Encryption to SSE-KMS</b><br>
+<pre>
+Console Steps:
+1. Navigate to S3 bucket → Properties
+2. Scroll to Default encryption
+3. Select: Server-side encryption with AWS KMS keys (SSE-KMS)
+4. Choose: AWS managed key or Customer managed key
+   - For security team control: Choose Customer managed key
+5. Select or create KMS key
+6. Save changes
+
+AWS CLI:
+aws s3api put-bucket-encryption \
+  --bucket my-pii-bucket \
+  --server-side-encryption-configuration '{
+    "Rules": [{
+      "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "aws:kms",
+        "KMSMasterKeyID": "arn:aws:kms:us-east-1:123456789012:key/abcd-1234"
+      },
+      "BucketKeyEnabled": true
+    }]
+  }'
+</pre><br>
+
+<b>What This Does:</b>
+<ul>
+<li>All NEW objects uploaded will use SSE-KMS automatically</li>
+<li>Existing objects remain encrypted with SSE-S3 (not changed)</li>
+<li>Default encryption applies to uploads without explicit encryption</li>
+</ul><br>
+
+<b>Step 2: Set S3 Bucket Policy to Deny Unencrypted Uploads</b><br>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyUnencryptedObjectUploads",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::my-pii-bucket/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption": "aws:kms"
+        }
+      }
+    },
+    {
+      "Sid": "DenyIncorrectKMSKey",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::my-pii-bucket/*",
+      "Condition": {
+        "StringNotEquals": {
+          "s3:x-amz-server-side-encryption-aws-kms-key-id": 
+            "arn:aws:kms:us-east-1:123456789012:key/abcd-1234"
+        }
+      }
+    }
+  ]
+}
+</pre><br>
+
+<b>Why This Policy:</b>
+<ul>
+<li><b>Preventive Control:</b> Blocks uploads without SSE-KMS</li>
+<li><b>Enforces Compliance:</b> No one can bypass encryption requirement</li>
+<li><b>Specific KMS Key:</b> Ensures correct customer-managed key is used</li>
+</ul><br>
+
+<b>Step 3: Re-upload All Objects (Migrate Existing Objects)</b><br>
+<pre>
+Why Re-upload:
+- Existing objects are encrypted with SSE-S3
+- S3 default encryption ONLY affects new uploads
+- Must re-upload to apply SSE-KMS to existing objects
+
+AWS CLI Method:
+# Copy objects to themselves with new encryption
+aws s3 cp s3://my-pii-bucket/ s3://my-pii-bucket/ \
+  --recursive \
+  --sse aws:kms \
+  --sse-kms-key-id arn:aws:kms:us-east-1:123456789012:key/abcd-1234 \
+  --metadata-directive REPLACE
+
+What This Does:
+- Reads each object from S3
+- Writes it back with SSE-KMS encryption
+- Replaces object in-place (same key)
+- Preserves metadata (with REPLACE directive)
+</pre><br>
+
+<b>Alternative: S3 Batch Operations</b><br>
+<pre>
+For large buckets (millions of objects):
+
+1. Create S3 Inventory:
+   - Lists all objects in bucket
+   - CSV format
+
+2. Create S3 Batch Operations Job:
+   - Input: S3 Inventory CSV
+   - Operation: Copy (to same bucket)
+   - Encryption: SSE-KMS with specific key
+   
+3. Benefits:
+   - Handles millions of objects
+   - Tracks progress
+   - Generates completion report
+   - Can retry failures
+</pre><br>
+
+<b>Why Order Matters in Option B:</b><br>
+<ol>
+<li><b>Set Default Encryption First:</b> Ensures future objects use KMS</li>
+<li><b>Set Bucket Policy Second:</b> Enforces encryption requirement</li>
+<li><b>Re-upload Last:</b> Migrates existing objects to KMS encryption</li>
+</ol><br>
+
+If you re-upload before setting the policy, there's a window where unencrypted uploads could occur.<br><br>
+
+<b>Customer-Managed KMS Key Benefits:</b><br>
+<pre>
+Key Control:
+- Security team controls key lifecycle
+- Can enable/disable key
+- Can schedule key deletion
+- Define key policies
+
+Audit Trail:
+- CloudTrail logs all key usage
+- See who accessed what data
+- When keys were used
+- Which S3 objects were accessed
+
+Access Control:
+- Fine-grained IAM policies
+- Separate permissions for encrypt/decrypt
+- Cross-account access control
+- VPC endpoint policies
+
+Compliance:
+- Meet regulatory requirements (HIPAA, PCI-DSS)
+- Demonstrate key management
+- Encryption key rotation
+</pre><br>
+
+<b>Cost Considerations:</b><br>
+<pre>
+SSE-S3: No additional cost
+
+SSE-KMS Costs:
+- KMS key: $1/month per key
+- API requests: $0.03 per 10,000 requests
+  
+For PII bucket with 1M objects:
+- Initial re-upload: 1M PUT requests = $3
+- Monthly reads (assume 10M): $30
+- Key storage: $1
+Total: ~$34/month (vs. $0 for SSE-S3)
+
+Worth it for PII due to:
+- Compliance requirements
+- Audit capabilities
+- Security team control
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> "SSE-S3 with a customer managed key" is technically incorrect - SSE-S3 uses AWS-managed keys, not customer-managed keys. This is a contradiction in terms. SSE-S3 never uses customer-managed keys. The correct service for customer-managed keys is SSE-KMS.<br>
+<b>Option C:</b> S3 bucket policies cannot "automatically encrypt objects on GetObject and PutObject" - bucket policies only allow or deny actions based on conditions. They can enforce that uploads MUST be encrypted (deny if not encrypted), but they cannot perform encryption themselves. Encryption must be specified in the upload request or via default encryption settings.<br>
+<b>Option D:</b> "AES-256 with a customer managed key" is not a valid S3 encryption option. The valid options are SSE-S3 (AES-256 with AWS-managed keys), SSE-KMS (customer-managed KMS keys), or SSE-C (customer-provided keys in each request). This option conflates encryption algorithms with key management approaches.
+</div>
+</div>
+
+
+<!-- ================= Q2 ================= -->
+<div class="question">
+<pre>
+52) A company is running a web application in the AWS Cloud. The application consists of dynamic content that is created on a set of Amazon EC2 instances. The EC2 instances run in an Auto Scaling group that is configured as a target group for an Application Load Balancer (ALB).
+
+The company is using an Amazon CloudFront distribution to distribute the application globally. The CloudFront distribution uses the ALB as an origin. The company uses Amazon Route 53 for DNS and has created an A record of www.example.com for the CloudFront distribution.
+
+A solutions architect must configure the application so that it is highly available and fault tolerant.
+
+Which solution meets these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q2">
+A. Provision a full, secondary application deployment in a different AWS Region. Update the Route 53 A record to be a failover record. Add both of the CloudFront distributions as values. Create Route 53 health checks.
+</label>
+
+<label>
+<input type="radio" name="q2">
+B. Provision an ALB, an Auto Scaling group, and EC2 instances in a different AWS Region. Update the CloudFront distribution, and create a second origin for the new ALB. Create an origin group for the two origins. Configure one origin as primary and one origin as secondary.
+</label>
+
+<label>
+<input type="radio" name="q2">
+C. Provision an Auto Scaling group and EC2 instances in a different AWS Region. Create a second target for the new Auto Scaling group in the ALB. Set up the failover routing algorithm on the ALB.
+</label>
+
+<label>
+<input type="radio" name="q2">
+D. Provision a full, secondary application deployment in a different AWS Region. Create a second CloudFront distribution, and add the new application setup as an origin. Create an AWS Global Accelerator accelerator. Add both of the CloudFront distributions as endpoints.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question addresses <b>multi-region high availability with CloudFront origin failover</b>.<br><br>
+
+<b>Current Architecture:</b>
+<pre>
+Route 53 (www.example.com)
+    ↓
+CloudFront Distribution (Global CDN)
+    ↓
+ALB (Region 1)
+    ↓
+Auto Scaling Group → EC2 Instances
+</pre><br>
+
+<b>Problem:</b> Single region = single point of failure<br><br>
+
+<b>CloudFront Origin Groups Feature:</b><br>
+
+CloudFront origin groups provide <b>automatic failover between origins</b>:<br>
+<ul>
+<li>Configure multiple origins (primary and secondary)</li>
+<li>CloudFront monitors origin health</li>
+<li>Automatic failover on origin failure</li>
+<li>Seamless for end users</li>
+<li>No DNS changes needed</li>
+</ul><br>
+
+<b>Option B Solution Architecture:</b><br>
+<pre>
+                Route 53 (www.example.com)
+                        ↓
+            CloudFront Distribution (Single)
+                   /        \
+         Origin 1 (Primary)  Origin 2 (Secondary)
+              ↓                      ↓
+        ALB (us-east-1)         ALB (us-west-2)
+              ↓                      ↓
+        Auto Scaling            Auto Scaling
+              ↓                      ↓
+        EC2 Instances           EC2 Instances
+</pre><br>
+
+<b>Implementation Steps:</b><br><br>
+
+<b>Step 1: Deploy Secondary Application Stack</b><br>
+<pre>
+In us-west-2 (if primary is us-east-1):
+
+1. Create VPC and subnets
+2. Create Application Load Balancer
+3. Create Launch Template for EC2 instances
+4. Create Auto Scaling Group
+5. Configure ALB target group
+6. Deploy application code
+7. Test application independently
+</pre><br>
+
+<b>Step 2: Create CloudFront Origin Group</b><br>
+<pre>
+Console Steps:
+1. Go to CloudFront → Distributions → Select distribution
+2. Go to Origins tab
+3. Create origin for secondary ALB:
+   - Origin Domain: alb-west.us-west-2.elb.amazonaws.com
+   - Protocol: HTTPS
+   - Origin Shield: Enabled (optional, for better performance)
+
+4. Create Origin Group:
+   - Name: multi-region-failover
+   - Primary origin: alb-east (us-east-1 ALB)
+   - Secondary origin: alb-west (us-west-2 ALB)
+   - Failover criteria: 
+     • HTTP 5xx status codes
+     • Origin timeout
+     • Origin connection errors
+
+5. Update behavior to use origin group (not individual origin)
+</pre><br>
+
+<b>Step 3: Configure Failover Criteria</b><br>
+<pre>
+Failover Triggers:
+- HTTP 500 (Internal Server Error)
+- HTTP 502 (Bad Gateway)
+- HTTP 503 (Service Unavailable)
+- HTTP 504 (Gateway Timeout)
+- Origin connection timeout (default: 30 sec)
+- Origin response timeout (default: 30 sec)
+
+CloudFront Behavior:
+1. Request sent to primary origin (us-east-1 ALB)
+2. If primary fails with 5xx or timeout:
+   - CloudFront marks origin as unhealthy
+   - Automatically retries with secondary origin (us-west-2 ALB)
+3. Response served from secondary origin
+4. Future requests continue to secondary until primary recovers
+</pre><br>
+
+<b>CloudFront Origin Failover Logic:</b><br>
+<pre>
+Request Flow:
+
+Normal Operation:
+  User → CloudFront → Primary Origin → Success → User
+
+Primary Origin Failure:
+  User → CloudFront → Primary Origin → 503 Error
+       → CloudFront detects failure
+       → CloudFront → Secondary Origin → Success → User
+
+Primary Recovery:
+  - CloudFront periodically checks primary health
+  - Once primary responds successfully
+  - CloudFront switches back to primary origin
+</pre><br>
+
+<b>Benefits of This Approach:</b><br>
+
+<b>1. Single CloudFront Distribution:</b>
+<ul>
+<li>One DNS endpoint for users</li>
+<li>No Route 53 failover needed</li>
+<li>Simpler than multiple distributions</li>
+<li>Single SSL certificate</li>
+<li>Unified caching strategy</li>
+</ul><br>
+
+<b>2. Automatic Failover:</b>
+<ul>
+<li>Sub-second failover time</li>
+<li>No manual intervention</li>
+<li>No DNS propagation delays</li>
+<li>Transparent to users</li>
+</ul><br>
+
+<b>3. Cost-Effective:</b>
+<ul>
+<li>Pay for secondary region only when used</li>
+<li>Auto Scaling can have min=0 in secondary (or min=1 for faster failover)</li>
+<li>Single CloudFront distribution (not double)</li>
+</ul><br>
+
+<b>Complete Configuration Example:</b><br>
+<pre>
+CloudFront Distribution:
+
+Origins:
+  1. origin-primary:
+     Domain: alb-prod-123.us-east-1.elb.amazonaws.com
+     Protocol: HTTPS only
+     Custom Headers: X-Custom-Header: from-cloudfront
+     
+  2. origin-secondary:
+     Domain: alb-prod-456.us-west-2.elb.amazonaws.com
+     Protocol: HTTPS only
+     Custom Headers: X-Custom-Header: from-cloudfront
+
+Origin Groups:
+  multi-region-failover:
+    Primary: origin-primary
+    Secondary: origin-secondary
+    Failover status codes: 500, 502, 503, 504
+
+Behaviors:
+  Default (*):
+    Origin: multi-region-failover (origin group)
+    Viewer Protocol Policy: Redirect HTTP to HTTPS
+    Allowed HTTP Methods: GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE
+    Cache Policy: CachingOptimized
+    Origin Request Policy: AllViewer
+</pre><br>
+
+<b>Testing Failover:</b><br>
+<pre>
+Test Scenarios:
+
+1. Simulate Primary Region Failure:
+   - Stop Auto Scaling group in us-east-1
+   - Or modify ALB security group to block CloudFront
+   - CloudFront automatically fails over to us-west-2
+   - Users experience minimal disruption
+
+2. Monitor Failover:
+   - CloudWatch Metrics:
+     • OriginLatency (per origin)
+     • 4xxErrorRate, 5xxErrorRate
+     • Requests (per origin)
+   - CloudFront Access Logs:
+     • x-edge-result-type: Miss, Hit, Error
+     • cs-uri-stem: Request path
+
+3. Verify Primary Recovery:
+   - Restart us-east-1 Auto Scaling group
+   - CloudFront detects health
+   - Switches back to primary
+   - Traffic flows through us-east-1 again
+</pre><br>
+
+<b>Data Consistency Considerations:</b><br>
+
+For dynamic content, ensure both regions can serve requests:
+<ul>
+<li><b>Database:</b> Use Aurora Global Database or DynamoDB Global Tables</li>
+<li><b>Sessions:</b> Store in ElastiCache Global Datastore or DynamoDB</li>
+<li><b>Uploads:</b> Use S3 Cross-Region Replication</li>
+<li><b>Code Deployment:</b> Deploy same version to both regions</li>
+</ul><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Creating two separate CloudFront distributions and using Route 53 failover is overly complex and has several issues: (1) DNS failover has propagation delays (TTL-dependent, typically minutes), (2) Two CloudFront distributions mean double the costs and complexity, (3) Separate SSL certificates needed, (4) Cache warming required for both distributions. CloudFront origin groups provide built-in, faster failover without these drawbacks.<br>
+<b>Option C:</b> ALBs cannot have targets in different AWS Regions. ALBs are regional services - they can only route to targets within the same region. You cannot "create a second target for the new Auto Scaling group in the ALB" if that Auto Scaling group is in a different region. Also, "failover routing algorithm on the ALB" doesn't exist - ALBs use round-robin, least outstanding requests, or flow hash algorithms, none of which provide multi-region failover.<br>
+<b>Option D:</b> AWS Global Accelerator with two CloudFront distributions is unnecessarily complex and expensive. Global Accelerator is typically used to accelerate TCP/UDP traffic or to provide static IP addresses for applications. Using it in front of CloudFront (which is already a global CDN) provides no meaningful benefit and adds latency (extra hop) and cost. Origin groups within a single CloudFront distribution achieve the same goal more simply and cost-effectively.
+</div>
+</div>
+
+
+<!-- ================= Q3 ================= -->
+<div class="question">
+<pre>
+53) A company has an organization in AWS Organizations that has a large number of AWS accounts. One of the AWS accounts is designated as a transit account and has a transit gateway that is shared with all of the other AWS accounts. AWS Site-to-Site VPN connections are configured between all of the company's global offices and the transit account. The company has AWS Config enabled on all of its accounts.
+
+The company's networking team needs to centrally manage a list of internal IP address ranges that belong to the global offices. Developers will reference this list to gain access to their applications securely.
+
+Which solution meets these requirements with the LEAST amount of operational overhead?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q3">
+A. Create a JSON file that is hosted in Amazon S3 and that lists all of the internal IP address ranges. Configure an Amazon Simple Notification Service (Amazon SNS) topic in each of the accounts that can be invoked when the JSON file is updated. Subscribe an AWS Lambda function to the SNS topic to update all relevant security group rules with the updated IP address ranges.
+</label>
+
+<label>
+<input type="radio" name="q3">
+B. Create a new AWS Config managed rule that contains all of the internal IP address ranges. Use the rule to check the security groups in each of the accounts to ensure compliance with the list of IP address ranges. Configure the rule to automatically remediate any noncompliant security group that is detected.
+</label>
+
+<label>
+<input type="radio" name="q3">
+C. In the transit account, create a VPC prefix list with all of the internal IP address ranges. Use AWS Resource Access Manager to share the prefix list with all of the other accounts. Use the shared prefix list to configure security group rules in the other accounts.
+</label>
+
+<label>
+<input type="radio" name="q3">
+D. In the transit account, create a security group with all of the internal IP address ranges. Configure the security groups in the other accounts to reference the transit account's security group by using a nested security group reference of "/sg-1a2b3c4d".
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests <b>centralized IP address management using VPC Managed Prefix Lists with AWS RAM sharing</b>.<br><br>
+
+<b>Problem Statement:</b>
+<ul>
+<li>Multiple AWS accounts in organization</li>
+<li>Need to reference internal office IP ranges in security groups</li>
+<li>IP ranges should be centrally managed</li>
+<li>Developers need to use these ranges across accounts</li>
+<li>Minimize operational overhead</li>
+</ul><br>
+
+<b>VPC Managed Prefix Lists:</b><br>
+
+A <b>prefix list</b> is a set of CIDR blocks that can be referenced as a single entity:<br>
+<ul>
+<li>Create once, reference many times</li>
+<li>Update centrally, changes propagate automatically</li>
+<li>Can be shared across accounts via AWS RAM</li>
+<li>Supported in security groups, route tables, transit gateway routes</li>
+</ul><br>
+
+<b>Option C Implementation:</b><br><br>
+
+<b>Step 1: Create Managed Prefix List in Transit Account</b><br>
+<pre>
+Console Steps:
+1. VPC Dashboard → Managed Prefix Lists → Create prefix list
+
+Configuration:
+  Name: corporate-office-ips
+  Address family: IPv4
+  Max entries: 50 (estimate based on number of offices)
+  
+  Entries:
+  - 10.1.0.0/16 (New York Office)
+  - 10.2.0.0/16 (London Office)
+  - 10.3.0.0/16 (Tokyo Office)
+  - 192.168.10.0/24 (Remote Office 1)
+  - 192.168.20.0/24 (Remote Office 2)
+  
+2. Create the prefix list
+
+AWS CLI:
+aws ec2 create-managed-prefix-list \
+  --prefix-list-name corporate-office-ips \
+  --address-family IPv4 \
+  --max-entries 50 \
+  --entries Cidr=10.1.0.0/16,Description="NY Office" \
+            Cidr=10.2.0.0/16,Description="London Office" \
+            Cidr=10.3.0.0/16,Description="Tokyo Office"
+</pre><br>
+
+<b>Step 2: Share Prefix List via AWS Resource Access Manager</b><br>
+<pre>
+AWS RAM Console:
+1. Navigate to AWS RAM → Create resource share
+
+Configuration:
+  Name: shared-corporate-ips
+  
+  Resources:
+  - Select resource type: Prefix Lists
+  - Select: pl-12345678 (corporate-office-ips)
+  
+  Principals:
+  - Share with: Your organization (ou-xxxx-xxxxxxxx)
+  - Or specific accounts: 111111111111, 222222222222
+  
+  Permissions: Default (allows use in security groups/routes)
+
+2. Create resource share
+
+AWS CLI:
+aws ram create-resource-share \
+  --name shared-corporate-ips \
+  --resource-arns arn:aws:ec2:us-east-1:123456789012:prefix-list/pl-12345678 \
+  --principals arn:aws:organizations::123456789012:organization/o-xxxx
+</pre><br>
+
+<b>Step 3: Accept Resource Share (if needed)</b><br>
+<pre>
+In member accounts:
+1. AWS RAM console → Shared with me
+2. See pending invitation for prefix list
+3. Accept resource share
+4. Prefix list now available in that account
+
+Note: If sharing with entire organization and 
+      "Enable sharing with AWS Organizations" is enabled,
+      acceptance is automatic.
+</pre><br>
+
+<b>Step 4: Use Shared Prefix List in Security Groups</b><br>
+<pre>
+In ANY member account:
+
+Console:
+1. EC2 → Security Groups → Select security group
+2. Edit inbound rules
+3. Add rule:
+   Type: SSH (or any type)
+   Source: Select "Prefix list"
+   Prefix list: pl-12345678 (corporate-office-ips)
+   Description: Corporate office access
+
+AWS CLI:
+aws ec2 authorize-security-group-ingress \
+  --group-id sg-abcdef123 \
+  --ip-permissions \
+    IpProtocol=tcp,FromPort=22,ToPort=22,PrefixListIds=[{PrefixListId=pl-12345678}]
+</pre><br>
+
+<b>Security Group Rule Example:</b><br>
+<pre>
+Before (manual CIDR management):
+Inbound Rules:
+  SSH | TCP | 22 | 10.1.0.0/16 | NY Office
+  SSH | TCP | 22 | 10.2.0.0/16 | London Office
+  SSH | TCP | 22 | 10.3.0.0/16 | Tokyo Office
+  SSH | TCP | 22 | 192.168.10.0/24 | Remote 1
+  SSH | TCP | 22 | 192.168.20.0/24 | Remote 2
+
+After (prefix list):
+Inbound Rules:
+  SSH | TCP | 22 | pl-12345678 (corporate-office-ips) | All offices
+
+Benefits:
+  - Single rule instead of 5
+  - Centrally managed
+  - Automatic updates
+  - Consistent across accounts
+</pre><br>
+
+<b>Updating the Prefix List:</b><br>
+<pre>
+When new office added or IP changes:
+
+In Transit Account Only:
+1. VPC → Managed Prefix Lists → corporate-office-ips
+2. Edit entries
+3. Add new entry: 10.4.0.0/16 (Singapore Office)
+4. Save changes
+
+Automatic Propagation:
+  - Change takes effect immediately
+  - All security groups referencing this prefix list 
+    across ALL accounts automatically updated
+  - No action required in member accounts
+  - No Lambda functions to run
+  - No manual updates
+
+This is the power of centralized management!
+</pre><br>
+
+<b>Architecture Diagram:</b><br>
+<pre>
+Transit Account (Network Hub)
+├─ VPC Managed Prefix List
+│  └─ 10.1.0.0/16, 10.2.0.0/16, 10.3.0.0/16
+│
+├─ AWS Resource Access Manager
+│  └─ Share prefix list with organization
+│
+└─ Transit Gateway + VPN Connections
+
+Member Accounts (100s of accounts)
+├─ Account A
+│  └─ Security Groups reference pl-12345678
+│
+├─ Account B
+│  └─ Security Groups reference pl-12345678
+│
+└─ Account C
+   └─ Security Groups reference pl-12345678
+
+Update in transit account → Automatically propagates to all accounts
+</pre><br>
+
+<b>Operational Benefits:</b><br>
+
+<b>Centralized Management:</b>
+<ul>
+<li>Single source of truth for IP ranges</li>
+<li>Network team controls prefix list</li>
+<li>Developers use, not manage</li>
+</ul><br>
+
+<b>Automatic Updates:</b>
+<ul>
+<li>Add/remove/modify IP ranges in one place</li>
+<li>Changes propagate instantly</li>
+<li>No scripts, Lambda, or automation needed</li>
+</ul><br>
+
+<b>Consistency:</b>
+<ul>
+<li>All accounts reference same prefix list</li>
+<li>No drift between accounts</li>
+<li>Compliance enforcement easier</li>
+</ul><br>
+
+<b>Scalability:</b>
+<ul>
+<li>Works with 1 or 1000 accounts</li>
+<li>No per-account configuration</li>
+<li>RAM sharing handles distribution</li>
+</ul><br>
+
+<b>Audit Trail:</b><br>
+<pre>
+CloudTrail Events:
+- CreateManagedPrefixList
+- ModifyManagedPrefixList
+- CreateResourceShare
+- AuthorizeSecurityGroupIngress (with prefix list ID)
+
+Who changed what, when:
+  - Network team updates prefix list
+  - Developers use prefix list in security groups
+  - All tracked via CloudTrail
+</pre><br>
+
+<b>Cost:</b><br>
+<pre>
+VPC Managed Prefix Lists: FREE
+AWS RAM sharing: FREE
+Total cost: $0
+
+Compare to Option A:
+- S3 storage + requests
+- Lambda invocations (per account)
+- SNS messages
+- Operational overhead
+Total: $$$
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> This creates significant operational overhead: (1) Must maintain JSON file in S3, (2) SNS topic in EACH account, (3) Lambda function in EACH account to parse JSON and update security groups, (4) Lambda needs permissions to modify security groups, (5) Must handle concurrent updates, failures, retries, (6) No automatic propagation - requires custom automation, (7) Prone to errors and drift between accounts. This is the opposite of "LEAST operational overhead."<br>
+<b>Option B:</b> AWS Config is a compliance checking service, not an IP address management service. Config rules detect non-compliance but don't provide a mechanism to centrally define and distribute IP address lists. Config can check if security groups match certain patterns, but you'd still need to hard-code the IP ranges into the rule definition (not centralized). Config remediation can fix violations but doesn't solve the central management problem.<br>
+<b>Option D:</b> Cross-account security group references don't work with CIDR blocks. You can reference another security group (within the same VPC or via VPC peering), but that referenced security group would need to have EC2 instances in it - you can't just put CIDR blocks in a security group and reference it. This is a fundamental misunderstanding of how security group references work. Also, the syntax "/sg-1a2b3c4d" is incorrect.
+</div>
+</div>
+
+
+<!-- ================= Q4 ================= -->
+<div class="question">
+<pre>
+54) A company runs a new application as a static website in Amazon S3. The company has deployed the application to a production AWS account and uses Amazon CloudFront to deliver the website. The website calls an Amazon API Gateway REST API. An AWS Lambda function backs each API method.
+
+The company wants to create a CSV report every 2 weeks to show each API Lambda function's recommended configured memory, recommended cost, and the price difference between current configurations and the recommendations. The company will store the reports in an S3 bucket.
+
+Which solution will meet these requirements with the LEAST development time?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q4">
+A. Create a Lambda function that extracts metrics data for each API Lambda function from Amazon CloudWatch Logs for the 2-week period. Collate the data into tabular format. Store the data as a .csv file in an S3 bucket. Create an Amazon EventBridge rule to schedule the Lambda function to run every 2 weeks.
+</label>
+
+<label>
+<input type="radio" name="q4">
+B. Opt in to AWS Compute Optimizer. Create a Lambda function that calls the ExportLambdaFunctionRecommendations operation. Export the .csv file to an S3 bucket. Create an Amazon EventBridge rule to schedule the Lambda function to run every 2 weeks.
+</label>
+
+<label>
+<input type="radio" name="q4">
+C. Opt in to AWS Compute Optimizer. Set up enhanced infrastructure metrics. Within the Compute Optimizer console, schedule a job to export the Lambda recommendations to a .csv file. Store the file in an S3 bucket every 2 weeks.
+</label>
+
+<label>
+<input type="radio" name="q4">
+D. Purchase the AWS Business Support plan for the production account. Opt in to AWS Compute Optimizer for AWS Trusted Advisor checks. In the Trusted Advisor console, schedule a job to export the cost optimization checks to a .csv file. Store the file in an S3 bucket every 2 weeks.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests knowledge of <b>AWS Compute Optimizer for Lambda function optimization recommendations with automated exports</b>.<br><br>
+
+<b>AWS Compute Optimizer Overview:</b><br>
+
+Compute Optimizer analyzes workloads and provides recommendations to optimize:<br>
+<ul>
+<li>EC2 instances (right-sizing)</li>
+<li>Auto Scaling groups</li>
+<li>EBS volumes</li>
+<li><b>Lambda functions (memory configuration)</b></li>
+<li>ECS services on Fargate</li>
+</ul><br>
+
+For Lambda, it provides:<br>
+<ul>
+<li>Recommended memory configuration</li>
+<li>Current vs. recommended cost</li>
+<li>Potential cost savings</li>
+<li>Performance risk assessment</li>
+</ul><br>
+
+<b>Option B Implementation:</b><br><br>
+
+<b>Step 1: Opt In to AWS Compute Optimizer</b><br>
+<pre>
+Console:
+1. Navigate to AWS Compute Optimizer
+2. Click "Opt in" (one-time setup)
+3. Choose scope: This account or Organization
+4. Opt in
+
+Requirements:
+- No cost for service (only pay for CloudWatch metrics)
+- Automatically collects Lambda metrics
+- 14-day warm-up period for initial data
+
+What Compute Optimizer Analyzes:
+- Lambda invocations over last 14 days
+- Memory utilization
+- Duration metrics
+- Throttling events
+- Error rates
+</pre><br>
+
+<b>Step 2: Create Lambda Function for Export</b><br>
+<pre>
+Python Lambda Function:
+
+import boto3
+import json
+from datetime import datetime
+
+compute_optimizer = boto3.client('compute-optimizer')
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    # Call ExportLambdaFunctionRecommendations API
+    response = compute_optimizer.export_lambda_function_recommendations(
+        accountIds=['123456789012'],
+        s3DestinationConfig={
+            'Bucket': 'my-optimization-reports',
+            'KeyPrefix': 'lambda-recommendations/'
+        },
+        fileFormat='Csv',
+        includeMemberAccounts=False
+    )
+    
+    job_id = response['jobId']
+    print(f"Export job started: {job_id}")
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps(f'Export job {job_id} initiated')
+    }
+
+IAM Permissions Required:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "compute-optimizer:ExportLambdaFunctionRecommendations",
+        "compute-optimizer:GetLambdaFunctionRecommendations"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:PutObjectAcl"
+      ],
+      "Resource": "arn:aws:s3:::my-optimization-reports/*"
+    }
+  ]
+}
+</pre><br>
+
+<b>Step 3: Schedule with EventBridge</b><br>
+<pre>
+EventBridge Rule:
+
+Name: bi-weekly-lambda-optimization-report
+Schedule: cron(0 9 ? * MON#2,MON#4 *)  
+  (Every 2nd and 4th Monday of month at 9 AM)
+  
+Or for exact 2-week intervals:
+cron(0 9 1,15 * ? *)  (1st and 15th of month at 9 AM)
+
+Target: Lambda function (compute-optimizer-exporter)
+
+EventBridge creates the schedule, invokes Lambda, 
+Lambda calls Compute Optimizer API, report exported to S3.
+</pre><br>
+
+<b>CSV Report Contents:</b><br>
+<pre>
+Exported CSV includes:
+
+Columns:
+- Function ARN
+- Function Name
+- Function Version
+- Current Memory (MB)
+- Recommended Memory (MB)
+- Current Cost ($/month estimate)
+- Recommended Cost ($/month estimate)
+- Estimated Savings ($/month)
+- Estimated Savings Percentage (%)
+- Performance Risk (Low/Medium/High)
+- Finding (Optimized, Under-provisioned, Over-provisioned)
+- Reason Codes
+- Lookback Period (days)
+
+Example Row:
+arn:aws:lambda:us-east-1:123:function:api-handler,
+  api-handler, $LATEST, 1024, 512, $15.20, $7.60, $7.60, 50%, Low,
+  Over-provisioned, "Memory under-utilized"
+</pre><br>
+
+<b>Complete Workflow:</b><br>
+<pre>
+Timeline:
+
+Day 0: Opt in to Compute Optimizer
+Day 1-14: Compute Optimizer collects Lambda metrics
+Day 15: First export available
+
+Every 2 weeks:
+  1. EventBridge triggers Lambda at 9 AM
+  2. Lambda calls ExportLambdaFunctionRecommendations
+  3. Compute Optimizer generates CSV
+  4. CSV uploaded to S3: s3://bucket/lambda-recommendations/YYYY-MM-DD/recommendations.csv
+  5. Team reviews report
+  6. Implement recommended changes
+</pre><br>
+
+<b>Benefits of Compute Optimizer:</b><br>
+
+<b>1. Machine Learning-Based:</b>
+<ul>
+<li>Analyzes actual usage patterns</li>
+<li>Not just average metrics</li>
+<li>Considers performance risk</li>
+</ul><br>
+
+<b>2. Comprehensive Data:</b>
+<ul>
+<li>Memory recommendations</li>
+<li>Cost projections</li>
+<li>Savings calculations</li>
+<li>Performance impact analysis</li>
+</ul><br>
+
+<b>3. Minimal Development:</b>
+<ul>
+<li>Simple API call</li>
+<li>AWS generates CSV</li>
+<li>No parsing CloudWatch Logs</li>
+<li>No cost calculation logic needed</li>
+</ul><br>
+
+<b>Example Optimization Scenario:</b><br>
+<pre>
+Function: api-user-handler
+
+Current Configuration:
+- Memory: 1024 MB
+- Avg Utilization: 45% (460 MB)
+- Monthly invocations: 10 million
+- Duration: 100ms avg
+- Current cost: $20.83/month
+
+Compute Optimizer Recommendation:
+- Recommended Memory: 512 MB
+- Performance Risk: Low
+- Estimated Duration: 105ms (5% slower, acceptable)
+- Recommended cost: $10.42/month
+- Estimated Savings: $10.41/month (50%)
+
+Action:
+- Test with 512 MB in staging
+- Verify performance acceptable
+- Deploy to production
+- Realize 50% cost savings
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Building custom logic to extract CloudWatch Logs, calculate memory recommendations, compute cost projections, and generate CSV requires significant development effort. You'd need to: parse logs, calculate percentiles, determine optimal memory, query Lambda pricing, compute cost differences, generate CSV format. This is HIGH development time, not LEAST. Compute Optimizer already does all this.<br>
+<b>Option C:</b> Compute Optimizer console does NOT have a built-in "schedule a job to export" feature. You cannot schedule automatic exports from the console. Exports must be triggered via API (ExportLambdaFunctionRecommendations) or manually through the console. This option describes a capability that doesn't exist.<br>
+<b>Option D:</b> AWS Trusted Advisor provides cost optimization checks but NOT for Lambda memory configuration. Trusted Advisor focuses on unused/underutilized resources (idle EC2, unattached EBS, etc.). It doesn't provide Lambda memory sizing recommendations with cost differentials. Also, "Opt in to AWS Compute Optimizer for AWS Trusted Advisor checks" is incorrect - these are separate services. Trusted Advisor doesn't have scheduled CSV exports for Lambda optimization.
+</div>
+</div>
+
+
+<!-- ================= Q5 ================= -->
+<div class="question">
+<pre>
+55) A company's factory and automation applications are running in a single VPC. More than 20 applications run on a combination of Amazon EC2, Amazon Elastic Container Service (Amazon ECS), and Amazon RDS.
+
+The company has software engineers spread across three teams. One of the three teams owns each application, and each team is responsible for the cost and performance of all of its applications. Team resources have tags that represent their application and team. The teams use IAM access for daily activities.
+
+The company needs to determine which costs on the monthly AWS bill are attributable to each application or team. The company also must be able to create reports to compare costs from the last 12 months and to help forecast costs for the next 12 months. A solutions architect must recommend an AWS Billing and Cost Management solution that provides these cost reports.
+
+Which combination of actions will meet these requirements? (Choose three.)
+</pre>
+
+<div class="options">
+<label>
+<input type="checkbox" name="q5">
+A. Activate the user-defined cost allocation tags that represent the application and the team.
+</label>
+
+<label>
+<input type="checkbox" name="q5">
+B. Activate the AWS generated cost allocation tags that represent the application and the team.
+</label>
+
+<label>
+<input type="checkbox" name="q5">
+C. Create a cost category for each application in Billing and Cost Management.
+</label>
+
+<label>
+<input type="checkbox" name="q5">
+D. Activate IAM access to Billing and Cost Management.
+</label>
+
+<label>
+<input type="checkbox" name="q5">
+E. Create a cost budget.
+</label>
+
+<label>
+<input type="checkbox" name="q5">
+F. Enable Cost Explorer.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0,2,5])">Check Answer</button>
+<button onclick="showAnswer(this,[0,2,5])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A, C, F</b><br><br>
+
+This question addresses <b>cost allocation and reporting using tags, cost categories, and Cost Explorer</b>.<br><br>
+
+<b>Requirements Analysis:</b>
+<ul>
+<li>Attribute costs to each application and team</li>
+<li>Resources already tagged (application, team)</li>
+<li>Compare costs over last 12 months</li>
+<li>Forecast costs for next 12 months</li>
+<li>Teams need to see their costs</li>
+</ul><br>
+
+<b>Option A: Activate User-Defined Cost Allocation Tags</b><br><br>
+
+<b>Cost Allocation Tags:</b><br>
+
+Tags become cost allocation tags when activated in Billing console:<br>
+<ul>
+<li>User-defined tags: Custom tags you create (Application, Team, Environment)</li>
+<li>AWS-generated tags: AWS creates automatically (aws:createdBy, aws:cloudformation:stack-name)</li>
+</ul><br>
+
+<b>Activation Process:</b><br>
+<pre>
+1. Navigate to AWS Billing Console
+2. Cost Allocation Tags
+3. User-Defined Cost Allocation Tags tab
+4. See tags used in your account:
+   - Application
+   - Team
+   - Environment
+   - Project
+5. Select tags to activate:
+   ☑ Application
+   ☑ Team
+6. Click "Activate"
+
+After Activation:
+- Takes up to 24 hours to appear in reports
+- Tags appear as dimensions in Cost Explorer
+- Tags included in Cost and Usage Reports
+- Can filter/group costs by these tags
+</pre><br>
+
+<b>Tagging Example:</b><br>
+<pre>
+EC2 Instance:
+  Tags:
+    Application: inventory-system
+    Team: team-alpha
+    Environment: production
+
+ECS Service:
+  Tags:
+    Application: order-processor
+    Team: team-beta
+    Environment: production
+
+RDS Instance:
+  Tags:
+    Application: customer-database
+    Team: team-alpha
+    Environment: production
+
+After tag activation, costs appear in reports grouped by these tags.
+</pre><br>
+
+<b>Option C: Create Cost Categories</b><br><br>
+
+<b>AWS Cost Categories:</b><br>
+
+Cost Categories map costs to business units using rules based on tags:<br>
+<ul>
+<li>Define custom cost groupings</li>
+<li>Rules based on tags, accounts, services, etc.</li>
+<li>Hierarchical organization</li>
+<li>Split costs across multiple categories</li>
+</ul><br>
+
+<b>Creating Cost Categories:</b><br>
+<pre>
+Console: Billing → Cost Categories → Create cost category
+
+Example 1: By Application
+Name: Applications
+Rules:
+  - inventory-system:
+      Tag: Application = inventory-system
+  - order-processor:
+      Tag: Application = order-processor
+  - customer-database:
+      Tag: Application = customer-database
+  - user-authentication:
+      Tag: Application = user-authentication
+
+Example 2: By Team
+Name: Teams
+Rules:
+  - team-alpha:
+      Tag: Team = team-alpha
+  - team-beta:
+      Tag: Team = team-beta
+  - team-gamma:
+      Tag: Team = team-gamma
+
+Usage:
+- Cost Explorer can filter/group by cost category
+- More intuitive than raw tags
+- Easier for business reporting
+</pre><br>
+
+<b>Cost Category Benefits:</b><br>
+<ul>
+<li><b>Business Alignment:</b> Match AWS costs to business structure</li>
+<li><b>Flexibility:</b> One resource can belong to multiple categories</li>
+<li><b>Reporting:</b> Generate reports by business unit</li>
+<li><b>Forecasting:</b> Forecast costs per category</li>
+</ul><br>
+
+<b>Advanced Cost Category Rules:</b><br>
+<pre>
+Example: Shared Infrastructure
+
+Rule: Shared Services
+  Condition: 
+    Tag: Environment = shared
+  Split Method: Proportional
+  
+This splits shared infrastructure costs (VPC, NAT Gateway) 
+proportionally across teams based on their usage.
+</pre><br>
+
+<b>Option F: Enable Cost Explorer</b><br><br>
+
+<b>AWS Cost Explorer:</b><br>
+
+Interactive tool for visualizing and analyzing costs:<br>
+<ul>
+<li>View historical costs (up to 12 months)</li>
+<li>Forecast future costs (up to 12 months)</li>
+<li>Filter by tags, services, regions, etc.</li>
+<li>Create custom reports</li>
+<li>Save reports for recurring use</li>
+</ul><br>
+
+<b>Enabling Cost Explorer:</b><br>
+<pre>
+1. AWS Billing Console → Cost Explorer
+2. Click "Enable Cost Explorer"
+3. Wait 24 hours for initial data population
+4. Historical data available immediately
+5. Forecasting available after few days of data
+
+Cost: 
+- First feature view: Free
+- Saved reports: Free
+- API access: $0.01 per request
+</pre><br>
+
+<b>Using Cost Explorer for Requirements:</b><br><br>
+
+<b>1. View Costs by Team:</b><br>
+<pre>
+Filter:
+- Group by: Tag (Team)
+- Time range: Last 12 months
+- Granularity: Monthly
+
+Result:
+Month     | team-alpha | team-beta | team-gamma
+---------|------------|-----------|------------
+Jan 2025 | $5,234     | $3,421    | $4,123
+Feb 2025 | $5,456     | $3,567    | $4,234
+...
+
+Chart shows cost trends per team over time.
+</pre><br>
+
+<b>2. View Costs by Application:</b><br>
+<pre>
+Filter:
+- Group by: Cost Category (Applications)
+- Service: All
+- Time range: Last 6 months
+
+Result:
+Application         | Cost
+--------------------|--------
+inventory-system    | $12,345
+order-processor     | $8,765
+customer-database   | $6,543
+user-authentication | $3,210
+</pre><br>
+
+<b>3. Forecast Future Costs:</b><br>
+<pre>
+Cost Explorer Forecasting:
+
+Based on historical usage patterns, predicts:
+- Next 3 months: High confidence
+- Next 6 months: Medium confidence
+- Next 12 months: Lower confidence
+
+Example Forecast:
+Current monthly cost (team-alpha): $5,500
+Forecasted monthly cost (3 months): $6,200
+Trend: +12.7% growth
+
+Confidence band: $5,900 - $6,500
+</pre><br>
+
+<b>Complete Solution Architecture:</b><br>
+<pre>
+Step 1: Tag Resources (Already Done)
+  EC2, ECS, RDS tagged with Application and Team
+
+Step 2: Activate Cost Allocation Tags (Option A)
+  Billing Console → Activate "Application" and "Team" tags
+
+Step 3: Create Cost Categories (Option C)
+  Category: Applications (by Application tag)
+  Category: Teams (by Team tag)
+
+Step 4: Enable Cost Explorer (Option F)
+  Billing Console → Enable Cost Explorer
+
+Step 5: Create Reports
+  - Monthly cost by team
+  - Monthly cost by application
+  - 12-month historical comparison
+  - 12-month forecast
+  - Save reports for recurring use
+
+Step 6: Grant Team Access
+  IAM policies to allow teams to view their costs
+</pre><br>
+
+<b>Sample Cost Report:</b><br>
+<pre>
+Team Alpha - Monthly Cost Report
+Application         | Jan    | Feb    | Mar    | Forecast Apr
+--------------------|--------|--------|--------|-------------
+inventory-system    | $2,100 | $2,200 | $2,150 | $2,300
+customer-database   | $1,500 | $1,550 | $1,600 | $1,650
+shared-infrastructure| $800   | $850   | $900   | $950
+--------------------|--------|--------|--------|-------------
+Total Team Alpha    | $4,400 | $4,600 | $4,650 | $4,900
+
+YoY Growth: +8.5%
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> AWS-generated cost allocation tags like aws:createdBy or aws:cloudformation:stack-name are useful but don't represent "application and team" as stated in the question. The resources are already tagged with custom "Application" and "Team" tags (user-defined), so activating AWS-generated tags won't help attribute costs to applications and teams. Option A (user-defined tags) is the correct choice.<br>
+<b>Option D:</b> Activating IAM access to Billing is about permissions (who can see billing data), not cost allocation or reporting. While teams may need billing access to view their costs, this doesn't help "determine which costs are attributable to each application or team" or create historical/forecast reports. It's a permission setting, not a cost allocation mechanism.<br>
+<b>Option E:</b> Creating a cost budget helps monitor spending and get alerts when costs exceed thresholds, but it doesn't provide cost attribution, historical comparisons, or forecasting. Budgets are for spend control (alerts when team-alpha exceeds $5,000/month), not for analyzing which resources cost how much or comparing trends over 12 months. Different purpose.
+</div>
+</div>
+
+
+<!-- ================= Q6 ================= -->
+<div class="question">
+<pre>
+56) A company is running an application in the AWS Cloud. The company's security team must approve the creation of all new IAM users. When a new IAM user is created, all access keys must be removed within 24 hours. The security team must be notified immediately if an access key is created.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q6">
+A. Create an Amazon EventBridge rule that invokes an AWS Lambda function when an IAM access key is created. Configure the Lambda function to remove the access key and send a notification to the security team through an Amazon Simple Notification Service (Amazon SNS) topic.
+</label>
+
+<label>
+<input type="radio" name="q6">
+B. Create an AWS Config rule to check for the creation of IAM access keys. Configure automatic remediation to remove the access key and publish a message to an Amazon Simple Notification Service (Amazon SNS) topic.
+</label>
+
+<label>
+<input type="radio" name="q6">
+C. Create an Amazon EventBridge rule that filters for IAM CreateUser API calls. Configure the rule to invoke an AWS Lambda function to remove the access key. Send a notification to the security team through an Amazon Simple Notification Service (Amazon SNS) topic.
+</label>
+
+<label>
+<input type="radio" name="q6">
+D. Create an AWS CloudTrail event that invokes an AWS Lambda function when an IAM access key is created. Configure the Lambda function to remove the access key and publish a message to an Amazon Simple Notification Service (Amazon SNS) topic.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests <b>event-driven automation for IAM security compliance using EventBridge and Lambda</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Detect when IAM access keys are created</li>
+<li>Remove access keys within 24 hours</li>
+<li>Notify security team immediately upon creation</li>
+</ul><br>
+
+<b>Option A: EventBridge + Lambda Solution</b><br><br>
+
+<b>Architecture:</b><br>
+<pre>
+IAM API: CreateAccessKey
+    ↓
+CloudTrail logs event
+    ↓
+EventBridge rule (matches CreateAccessKey)
+    ↓
+Lambda function
+    ↓
+    ├─→ Delete access key (IAM:DeleteAccessKey)
+    └─→ Publish to SNS (notify security team)
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> AWS Config checks for configuration compliance but is NOT real-time - it runs periodic evaluations (every few hours by default). The requirement is to "notify security team immediately" when an access key is created. Config introduces hours of delay, violating the immediate notification requirement.<br>
+<b>Option C:</b> This filters for "CreateUser" API calls, not "CreateAccessKey". Creating a user doesn't necessarily create an access key - they're separate API calls. The requirement is to detect access key creation specifically (CreateAccessKey event), not user creation.<br>
+<b>Option D:</b> CloudTrail is a logging service, not an event source. CloudTrail doesn't directly invoke Lambda functions. The correct architecture is CloudTrail (logs) → EventBridge (detects pattern) → Lambda (acts). Option A uses EventBridge correctly.
+</div>
+</div>
+
+
+<!-- ================= Q7 ================= -->
+<div class="question">
+<pre>
+57) A company uses Amazon S3 as its data lake. The company has a new partner that must use SFTP to upload data files. A solutions architect needs to implement a highly available SFTP solution that minimizes operational overhead.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q7">
+A. Create an SFTP connector in AWS Transfer Family. Configure the SFTP connector with the S3 bucket as the destination. Create an AWS Transfer Family managed workflow to transfer the file to the S3 bucket.
+</label>
+
+<label>
+<input type="radio" name="q7">
+B. Create an Amazon EC2 instance in a private subnet. Instruct the partner to upload files to the EC2 instance by using a VPN connection. Run a script on the EC2 instance to upload files to the S3 bucket.
+</label>
+
+<label>
+<input type="radio" name="q7">
+C. Configure an S3 File Gateway as an SFTP server. Configure the S3 File Gateway with the S3 bucket as the destination.
+</label>
+
+<label>
+<input type="radio" name="q7">
+D. Create an SFTP server endpoint by using AWS Transfer Family. Configure the SFTP server endpoint with the S3 bucket as the destination.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question addresses <b>AWS Transfer Family for managed SFTP access to S3 with high availability and minimal operational overhead</b>.<br><br>
+
+<b>AWS Transfer Family Overview:</b>
+
+Fully managed service for file transfers:<br>
+<ul>
+<li>Protocols: SFTP, FTPS, FTP, AS2</li>
+<li>Storage: S3, EFS</li>
+<li>Authentication: Service-managed, Active Directory, custom (Lambda)</li>
+<li>Highly available by default</li>
+<li>Scales automatically</li>
+</ul><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> SFTP Connectors in AWS Transfer Family are for OUTBOUND connections - they allow AWS to connect to external SFTP servers to retrieve files, not for partners to upload files TO AWS. The question requires INBOUND SFTP access (partner uploads to AWS). Option A has the direction reversed.<br>
+<b>Option B:</b> Self-managing SFTP on EC2 has high operational overhead: OS patching, security updates, SFTP server configuration, monitoring, backup, scaling. Single EC2 instance is not highly available - you'd need Auto Scaling, ALB, shared EFS, significantly more complexity.<br>
+<b>Option C:</b> S3 File Gateway is NOT an SFTP server - it's an on-premises gateway appliance that provides NFS/SMB access to S3 for on-premises applications. It doesn't support SFTP protocol. Completely wrong service for this use case.
+</div>
+</div>
+
+
+<!-- ================= Q8 ================= -->
+<div class="question">
+<pre>
+58) A company has a new application that needs to run on five Amazon EC2 instances in a single AWS Region. The application requires high-throughput, low-latency network connections between all of the EC2 instances.
+
+There is no requirement for the application to be fault-tolerant.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q8">
+A. Launch five new EC2 instances into a cluster placement group. Ensure that the EC2 instance type supports enhanced networking.
+</label>
+
+<label>
+<input type="radio" name="q8">
+B. Launch five new EC2 instances into an Auto Scaling group in the same Availability Zone. Attach an extra elastic network interface to each EC2 instance.
+</label>
+
+<label>
+<input type="radio" name="q8">
+C. Launch five new EC2 instances into a partition placement group. Ensure that the EC2 instance type supports enhanced networking.
+</label>
+
+<label>
+<input type="radio" name="q8">
+D. Launch five new EC2 instances into a spread placement group. Attach an extra elastic network interface to each EC2 instance.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests knowledge of <b>EC2 placement groups and enhanced networking for high-performance inter-instance communication</b>.<br><br>
+
+<b>EC2 Placement Groups:</b><br>
+
+<b>1. Cluster Placement Group:</b>
+<ul>
+<li>Packs instances close together in single AZ</li>
+<li>Low latency (sub-millisecond)</li>
+<li>High throughput (10 Gbps or more)</li>
+<li>Best for HPC, tightly-coupled workloads</li>
+</ul><br>
+
+<b>2. Spread Placement Group:</b>
+<ul>
+<li>Spreads instances across distinct hardware</li>
+<li>Reduces correlated failures</li>
+<li>Max 7 instances per AZ</li>
+</ul><br>
+
+<b>3. Partition Placement Group:</b>
+<ul>
+<li>Divides instances into partitions (different racks)</li>
+<li>Each partition isolated from others</li>
+<li>Best for large distributed workloads (Hadoop, Cassandra)</li>
+</ul><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Auto Scaling group doesn't provide network performance benefits - it's for availability/scaling. Being in the same AZ helps latency but without a cluster placement group, instances could be on different racks/hardware. Adding extra ENIs doesn't improve throughput between instances.<br>
+<b>Option C:</b> Partition placement groups are designed to spread instances across different partitions (separate racks) to reduce correlated failures. This INCREASES latency between instances, opposite of what's needed.<br>
+<b>Option D:</b> Spread placement groups explicitly separate instances onto distinct underlying hardware to minimize correlated failures. This is the OPPOSITE of what's needed - it maximizes distance between instances, increasing latency and reducing throughput.
+</div>
+</div>
+
+
+<!-- ================= Q9 ================= -->
+<div class="question">
+<pre>
+59) A company has deployed a web application on AWS. The company hosts the backend database on multiple Amazon RDS for PostgreSQL DB instances in an Amazon Aurora DB cluster. The web application makes many concurrent queries to the database.
+
+The company has a monitoring system that monitors database performance. The monitoring system has detected that the database is experiencing performance degradation during times of high usage.
+
+What should a solutions architect recommend to improve performance?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q9">
+A. Create an RDS Proxy for the database. Configure the application to use the proxy endpoint.
+</label>
+
+<label>
+<input type="radio" name="q9">
+B. Migrate the database to Amazon DynamoDB with on-demand scaling.
+</label>
+
+<label>
+<input type="radio" name="q9">
+C. Configure the application to read from the Aurora Replica instead of the primary DB instance.
+</label>
+
+<label>
+<input type="radio" name="q9">
+D. Use Amazon ElastiCache for Redis to cache query results.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question addresses <b>Amazon RDS Proxy for connection pooling and database performance optimization</b>.<br><br>
+
+<b>Problem Analysis:</b>
+<ul>
+<li>Many concurrent queries to database</li>
+<li>Performance degradation during high usage</li>
+<li>Aurora PostgreSQL cluster (already has replicas)</li>
+</ul><br>
+
+<b>Root Cause: Connection Exhaustion</b><br>
+
+Each database connection consumes resources:<br>
+<ul>
+<li>Memory (connection buffers)</li>
+<li>CPU (connection management)</li>
+<li>Connection limits (max_connections)</li>
+</ul><br>
+
+Many concurrent web requests → Many database connections → Database overwhelmed<br><br>
+
+<b>Option A: RDS Proxy Solution</b><br><br>
+
+<b>RDS Proxy Benefits:</b>
+<ul>
+<li><b>Connection Pooling:</b> Reuses existing connections</li>
+<li><b>Reduces Connection Overhead:</b> Fewer connections to database</li>
+<li><b>Handles Failover:</b> Automatic reconnection during failures</li>
+<li><b>IAM Integration:</b> Secure authentication</li>
+<li><b>Lambda Friendly:</b> Perfect for serverless applications</li>
+</ul><br>
+
+<b>How RDS Proxy Works:</b><br>
+<pre>
+Without RDS Proxy:
+1000 concurrent web requests → 1000 database connections
+    → Database overwhelmed
+
+With RDS Proxy:
+1000 concurrent web requests → RDS Proxy (pool: 50 connections) → Database
+    → Database handles only 50 connections
+    → Much better performance
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Migrating from Aurora PostgreSQL to DynamoDB is a massive architectural change requiring complete application rewrite (SQL to NoSQL). It's not a simple performance fix - it's a months-long migration project. The question asks for performance improvement, not complete re-architecture.<br>
+<b>Option C:</b> The application already uses an Aurora DB cluster which includes replicas. Simply pointing read queries to replicas doesn't solve the connection exhaustion problem - you'll still have many concurrent connections, just distributed across replicas. Doesn't address the root cause.<br>
+<b>Option D:</b> ElastiCache caching can help with read-heavy workloads but requires significant application changes to implement cache logic, handle cache invalidation, and manage cache misses. The problem is connection management, not query speed. RDS Proxy solves this without application changes.
+</div>
+</div>
+
+
+<!-- ================= Q10 ================= -->
+<div class="question">
+<pre>
+60) A company is deploying a new application on AWS. The application uses AWS Lambda functions for its compute tier. The Lambda functions must access data that is stored in an Amazon RDS database. The database credentials must be encrypted at rest and must be rotated on a regular basis.
+
+Which solution will meet these requirements MOST securely?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q10">
+A. Store the database credentials in AWS Systems Manager Parameter Store as a SecureString parameter. Enable automatic rotation of credentials by using a Lambda function. Update the Lambda application to retrieve credentials from Parameter Store.
+</label>
+
+<label>
+<input type="radio" name="q10">
+B. Encrypt the database credentials with the AWS Key Management Service (AWS KMS) default Lambda service key. Store the credentials in the Lambda function's environment variables. Configure Lambda to automatically rotate the credentials.
+</label>
+
+<label>
+<input type="radio" name="q10">
+C. Store the database credentials in AWS Secrets Manager. Enable automatic rotation of credentials by using a Lambda function. Update the Lambda application to retrieve credentials from Secrets Manager.
+</label>
+
+<label>
+<input type="radio" name="q10">
+D. Use IAM database authentication to connect to the RDS database. Create an IAM role that has permissions to connect to the database. Attach the role to the Lambda function.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests <b>AWS Secrets Manager for secure database credential management with automatic rotation</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Store RDS database credentials</li>
+<li>Encrypt credentials at rest</li>
+<li>Rotate credentials regularly</li>
+<li>Most secure solution</li>
+</ul><br>
+
+<b>Option C: AWS Secrets Manager Solution</b><br><br>
+
+<b>AWS Secrets Manager Features:</b>
+<ul>
+<li><b>Automatic Encryption:</b> All secrets encrypted with AWS KMS</li>
+<li><b>Built-in Rotation:</b> Native support for RDS credential rotation</li>
+<li><b>No Custom Code:</b> AWS-managed rotation for RDS</li>
+<li><b>Version Management:</b> Tracks secret versions</li>
+<li><b>Fine-grained Access:</b> IAM policies control access</li>
+<li><b>Audit Trail:</b> CloudTrail logs all access</li>
+</ul><br>
+
+<b>Implementation:</b><br>
+<pre>
+Step 1: Store RDS credentials in Secrets Manager
+
+aws secretsmanager create-secret \
+  --name prod/myapp/database \
+  --description "RDS PostgreSQL credentials" \
+  --secret-string '{
+    "username": "dbadmin",
+    "password": "InitialPassword123!",
+    "engine": "postgres",
+    "host": "mydb.cluster-xxx.us-east-1.rds.amazonaws.com",
+    "port": 5432,
+    "dbname": "appdb"
+  }'
+
+Step 2: Enable Automatic Rotation
+
+aws secretsmanager rotate-secret \
+  --secret-id prod/myapp/database \
+  --rotation-lambda-arn arn:aws:lambda:us-east-1:123:function:SecretsManagerRDSPostgreSQLRotation \
+  --rotation-rules AutomaticallyAfterDays=30
+
+AWS provides pre-built rotation functions for:
+- RDS MySQL
+- RDS PostgreSQL  
+- RDS Oracle
+- RDS SQL Server
+- RDS MariaDB
+- Aurora
+
+Step 3: Lambda Function Retrieves Credentials
+
+Python Lambda Code:
+import boto3
+import json
+import psycopg2
+
+secrets_client = boto3.client('secretsmanager')
+
+def lambda_handler(event, context):
+    # Retrieve secret from Secrets Manager
+    response = secrets_client.get_secret_value(
+        SecretId='prod/myapp/database'
+    )
+    
+    secret = json.loads(response['SecretString'])
+    
+    # Connect to database using retrieved credentials
+    conn = psycopg2.connect(
+        host=secret['host'],
+        port=secret['port'],
+        database=secret['dbname'],
+        user=secret['username'],
+        password=secret['password']
+    )
+    
+    # Execute queries
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM users WHERE active = true")
+    results = cursor.fetchall()
+    
+    conn.close()
+    
+    return {
+        'statusCode': 200,
+        'body': json.dumps(results)
+    }
+
+Step 4: Grant Lambda Permissions
+
+IAM Policy for Lambda Execution Role:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+      ],
+      "Resource": "arn:aws:secretsmanager:us-east-1:123:secret:prod/myapp/database-*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt"
+      ],
+      "Resource": "arn:aws:kms:us-east-1:123:key/mrk-xxx"
+    }
+  ]
+}
+</pre><br>
+
+<b>Automatic Rotation Process:</b><br>
+<pre>
+Day 0: Initial password: "InitialPassword123!"
+
+Day 30: Rotation triggered automatically
+  1. Secrets Manager invokes rotation Lambda
+  2. Lambda creates new password: "NewPassword456!"
+  3. Lambda updates RDS database with new password
+  4. Lambda updates secret in Secrets Manager
+  5. Lambda tests connection with new password
+  6. If successful, marks rotation complete
+  7. Old password deprecated
+
+Day 60: Another rotation occurs (every 30 days)
+
+Application code unchanged - always retrieves current password
+</pre><br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Systems Manager Parameter Store SecureString can store encrypted credentials, but automatic rotation requires custom Lambda functions - you must write code to rotate passwords. Secrets Manager has built-in rotation for RDS with AWS-managed Lambda functions. The question asks for "MOST securely" - Secrets Manager is purpose-built for secrets with better features.<br>
+<b>Option B:</b> Lambda environment variables can be encrypted, but they're static - they don't rotate automatically. Lambda doesn't have a "configure Lambda to automatically rotate credentials" feature. You'd need to manually update environment variables for each rotation. Not secure, not automatic.<br>
+<b>Option D:</b> IAM database authentication is excellent for eliminating passwords entirely, but it's only supported for MySQL, PostgreSQL, and Aurora (not all RDS engines). The question specifically asks for "database credentials must be encrypted and rotated" implying username/password authentication, not IAM auth. While D would be ideal if supported, C directly answers the stated requirements.
+</div>
+</div>
+
+</div> <!-- Close container -->
+
+<div style="text-align:center; margin: 40px 0 20px 0;">
+  <a href="page5.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page7.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const isMultiSelect = q.querySelector('input[type="checkbox"]') !== null;
+  const inputs = q.querySelectorAll(isMultiSelect ? 'input[type="checkbox"]' : 'input[type="radio"]');
+  const labels = q.querySelectorAll("label");
+  const selected = [];
+
+  inputs.forEach((inp, idx) => {
+    if (inp.checked) selected.push(idx);
+  });
+
+  labels.forEach((label, idx) => {
+    label.classList.remove("user-correct", "user-wrong", "correct");
+    if (selected.includes(idx)) {
+      if (correct.includes(idx)) {
+        label.classList.add("user-correct");
+      } else {
+        label.classList.add("user-wrong");
+      }
+    }
+  });
+
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    q.appendChild(resultMsg);
+  }
+
+  const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+  if (isCorrect) {
+    resultMsg.textContent = "✔ Correct!";
+    resultMsg.style.color = "#10b981";
+    resultMsg.style.fontWeight = "600";
+  } else {
+    resultMsg.textContent = "✖ Incorrect. Try again or click 'Show Answer'.";
+    resultMsg.style.color = "#ef4444";
+    resultMsg.style.fontWeight = "600";
+  }
+  resultMsg.style.display = "block";
+}
+
+function showAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const labels = q.querySelectorAll("label");
+  
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  correct.forEach(i => labels[i].classList.add("correct"));
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
+}
+</script>
+
+</body>
+</html>
