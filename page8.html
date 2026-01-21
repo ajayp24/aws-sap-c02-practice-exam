@@ -1,0 +1,3107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 8</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page7.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page9.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 8)</h1>
+
+<!-- ================= Q1 ================= -->
+<div class="question">
+<pre>
+71) A video streaming company recently launched a mobile app for video sharing. The app uploads various files to an Amazon S3 bucket in the us-east-1 Region. The files range in size from 1 GB to 10 GB.
+
+Users who access the app from Australia have experienced uploads that take long periods of time. Sometimes the files fail to completely upload for these users. A solutions architect must improve the app's performance for these uploads.
+
+Which solutions will meet these requirements? (Choose two.)
+</pre>
+<div class="options">
+<label>
+<input type="checkbox" name="q1">
+A. Enable S3 Transfer Acceleration on the S3 bucket. Configure the app to use the Transfer Acceleration endpoint for uploads.
+</label>
+
+<label>
+<input type="checkbox" name="q1">
+B. Configure an S3 bucket in each Region to receive the uploads. Use S3 Cross-Region Replication to copy the files to the distribution S3 bucket.
+</label>
+
+<label>
+<input type="checkbox" name="q1">
+C. Set up Amazon Route 53 with latency-based routing to route the uploads to the nearest S3 bucket Region.
+</label>
+
+<label>
+<input type="checkbox" name="q1">
+D. Configure the app to break the video files into chunks. Use a multipart upload to transfer files to Amazon S3.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0,3])">Check Answer</button>
+<button onclick="showAnswer(this,[0,3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A, D</b><br><br>
+
+This question tests <b>optimizing large file uploads to S3 from distant geographic locations</b>.<br><br>
+
+<b>Problem Analysis:</b>
+<ul>
+<li>Large files: 1-10 GB uploads</li>
+<li>Users in Australia uploading to us-east-1</li>
+<li>Long upload times and failures</li>
+<li>Geographic distance causing latency</li>
+<li>Need reliable, faster uploads</li>
+</ul><br>
+
+<b>Why Options A + D Are Correct:</b><br>
+
+<b>Option A - S3 Transfer Acceleration:</b>
+<ul>
+<li>✓ <b>Edge Location Routing:</b> Uses CloudFront edge locations worldwide</li>
+<li>✓ <b>Optimized Network Path:</b> AWS backbone network instead of public internet</li>
+<li>✓ <b>Geographic Improvement:</b> Australia users upload to nearby edge location</li>
+<li>✓ <b>Automatic Routing:</b> Data routed to us-east-1 via AWS network</li>
+<li>✓ <b>Speed Increase:</b> Typically 50-500% faster for distant regions</li>
+<li>✓ <b>Simple Implementation:</b> Just change endpoint URL</li>
+</ul><br>
+
+<b>Transfer Acceleration Architecture:</b>
+<pre>
+User in Australia
+    ↓
+CloudFront Edge (Sydney)
+    ↓
+AWS Global Network (optimized path)
+    ↓
+S3 Bucket (us-east-1)
+
+Standard Upload Path:
+Australia → Public Internet → us-east-1 (slow, unreliable)
+
+Transfer Acceleration Path:
+Australia → Sydney Edge → AWS Backbone → us-east-1 (fast, reliable)
+</pre><br>
+
+<b>Implementation:</b>
+<pre>
+# Enable Transfer Acceleration
+aws s3api put-bucket-accelerate-configuration \
+  --bucket my-bucket \
+  --accelerate-configuration Status=Enabled
+
+# Update app endpoint
+Standard: https://my-bucket.s3.us-east-1.amazonaws.com
+Accelerated: https://my-bucket.s3-accelerate.amazonaws.com
+</pre><br>
+
+<b>Option D - Multipart Upload:</b>
+<ul>
+<li>✓ <b>Reliability:</b> Upload parts independently (failures only affect one part)</li>
+<li>✓ <b>Resumability:</b> Can resume failed uploads without starting over</li>
+<li>✓ <b>Parallel Uploads:</b> Multiple parts uploaded simultaneously</li>
+<li>✓ <b>Large File Support:</b> Handles files up to 5 TB</li>
+<li>✓ <b>Network Efficiency:</b> Better utilization of available bandwidth</li>
+<li>✓ <b>Required for >5GB:</b> Best practice for files over 100 MB</li>
+</ul><br>
+
+<b>Multipart Upload Process:</b>
+<pre>
+1. Initiate Multipart Upload
+   - Receive Upload ID
+
+2. Break File into Parts (5 MB - 5 GB each)
+   - Part 1: 0-100 MB
+   - Part 2: 100-200 MB
+   - Part 3: 200-300 MB
+   - ...
+
+3. Upload Parts in Parallel
+   - Each part independently uploaded
+   - Can retry individual failed parts
+
+4. Complete Multipart Upload
+   - S3 assembles all parts into single object
+</pre><br>
+
+<b>Code Example:</b>
+<pre>
+import boto3
+from boto3.s3.transfer import TransferConfig
+
+# Configure multipart settings
+config = TransferConfig(
+    multipart_threshold=1024 * 25,  # 25 MB
+    max_concurrency=10,
+    multipart_chunksize=1024 * 25,  # 25 MB
+    use_threads=True
+)
+
+s3 = boto3.client('s3')
+
+# Upload with Transfer Acceleration endpoint
+s3.upload_file(
+    'large-video.mp4',
+    'my-bucket',
+    'videos/large-video.mp4',
+    Config=config,
+    ExtraArgs={'ACL': 'private'}
+)
+</pre><br>
+
+<b>Combined Benefits (A + D):</b>
+<table border="1" cellpadding="5">
+<tr><th>Aspect</th><th>Improvement</th></tr>
+<tr><td>Speed</td><td>50-500% faster with Transfer Acceleration</td></tr>
+<tr><td>Reliability</td><td>Part-level retry reduces failures</td></tr>
+<tr><td>Resumability</td><td>Don't restart entire 10 GB upload on failure</td></tr>
+<tr><td>Throughput</td><td>Parallel uploads maximize bandwidth</td></tr>
+<tr><td>User Experience</td><td>Progress indicators, faster completion</td></tr>
+</table><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option B - Multi-Region Buckets + CRR:</b>
+<ul>
+<li>✓ Would reduce latency (upload to Australian bucket)</li>
+<li>✗ <b>Requires multiple buckets:</b> Management complexity</li>
+<li>✗ <b>CRR costs:</b> Additional data transfer charges</li>
+<li>✗ <b>Storage duplication:</b> Files stored in multiple regions</li>
+<li>✗ <b>App complexity:</b> Need to determine which bucket to use</li>
+<li>✗ <b>More expensive than Transfer Acceleration</b></li>
+<li>✗ Still need multipart for reliability with large files</li>
+</ul><br>
+
+<b>Option C - Route 53 Latency Routing:</b>
+<ul>
+<li>✗ <b>Doesn't work with S3 directly:</b> Route 53 routes DNS, not S3 uploads</li>
+<li>✗ <b>Would need multiple buckets:</b> Same issues as Option B</li>
+<li>✗ <b>DNS routing doesn't optimize network path:</b> Still uses public internet</li>
+<li>✗ Transfer Acceleration already provides optimal routing</li>
+</ul><br>
+
+<b>Performance Comparison:</b>
+<pre>
+<b>Scenario: 5 GB file upload from Sydney to us-east-1</b>
+
+Standard Upload (Single PUT):
+- Time: 45-60 minutes
+- Failure rate: 20-30%
+- Bandwidth: Limited by single connection
+
+Standard + Multipart (Option D only):
+- Time: 30-40 minutes
+- Failure rate: 5-10%
+- Bandwidth: Better (parallel uploads)
+
+Transfer Acceleration (Option A only):
+- Time: 15-25 minutes
+- Failure rate: 10-15%
+- Bandwidth: Optimized path
+
+<b>Transfer Acceleration + Multipart (A + D):</b>
+- Time: 10-15 minutes
+- Failure rate: <2%
+- Bandwidth: Maximum optimization
+</pre><br>
+
+<b>Cost Considerations:</b>
+<ul>
+<li><b>Transfer Acceleration:</b> $0.04-$0.08 per GB transferred (in addition to standard pricing)</li>
+<li><b>Multipart Upload:</b> No additional cost</li>
+<li><b>Worth it?</b> Yes - faster uploads, fewer failures, better UX</li>
+<li><b>Cost comparison:</b> Cheaper than multi-region buckets + CRR</li>
+</ul><br>
+
+<b>Testing Transfer Acceleration:</b>
+<pre>
+# Amazon provides a speed comparison tool
+http://s3-accelerate-speedtest.s3-accelerate.amazonaws.com/en/accelerate-speed-comparsion.html
+
+# Compare standard vs accelerated endpoint speeds
+# Shows actual improvement for your location
+</pre><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use Transfer Acceleration for uploads from distant regions</li>
+<li>Use multipart for files >100 MB</li>
+<li>Set appropriate part size (5-25 MB typically)</li>
+<li>Implement retry logic for failed parts</li>
+<li>Show upload progress to users</li>
+<li>Enable versioning for important files</li>
+<li>Use MD5 checksums to verify integrity</li>
+</ul><br>
+
+<b>Additional Optimizations:</b>
+<ul>
+<li>Compress videos before upload (if acceptable)</li>
+<li>Use adaptive bitrate encoding</li>
+<li>Implement client-side validation</li>
+<li>Monitor CloudWatch metrics for transfer times</li>
+<li>Set lifecycle policies for old files</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q2 ================= -->
+<div class="question">
+<pre>
+72) An application is using an Amazon RDS for MySQL Multi-AZ DB instance in the us-east-1 Region. After a failover test, the application lost the connections to the database and could not re-establish the connections. After a restart of the application, the application re-established the connections.
+
+A solutions architect must implement a solution so that the application can re-establish connections to the database without requiring a restart.
+
+Which solution will meet these requirements?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q2">
+A. Create an Amazon Aurora MySQL Serverless v1 DB instance. Migrate the RDS DB instance to the Aurora Serverless v1 DB instance. Update the connection settings in the application to point to the Aurora reader endpoint.
+</label>
+
+<label>
+<input type="radio" name="q2">
+B. Create an RDS proxy. Configure the existing RDS endpoint as a target. Update the connection settings in the application to point to the RDS proxy endpoint.
+</label>
+
+<label>
+<input type="radio" name="q2">
+C. Create a two-node Amazon Aurora MySQL DB cluster. Migrate the RDS DB instance to the Aurora DB cluster. Create an RDS proxy. Configure the existing RDS endpoint as a target. Update the connection settings in the application to point to the RDS proxy endpoint.
+</label>
+
+<label>
+<input type="radio" name="q2">
+D. Create an Amazon S3 bucket. Export the database to Amazon S3 by using AWS Database Migration Service (AWS DMS). Configure Amazon Athena to use the S3 bucket as a data store. Install the latest Open Database Connectivity (ODBC) driver for the application. Update the connection settings in the application to point to the Athena endpoint.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>RDS connection management and handling database failovers</b>.<br><br>
+
+<b>Problem Analysis:</b>
+<ul>
+<li>RDS Multi-AZ failover causes connection loss</li>
+<li>Application cannot automatically reconnect</li>
+<li>Requires application restart to reconnect</li>
+<li>Need automatic connection recovery</li>
+</ul><br>
+
+<b>Root Cause:</b>
+<ul>
+<li>Multi-AZ failover changes the underlying database instance</li>
+<li>Existing connections become invalid</li>
+<li>Application's connection pool doesn't handle reconnection properly</li>
+<li>Stale connections accumulate after failover</li>
+</ul><br>
+
+<b>Why Option B is Correct:</b><br>
+
+<b>Amazon RDS Proxy Benefits:</b>
+<ul>
+<li>✓ <b>Connection Pooling:</b> Maintains pool of database connections</li>
+<li>✓ <b>Automatic Reconnection:</b> Handles failover transparently</li>
+<li>✓ <b>No App Changes:</b> Just update connection endpoint</li>
+<li>✓ <b>Reduced Failover Time:</b> <1 second vs several minutes</li>
+<li>✓ <b>Connection Reuse:</b> Fewer database connections needed</li>
+<li>✓ <b>IAM Authentication:</b> Centralized credential management</li>
+</ul><br>
+
+<b>RDS Proxy Architecture:</b>
+<pre>
+Application Servers (Multiple Instances)
+    ↓ ↓ ↓
+    ↓ ↓ ↓ (Many connections)
+    ↓ ↓ ↓
+RDS Proxy (Connection Pool)
+    ↓
+    ↓ (Fewer, reused connections)
+    ↓
+RDS Multi-AZ Instance
+    ├─ Primary (Active)
+    └─ Standby (Passive)
+
+<b>During Failover:</b>
+RDS Proxy
+    ├─ Maintains client connections
+    ├─ Detects failover completion
+    ├─ Establishes new DB connections
+    └─ Routes requests to new primary
+
+Applications: No interruption, automatic reconnection
+</pre><br>
+
+<b>How RDS Proxy Handles Failover:</b>
+<ol>
+<li>Failover initiated (primary becomes unavailable)</li>
+<li>RDS Proxy detects connection failures to primary</li>
+<li>Proxy holds client connections (doesn't drop them)</li>
+<li>Standby promoted to new primary</li>
+<li>Proxy establishes connections to new primary</li>
+<li>Application requests automatically routed to new primary</li>
+<li><b>Total downtime: <1 second</b></li>
+</ol><br>
+
+<b>Implementation:</b>
+<pre>
+# Create RDS Proxy
+aws rds create-db-proxy \
+  --db-proxy-name my-app-proxy \
+  --engine-family MYSQL \
+  --auth '{"AuthScheme":"SECRETS","SecretArn":"arn:aws:..."}' \
+  --role-arn arn:aws:iam::account:role/RDSProxyRole \
+  --vpc-subnet-ids subnet-1 subnet-2 \
+  --require-tls
+
+# Register target
+aws rds register-db-proxy-targets \
+  --db-proxy-name my-app-proxy \
+  --db-instance-identifiers my-rds-instance
+
+# Update application connection string
+Old: my-rds-instance.abc123.us-east-1.rds.amazonaws.com
+New: my-app-proxy.proxy-abc123.us-east-1.rds.amazonaws.com
+</pre><br>
+
+<b>Additional Benefits:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>Without Proxy</th><th>With RDS Proxy</th></tr>
+<tr><td>Failover Recovery</td><td>Manual restart</td><td>Automatic</td></tr>
+<tr><td>Connection Management</td><td>App manages</td><td>Proxy manages</td></tr>
+<tr><td>DB Connections</td><td>100s-1000s</td><td>10s-100s</td></tr>
+<tr><td>Failover Time</td><td>1-2 minutes</td><td><1 second</td></tr>
+<tr><td>Connection Overhead</td><td>High</td><td>Low</td></tr>
+</table><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Aurora Serverless:</b>
+<ul>
+<li>✗ <b>Unnecessary migration:</b> RDS MySQL already works</li>
+<li>✗ <b>Reader endpoint:</b> Read-only, can't write data</li>
+<li>✗ <b>Doesn't solve reconnection issue:</b> App still needs reconnection logic</li>
+<li>✗ <b>Aurora Serverless v1:</b> Cold starts can cause delays</li>
+<li>✗ <b>Migration complexity:</b> More work than adding proxy</li>
+<li>✗ <b>Cost:</b> May be more expensive</li>
+</ul><br>
+
+<b>Option C - Aurora + RDS Proxy:</b>
+<ul>
+<li>✓ RDS Proxy part is correct</li>
+<li>✗ <b>Unnecessary Aurora migration:</b> RDS MySQL works fine</li>
+<li>✗ <b>Overcomplicated:</b> Two major changes instead of one</li>
+<li>✗ <b>Migration risk:</b> Downtime during migration</li>
+<li>✗ <b>Higher cost:</b> Aurora + Proxy + migration effort</li>
+<li>✗ <b>Doesn't add value:</b> Proxy solves the problem without Aurora</li>
+</ul><br>
+
+<b>Option D - S3 + Athena:</b>
+<ul>
+<li>✗ <b>Completely wrong architecture:</b> Changes transactional DB to analytics</li>
+<li>✗ <b>Athena is for analytics:</b> Not for transactional workloads</li>
+<li>✗ <b>No real-time writes:</b> Can't handle live application data</li>
+<li>✗ <b>Query latency:</b> Seconds, not milliseconds</li>
+<li>✗ <b>No ACID transactions:</b> Critical for applications</li>
+<li>✗ <b>Complete application rewrite needed</b></li>
+</ul><br>
+
+<b>Connection Pool Configuration Example:</b>
+<pre>
+{
+  "MaxConnectionsPercent": 100,
+  "MaxIdleConnectionsPercent": 50,
+  "ConnectionBorrowTimeout": 120,
+  "SessionPinningFilters": [
+    "EXCLUDE_VARIABLE_SETS"
+  ]
+}
+</pre><br>
+
+<b>RDS Proxy Pricing:</b>
+<pre>
+Pricing Model: Per vCPU-hour + Data processed
+
+Example (us-east-1):
+- $0.015 per vCPU-hour
+- Minimum: 2 vCPUs
+- Monthly cost: ~$22/month base
+
+Benefits vs Cost:
+✓ Reduced database load
+✓ Fewer DB connections needed
+✓ Better scalability
+✓ Automatic failover handling
+✓ Worth it for production workloads
+</pre><br>
+
+<b>When to Use RDS Proxy:</b>
+<ul>
+<li>Applications with many short-lived connections</li>
+<li>Lambda functions connecting to RDS</li>
+<li>Applications that need fast failover</li>
+<li>High-traffic applications</li>
+<li>Need to reduce database connection overhead</li>
+<li>Want IAM-based authentication</li>
+</ul><br>
+
+<b>RDS Proxy Limitations:</b>
+<ul>
+<li>Adds ~1ms latency per query</li>
+<li>Additional cost</li>
+<li>Doesn't support all MySQL/PostgreSQL features</li>
+<li>Some session-specific commands may not work</li>
+</ul><br>
+
+<b>Monitoring RDS Proxy:</b>
+<pre>
+CloudWatch Metrics:
+- DatabaseConnections
+- DatabaseConnectionsCurrentlyBorrowed
+- DatabaseConnectionsCurrentlyInTransaction
+- QueryDatabaseResponseLatency
+- ClientConnections
+- ClientConnectionsSetupSucceeded
+- ClientConnectionsSetupFailed
+</pre><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use RDS Proxy for Lambda-to-RDS connections</li>
+<li>Enable connection multiplexing</li>
+<li>Configure appropriate timeout values</li>
+<li>Use IAM authentication for security</li>
+<li>Monitor proxy metrics in CloudWatch</li>
+<li>Test failover scenarios regularly</li>
+<li>Keep proxy in same VPC as database</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q3 ================= -->
+<div class="question">
+<pre>
+73) A company is building a solution in the AWS Cloud. Thousands of devices will connect to the solution and send data. 
+Each device needs to be able to send and receive data in real time over the MQTT protocol. 
+Each device must authenticate by using a unique X.509 certificate.
+
+Which solution will meet these requirements with the LEAST operational overhead?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q3">
+A. Set up AWS IoT Core. For each device, create a corresponding Amazon MQ queue and provision a certificate. Connect each device to Amazon MQ.
+</label>
+
+<label>
+<input type="radio" name="q3">
+B. Create a Network Load Balancer (NLB) and configure it with an AWS Lambda authorizer. Run an MQTT broker on Amazon EC2 instances in an Auto Scaling group. Set the Auto Scaling group as the target for the NLB. Connect each device to the NLB.
+</label>
+
+<label>
+<input type="radio" name="q3">
+C. Set up AWS IoT Core. For each device, create a corresponding AWS IoT thing and provision a certificate. Connect each device to AWS IoT Core.
+</label>
+
+<label>
+<input type="radio" name="q3">
+D. Set up an Amazon API Gateway HTTP API and a Network Load Balancer (NLB). Create integration between API Gateway and the NLB. Configure a mutual TLS certificate authorizer on the HTTP API. Run an MQTT broker on an Amazon EC2 instance that the NLB targets. Connect each device to the NLB.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests <b>AWS IoT Core for managed MQTT device connectivity</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Thousands of devices sending/receiving data</li>
+<li>Real-time bidirectional communication</li>
+<li>MQTT protocol support</li>
+<li>X.509 certificate authentication per device</li>
+<li>LEAST operational overhead</li>
+</ul><br>
+
+<b>Why Option C is Correct:</b><br>
+
+<b>AWS IoT Core Overview:</b>
+<ul>
+<li>✓ <b>Fully Managed MQTT Broker:</b> No servers to manage</li>
+<li>✓ <b>Massive Scale:</b> Supports billions of devices, trillions of messages</li>
+<li>✓ <b>Native X.509 Support:</b> Built-in certificate-based authentication</li>
+<li>✓ <b>Device Registry:</b> Managed device inventory (IoT Things)</li>
+<li>✓ <b>Message Routing:</b> Rules engine for data processing</li>
+<li>✓ <b>Device Shadow:</b> Virtual representation of device state</li>
+<li>✓ <b>Zero Operational Overhead:</b> AWS manages all infrastructure</li>
+</ul><br>
+
+<b>AWS IoT Core Architecture:</b>
+<pre>
+IoT Devices (Thousands)
+    ↓
+    ↓ MQTT over TLS
+    ↓ (X.509 cert authentication)
+    ↓
+AWS IoT Core
+    ├─ Device Registry (Things)
+    ├─ Certificate Management
+    ├─ MQTT Message Broker
+    ├─ Rules Engine
+    └─ Device Shadows
+
+    ↓ Process messages
+    ↓
+AWS Services
+    ├─ Lambda
+    ├─ DynamoDB
+    ├─ S3
+    ├─ Kinesis
+    └─ Others
+</pre><br>
+
+<b>IoT Thing Setup:</b>
+<pre>
+# Create IoT Thing
+aws iot create-thing --thing-name device-001
+
+# Create certificate and keys
+aws iot create-keys-and-certificate \
+  --set-as-active \
+  --certificate-pem-outfile device-001-cert.pem \
+  --public-key-outfile device-001-public.key \
+  --private-key-outfile device-001-private.key
+
+# Attach certificate to thing
+aws iot attach-thing-principal \
+  --thing-name device-001 \
+  --principal arn:aws:iot:region:account:cert/certificateId
+
+# Create and attach policy
+aws iot attach-policy \
+  --policy-name DevicePolicy \
+  --target arn:aws:iot:region:account:cert/certificateId
+</pre><br>
+
+<b>Device Policy Example:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Connect"
+      ],
+      "Resource": "arn:aws:iot:region:account:client/${iot:Connection.Thing.ThingName}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "iot:Publish",
+        "iot:Receive"
+      ],
+      "Resource": "arn:aws:iot:region:account:topic/device/${iot:Connection.Thing.ThingName}/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iot:Subscribe",
+      "Resource": "arn:aws:iot:region:account:topicfilter/device/${iot:Connection.Thing.ThingName}/*"
+    }
+  ]
+}
+</pre><br>
+
+<b>Device Code Example (Python):</b>
+<pre>
+from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+
+# Initialize client
+myMQTTClient = AWSIoTMQTTClient("device-001")
+myMQTTClient.configureEndpoint("xxxxxx.iot.us-east-1.amazonaws.com", 8883)
+myMQTTClient.configureCredentials(
+    "root-CA.crt",
+    "device-001-private.key",
+    "device-001-cert.pem"
+)
+
+# Connect
+myMQTTClient.connect()
+
+# Subscribe to topic
+def messageCallback(client, userdata, message):
+    print(f"Received: {message.payload}")
+
+myMQTTClient.subscribe("device/device-001/commands", 1, messageCallback)
+
+# Publish data
+myMQTTClient.publish("device/device-001/data", '{"temp": 25}', 1)
+</pre><br>
+
+<b>Key Features:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>Benefit</th></tr>
+<tr><td>Device Registry</td><td>Track and manage all devices</td></tr>
+<tr><td>X.509 Certificates</td><td>Strong authentication per device</td></tr>
+<tr><td>MQTT Broker</td><td>Bi-directional real-time messaging</td></tr>
+<tr><td>Rules Engine</td><td>Route messages to AWS services</td></tr>
+<tr><td>Device Shadow</td><td>Store and sync device state</td></tr>
+<tr><td>Jobs</td><td>Deploy updates to devices</td></tr>
+<tr><td>Fleet Indexing</td><td>Search and query devices</td></tr>
+</table><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Amazon MQ:</b>
+<ul>
+<li>✗ <b>Amazon MQ is not for IoT:</b> Designed for enterprise messaging (ActiveMQ, RabbitMQ)</li>
+<li>✗ <b>Queue per device:</b> Thousands of queues = management nightmare</li>
+<li>✗ <b>Not MQTT-optimized:</b> Supports MQTT but not designed for IoT scale</li>
+<li>✗ <b>High operational overhead:</b> Need to manage broker infrastructure</li>
+<li>✗ <b>Scaling issues:</b> Hard to scale to thousands of devices</li>
+<li>✗ <b>Wrong tool for the job</b></li>
+</ul><br>
+
+<b>Option B - Self-Managed MQTT on EC2:</b>
+<ul>
+<li>✗ <b>HIGH operational overhead:</b> Manage EC2, broker software, scaling</li>
+<li>✗ <b>Infrastructure management:</b> Patching, monitoring, updates</li>
+<li>✗ <b>Certificate management:</b> Must build custom solution</li>
+<li>✗ <b>Scaling complexity:</b> Manual Auto Scaling configuration</li>
+<li>✗ <b>High availability:</b> Must implement yourself</li>
+<li>✗ <b>Lambda authorizer:</b> Additional complexity and latency</li>
+<li>✗ <b>Violates "LEAST operational overhead" requirement</b></li>
+</ul><br>
+
+<b>Option D - API Gateway + EC2 MQTT:</b>
+<ul>
+<li>✗ <b>Overly complex architecture:</b> API Gateway + NLB + EC2</li>
+<li>✗ <b>API Gateway for MQTT:</b> Not designed for persistent MQTT connections</li>
+<li>✗ <b>Still managing EC2 MQTT broker:</b> Operational overhead</li>
+<li>✗ <b>Multiple layers:</b> More points of failure</li>
+<li>✗ <b>Cost:</b> More expensive than IoT Core</li>
+<li>✗ <b>Latency:</b> Additional hops reduce performance</li>
+</ul><br>
+
+<b>Operational Overhead Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Solution</th><th>Setup</th><th>Management</th><th>Scaling</th><th>Overhead</th></tr>
+<tr><td>IoT Core (C)</td><td>Low</td><td>None</td><td>Automatic</td><td><b>LEAST</b></td></tr>
+<tr><td>Amazon MQ (A)</td><td>Medium</td><td>High</td><td>Manual</td><td>High</td></tr>
+<tr><td>EC2 MQTT (B)</td><td>High</td><td>Very High</td><td>Manual</td><td>Very High</td></tr>
+<tr><td>API GW+EC2 (D)</td><td>Very High</td><td>Very High</td><td>Manual</td><td>Very High</td></tr>
+</table><br>
+
+<b>AWS IoT Core Pricing:</b>
+<pre>
+Connectivity (per million minutes): $0.08
+Messaging (per million messages): $1.00
+
+Example: 1,000 devices
+- Always connected: 1,000 × 43,200 min/month = 43.2M minutes
+- Connectivity cost: 43.2 × $0.08 = $3.46
+
+- 1 message/second per device: 2.6B messages/month
+- Messaging cost: 2,600 × $1.00 = $2,600
+
+Total: ~$2,603/month for 1,000 devices sending 1 msg/sec
+</pre><br>
+
+<b>IoT Core Rules Engine Example:</b>
+<pre>
+# Rule to store device data in DynamoDB
+{
+  "sql": "SELECT * FROM 'device/+/data'",
+  "actions": [
+    {
+      "dynamoDBv2": {
+        "roleArn": "arn:aws:iam::account:role/IoTDynamoDBRole",
+        "putItem": {
+          "tableName": "DeviceData"
+        }
+      }
+    }
+  ]
+}
+
+# Rule to trigger Lambda for processing
+{
+  "sql": "SELECT *, timestamp() as ts FROM 'device/+/data' WHERE temperature > 30",
+  "actions": [
+    {
+      "lambda": {
+        "functionArn": "arn:aws:lambda:region:account:function:ProcessAlert"
+      }
+    }
+  ]
+}
+</pre><br>
+
+<b>Device Shadow Example:</b>
+<pre>
+{
+  "state": {
+    "desired": {
+      "color": "blue",
+      "temperature": 20
+    },
+    "reported": {
+      "color": "red",
+      "temperature": 25
+    }
+  },
+  "metadata": {
+    "desired": {
+      "color": {"timestamp": 1234567890},
+      "temperature": {"timestamp": 1234567890}
+    },
+    "reported": {
+      "color": {"timestamp": 1234567891},
+      "temperature": {"timestamp": 1234567891}
+    }
+  }
+}
+</pre><br>
+
+<b>Security Best Practices:</b>
+<ul>
+<li>Use unique X.509 certificate per device</li>
+<li>Implement least privilege policies</li>
+<li>Enable IoT logging to CloudWatch</li>
+<li>Use fleet provisioning for large deployments</li>
+<li>Rotate certificates regularly</li>
+<li>Monitor device activity</li>
+<li>Use VPC endpoints for private connectivity</li>
+</ul><br>
+
+<b>Additional IoT Core Features:</b>
+<ul>
+<li><b>Fleet Provisioning:</b> Auto-register devices at scale</li>
+<li><b>Jobs:</b> Deploy firmware updates</li>
+<li><b>Device Defender:</b> Security monitoring and anomaly detection</li>
+<li><b>Events:</b> Lifecycle events (connected, disconnected)</li>
+<li><b>Custom Domains:</b> Use your own domain for IoT endpoint</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q4 ================= -->
+<div class="question">
+<pre>
+74) A company is running several workloads in a single AWS account. A new company policy states that engineers can provision only approved resources and that engineers must use AWS CloudFormation to provision these resources.
+ A solutions architect needs to create a solution to enforce the new restriction on the IAM role that the engineers use for access.
+
+What should the solutions architect do to create the solution?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q4">
+A. Upload AWS CloudFormation templates that contain approved resources to an Amazon S3 bucket. Update the IAM policy for the engineers' IAM role to only allow access to Amazon S3 and AWS CloudFormation. Use AWS CloudFormation templates to provision resources.
+</label>
+
+<label>
+<input type="radio" name="q4">
+B. Update the IAM policy for the engineers' IAM role with permissions to only allow provisioning of approved resources and AWS CloudFormation. Use AWS CloudFormation templates to create stacks with approved resources.
+</label>
+
+<label>
+<input type="radio" name="q4">
+C. Update the IAM policy for the engineers' IAM role with permissions to only allow AWS CloudFormation actions. Create a new IAM policy with permission to provision approved resources, and assign the policy to a new IAM service role. Assign the IAM service role to AWS CloudFormation during stack creation.
+</label>
+
+<label>
+<input type="radio" name="q4">
+D. Provision resources in AWS CloudFormation stacks. Update the IAM policy for the engineers' IAM role to only allow access to their own AWS CloudFormation stack.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests <b>IAM role separation and CloudFormation service roles for security</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Engineers can only provision approved resources</li>
+<li>Must use CloudFormation (not console/CLI/API)</li>
+<li>Enforce restrictions via IAM</li>
+</ul><br>
+
+<b>Why Option C is Correct:</b><br>
+
+<b>Principle of Least Privilege with Service Roles:</b>
+<ul>
+<li>✓ <b>Engineers:</b> Can only create/update CloudFormation stacks</li>
+<li>✓ <b>CloudFormation Service Role:</b> Has permissions to create approved resources</li>
+<li>✓ <b>Separation of Concerns:</b> Engineers can't bypass CloudFormation</li>
+<li>✓ <b>Controlled Permissions:</b> Only CloudFormation can create resources</li>
+<li>✓ <b>Audit Trail:</b> All resource creation tracked through CloudFormation</li>
+</ul><br>
+
+<b>Architecture:</b>
+<pre>
+Engineer (IAM User/Role)
+    ├─ Permissions: CloudFormation actions only
+    │   - cloudformation:CreateStack
+    │   - cloudformation:UpdateStack
+    │   - cloudformation:DeleteStack
+    │   - iam:PassRole (for CloudFormation service role)
+    │
+    ↓ Creates stack with service role
+    │
+CloudFormation Service
+    ├─ Assumes: CloudFormation Service Role
+    │
+CloudFormation Service Role
+    ├─ Permissions: Create approved resources
+    │   - ec2:RunInstances (only t3.micro, t3.small)
+    │   - rds:CreateDBInstance (only specific instance types)
+    │   - s3:CreateBucket
+    │   - dynamodb:CreateTable
+    │
+    ↓ Provisions resources
+    │
+AWS Resources (Approved types only)
+</pre><br>
+
+<b>Engineer IAM Policy:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "cloudformation:CreateStack",
+        "cloudformation:UpdateStack",
+        "cloudformation:DeleteStack",
+        "cloudformation:DescribeStacks",
+        "cloudformation:ListStacks",
+        "cloudformation:GetTemplate"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": "arn:aws:iam::account:role/CloudFormationServiceRole",
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "cloudformation.amazonaws.com"
+        }
+      }
+    },
+    {
+      "Effect": "Deny",
+      "Action": [
+        "ec2:RunInstances",
+        "rds:CreateDBInstance",
+        "s3:CreateBucket"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+</pre><br>
+
+<b>CloudFormation Service Role:</b>
+<pre>
+Trust Policy:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Service": "cloudformation.amazonaws.com"
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+
+Permissions Policy:
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:RunInstances",
+        "ec2:CreateTags",
+        "ec2:DescribeInstances"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:InstanceType": ["t3.micro", "t3.small", "t3.medium"]
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "rds:CreateDBInstance",
+        "rds:DescribeDBInstances"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "rds:DatabaseEngine": ["mysql", "postgres"]
+        }
+      }
+    }
+  ]
+}
+</pre><br>
+
+<b>Using the Service Role:</b>
+<pre>
+# Create stack with service role
+aws cloudformation create-stack \
+  --stack-name my-application \
+  --template-body file://template.yaml \
+  --role-arn arn:aws:iam::account:role/CloudFormationServiceRole
+
+# Engineers CANNOT do this (no direct EC2 permissions):
+aws ec2 run-instances --instance-type t3.large  # DENIED
+
+# But CloudFormation CAN (via service role):
+# template.yaml
+Resources:
+  MyInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t3.micro  # Allowed by service role
+</pre><br>
+
+<b>Why This Works:</b>
+<ol>
+<li>Engineers have NO permissions to create resources directly</li>
+<li>Engineers CAN create CloudFormation stacks</li>
+<li>Engineers MUST specify service role when creating stacks</li>
+<li>CloudFormation assumes service role</li>
+<li>Service role has limited permissions (approved resources only)</li>
+<li>Resources created only through CloudFormation</li>
+<li>Engineers cannot bypass restriction</li>
+</ol><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - S3 + CloudFormation Access Only:</b>
+<ul>
+<li>✗ <b>Missing resource permissions:</b> CloudFormation needs permissions to create resources</li>
+<li>✗ <b>Who creates resources?:</b> No service role, so engineer's role must have permissions</li>
+<li>✗ <b>Engineers could still bypass:</b> Could use CLI with their role</li>
+<li>✗ <b>Doesn't enforce:</b> No mechanism to restrict to approved resources only</li>
+</ul><br>
+
+<b>Option B - Direct Resource Permissions:</b>
+<ul>
+<li>✗ <b>Engineers can bypass CloudFormation:</b> Have direct resource permissions</li>
+<li>✗ <b>Can use CLI/Console:</b> Nothing forces CloudFormation usage</li>
+<li>✗ <b>Defeats the purpose:</b> Policy says "must use CloudFormation"</li>
+<li>✗ <b>No enforcement:</b> Engineers could provision resources any way</li>
+</ul>
+
+Example bypass:
+<pre>
+# Engineer could do this directly (violates policy):
+aws ec2 run-instances --instance-type t3.micro
+# No CloudFormation used!
+</pre><br>
+
+<b>Option D - Stack-Level Access Only:</b>
+<ul>
+<li>✗ <b>Incomplete solution:</b> Doesn't specify how resources get created</li>
+<li>✗ <b>No service role:</b> Who has permissions to create resources?</li>
+<li>✗ <b>Stack ownership:</b> Isolation is good but doesn't enforce approved resources</li>
+<li>✗ <b>Missing key component:</b> No mechanism to limit resource types</li>
+</ul><br>
+
+<b>Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Option</th><th>Enforces CFN</th><th>Limits Resources</th><th>Prevents Bypass</th></tr>
+<tr><td>A</td><td>No</td><td>No</td><td>No</td></tr>
+<tr><td>B</td><td>No</td><td>Partial</td><td>No</td></tr>
+<tr><td><b>C (Correct)</b></td><td><b>Yes</b></td><td><b>Yes</b></td><td><b>Yes</b></td></tr>
+<tr><td>D</td><td>Yes</td><td>No</td><td>Partial</td></tr>
+</table><br>
+
+<b>Advanced Service Role Pattern:</b>
+<pre>
+# Approved resource types in service role
+{
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "ec2:RunInstances",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "ec2:InstanceType": ["t3.micro", "t3.small"]
+        },
+        "StringLike": {
+          "aws:RequestTag/Project": "*"
+        }
+      }
+    },
+    {
+      "Effect": "Deny",
+      "Action": "ec2:RunInstances",
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "ec2:Region": ["us-east-1", "us-west-2"]
+        }
+      }
+    }
+  ]
+}
+</pre><br>
+
+<b>Benefits of Service Role Pattern:</b>
+<ul>
+<li>Centralized permission management</li>
+<li>Engineers can't escalate privileges</li>
+<li>Infrastructure as Code enforcement</li>
+<li>Audit trail through CloudFormation</li>
+<li>Version control for templates</li>
+<li>Consistent resource configuration</li>
+<li>Policy compliance guaranteed</li>
+</ul><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use separate service roles per environment (dev, prod)</li>
+<li>Implement CloudFormation drift detection</li>
+<li>Enable CloudTrail for audit logging</li>
+<li>Use SCPs for additional guardrails</li>
+<li>Store templates in version control</li>
+<li>Implement template validation in CI/CD</li>
+<li>Use StackSets for multi-account deployments</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q5 ================= -->
+<div class="question">
+<pre>
+75) A solutions architect is designing the data storage and retrieval architecture for a new application that a company will be launching soon. The application is designed to ingest millions of small records per minute from devices all around the world. Each record is less than 4 KB in size and needs to be stored in a durable location where it can be retrieved with low latency. The data is ephemeral and the company is required to store the data for 120 days only, after which the data can be deleted.
+
+The solutions architect calculates that, during the course of a year, the storage requirements would be about 10-15 TB.
+
+Which storage strategy is the MOST cost-effective and meets the design requirements?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q5">
+A. Design the application to store each incoming record as a single .csv file in an Amazon S3 bucket to allow for indexed retrieval. Configure a lifecycle policy to delete data older than 120 days.
+</label>
+
+<label>
+<input type="radio" name="q5">
+B. Design the application to store each incoming record in an Amazon DynamoDB table properly configured for the scale. Configure the DynamoDB Time to Live (TTL) feature to delete records older than 120 days.
+</label>
+
+<label>
+<input type="radio" name="q5">
+C. Design the application to store each incoming record in a single table in an Amazon RDS MySQL database. Run a nightly cron job that runs a query to delete any records older than 120 days.
+</label>
+
+<label>
+<input type="radio" name="q5">
+D. Design the application to batch incoming records before writing them to an Amazon S3 bucket. Update the metadata for the object to contain the list of records in the batch and use the Amazon S3 metadata search feature to retrieve the data. Configure a lifecycle policy to delete the data after 120 days.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>choosing the right data store for high-volume, low-latency IoT data</b>.<br><br>
+
+<b>Requirements Analysis:</b>
+<ul>
+<li>Millions of small records per minute (high write throughput)</li>
+<li>Small records (<4 KB each)</li>
+<li>Low latency retrieval</li>
+<li>120-day retention (ephemeral data)</li>
+<li>10-15 TB total storage</li>
+<li>Cost-effective solution</li>
+</ul><br>
+
+<b>Why Option B (DynamoDB) is Correct:</b><br>
+
+<b>DynamoDB Advantages:</b>
+<ul>
+<li>✓ <b>Massive Write Throughput:</b> Millions of writes per second</li>
+<li>✓ <b>Low Latency:</b> Single-digit millisecond reads/writes</li>
+<li>✓ <b>Auto-Scaling:</b> Handles variable load automatically</li>
+<li>✓ <b>Native TTL:</b> Automatic data expiration at no cost</li>
+<li>✓ <b>Small Record Optimization:</b> Perfect for <4 KB items</li>
+<li>✓ <b>No Administration:</b> Fully managed</li>
+<li>✓ <b>Cost-Effective:</b> On-demand pricing for variable workloads</li>
+</ul><br>
+
+<b>DynamoDB Architecture:</b>
+<pre>
+IoT Devices (Worldwide)
+    ↓ ↓ ↓
+    ↓ ↓ ↓ Millions of records/minute
+    ↓ ↓ ↓
+Application Layer
+    ↓
+    ↓ BatchWriteItem (up to 25 items)
+    ↓
+DynamoDB Table
+    ├─ Partition Key: deviceId
+    ├─ Sort Key: timestamp
+    ├─ TTL: expirationTime (120 days)
+    ├─ Auto-Scaling: Enabled
+    └─ On-Demand Mode
+
+<b>Automatic TTL Deletion:</b>
+Items with expirationTime < current time → Deleted within 48 hours
+</pre><br>
+
+<b>Table Design:</b>
+<pre>
+{
+  "deviceId": "device-12345",        // Partition key
+  "timestamp": 1640000000,           // Sort key
+  "temperature": 25.5,
+  "humidity": 60,
+  "location": "us-west-2",
+  "expirationTime": 1650368000      // TTL attribute (120 days from now)
+}
+
+# Create table with TTL
+aws dynamodb create-table \
+  --table-name IoTData \
+  --attribute-definitions \
+    AttributeName=deviceId,AttributeType=S \
+    AttributeName=timestamp,AttributeType=N \
+  --key-schema \
+    AttributeName=deviceId,KeyType=HASH \
+    AttributeName=timestamp,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST
+
+# Enable TTL
+aws dynamodb update-time-to-live \
+  --table-name IoTData \
+  --time-to-live-specification \
+    Enabled=true,AttributeName=expirationTime
+</pre><br>
+
+<b>Write Pattern:</b>
+<pre>
+import boto3
+import time
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('IoTData')
+
+# Batch write for efficiency
+with table.batch_writer() as batch:
+    for record in incoming_records:
+        batch.put_item(Item={
+            'deviceId': record['deviceId'],
+            'timestamp': int(time.time()),
+            'temperature': record['temp'],
+            'expirationTime': int(time.time()) + (120 * 24 * 60 * 60)  # 120 days
+        })
+</pre><br>
+
+<b>Cost Analysis (DynamoDB):</b>
+<pre>
+<b>Assumptions:</b>
+- 2 million records/minute = 2.88 billion records/day
+- Average record size: 2 KB
+- On-Demand pricing (us-east-1)
+
+<b>Write Costs:</b>
+- Write requests: 2.88B × 30 days = 86.4B writes/month
+- Cost per million writes: $1.25
+- Monthly write cost: 86,400 × $1.25 = $108,000
+
+<b>Storage Costs:</b>
+- 120 days of data: ~346 billion records
+- Storage: 346B × 2 KB = 692 TB (unrealistic, recalculate)
+
+Wait - problem states 10-15 TB total:
+- Storage cost: 15 TB × $0.25/GB = 15,000 GB × $0.25 = $3,750/month
+
+<b>TTL Deletion:</b>
+- Free! No cost for TTL-based deletions
+
+<b>Total Monthly Cost: ~$111,750</b>
+
+Note: Could use Standard-IA for 60% cost reduction on storage
+</pre><br>
+
+<b>DynamoDB TTL Benefits:</b>
+<ul>
+<li>Automatic background deletion (no manual jobs)</li>
+<li>No cost for TTL deletions</li>
+<li>Eventual deletion (within 48 hours of expiration)</li>
+<li>No performance impact</li>
+<li>Simple to configure</li>
+</ul><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Individual CSV Files in S3:</b>
+<ul>
+<li>✗ <b>Massive overhead:</b> Millions of tiny files per minute</li>
+<li>✗ <b>S3 LIST performance:</b> Billions of objects = very slow listing</li>
+<li>✗ <b>Request costs:</b> $0.005 per 1,000 PUT requests</li>
+<li>✗ <b>Not designed for this:</b> S3 is for larger objects</li>
+<li>✗ <b>Retrieval latency:</b> Higher than DynamoDB</li>
+</ul>
+
+Cost calculation:
+<pre>
+2M records/min × 60 min × 24 hrs × 30 days = 86.4B PUT requests/month
+86.4B / 1000 × $0.005 = $432,000/month just for PUTs!
+Plus storage: 15 TB × $0.023/GB = $345/month
+Total: $432,345/month (4x more expensive than DynamoDB!)
+</pre><br>
+
+<b>Option C - RDS MySQL:</b>
+<ul>
+<li>✗ <b>Write throughput limits:</b> Millions/minute would need massive instance</li>
+<li>✗ <b>Scaling complexity:</b> Vertical scaling only</li>
+<li>✗ <b>Manual deletion:</b> Cron job adds complexity and load</li>
+<li>✗ <b>Expensive:</b> Large RDS instances cost thousands/month</li>
+<li>✗ <b>Maintenance overhead:</b> Backups, patching, optimization</li>
+</ul>
+
+Cost estimate:
+<pre>
+Need db.r5.24xlarge for this throughput: $16,000+/month
+Plus storage: 15 TB × $0.115/GB = $1,725/month
+Total: $17,725/month (but can't handle the load!)
+</pre><br>
+
+<b>Option D - Batched S3 with Metadata Search:</b>
+<ul>
+<li>✗ <b>"S3 metadata search" doesn't exist:</b> Not a real feature</li>
+<li>✗ <b>Metadata limit:</b> 2 KB per object (can't store list of records)</li>
+<li>✗ <b>Retrieval complexity:</b> How to find specific records?</li>
+<li>✗ <b>Better than A:</b> But still not ideal for low-latency retrieval</li>
+<li>✗ <b>Would need additional index:</b> DynamoDB or Elasticsearch</li>
+</ul><br>
+
+<b>Comparison Table:</b>
+<table border="1" cellpadding="5">
+<tr><th>Solution</th><th>Write Speed</th><th>Latency</th><th>Cost/Month</th><th>Complexity</th></tr>
+<tr><td><b>B-DynamoDB</b></td><td><b>Excellent</b></td><td><b>ms</b></td><td><b>$112K</b></td><td><b>Low</b></td></tr>
+<tr><td>A-S3 Files</td><td>Poor</td><td>Higher</td><td>$432K</td><td>High</td></tr>
+<tr><td>C-RDS</td><td>Limited</td><td>ms</td><td>$18K*</td><td>High</td></tr>
+<tr><td>D-S3 Batch</td><td>Good</td><td>High</td><td>Low</td><td>Very High</td></tr>
+</table>
+*RDS can't actually handle the throughput<br><br>
+
+<b>Alternative: DynamoDB + S3 Archival:</b>
+<pre>
+For even better cost optimization:
+
+1. Write to DynamoDB (hot data, fast access)
+2. Use DynamoDB Streams + Lambda
+3. Archive to S3 after 30 days (cold data)
+4. Use S3 for long-term storage (30-120 days)
+5. S3 lifecycle policy deletes at 120 days
+
+Hot data (0-30 days): DynamoDB
+Cold data (30-120 days): S3
+
+Cost savings: ~40% reduction
+</pre><br>
+
+<b>DynamoDB On-Demand vs Provisioned:</b>
+<table border="1" cellpadding="5">
+<tr><th>Mode</th><th>Best For</th><th>Cost Model</th></tr>
+<tr><td>On-Demand</td><td>Variable/unpredictable load</td><td>Per request</td></tr>
+<tr><td>Provisioned</td><td>Consistent, predictable load</td><td>Per hour (cheaper if consistent)</td></tr>
+</table><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use batch writes (up to 25 items) for efficiency</li>
+<li>Enable DynamoDB Auto Scaling for provisioned mode</li>
+<li>Use DynamoDB Streams for downstream processing</li>
+<li>Consider Global Tables for multi-region</li>
+<li>Monitor CloudWatch metrics (throttling, latency)</li>
+<li>Use composite partition keys to avoid hot partitions</li>
+<li>Enable Point-in-Time Recovery for production</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q6 ================= -->
+<div class="question">
+<pre>
+76) A retail company is hosting an ecommerce website on AWS across multiple AWS Regions. 
+The company wants the website to be operational at all times for online purchases. The website stores data in an Amazon RDS for MySQL DB instance.
+
+Which solution will provide the HIGHEST availability for the database?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q6">
+A. Configure automated backups on Amazon RDS. In the case of disruption, promote an automated backup to be a standalone DB instance. Direct database traffic to the promoted DB instance. Create a replacement read replica that has the promoted DB instance as its source.
+</label>
+
+<label>
+<input type="radio" name="q6">
+B. Configure global tables and read replicas on Amazon RDS. Activate the cross-Region scope. In the case of disruption, use AWS Lambda to copy the read replicas from one Region to another Region.
+</label>
+
+<label>
+<input type="radio" name="q6">
+C. Configure global tables and automated backups on Amazon RDS. In the case of disruption, use AWS Lambda to copy the read replicas from one Region to another Region.
+</label>
+
+<label>
+<input type="radio" name="q6">
+D. Configure read replicas on Amazon RDS. In the case of disruption, promote a cross-Region read replica to be a standalone DB instance. Direct database traffic to the promoted DB instance. Create a replacement read replica that has the promoted DB instance as its source.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question tests <b>multi-region database high availability with RDS</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Ecommerce website across multiple regions</li>
+<li>HIGHEST availability (operational at all times)</li>
+<li>Handle regional disruptions</li>
+<li>RDS MySQL database</li>
+</ul><br>
+
+<b>Why Option D is Correct:</b><br>
+
+<b>Cross-Region Read Replica Strategy:</b>
+<ul>
+<li>✓ <b>Geographic Redundancy:</b> Data replicated to another region</li>
+<li>✓ <b>Fast Failover:</b> Promote replica to standalone instance</li>
+<li>✓ <b>Minimal Data Loss:</b> Near real-time replication</li>
+<li>✓ <b>Read Capability:</b> Can serve reads before disaster</li>
+<li>✓ <b>Auto Recovery:</b> Create new replica after failover</li>
+<li>✓ <b>Proven Pattern:</b> Standard DR architecture</li>
+</ul><br>
+
+<b>Architecture:</b>
+<pre>
+<b>Normal Operations:</b>
+
+Region A (Primary)
+    ├─ RDS MySQL (Multi-AZ)
+    │   ├─ Primary Instance
+    │   └─ Standby Instance (AZ failover)
+    │
+    ↓ Asynchronous Replication
+    │
+Region B (DR)
+    └─ Read Replica (Cross-Region)
+        - Can serve read traffic
+        - Ready for promotion
+
+<b>During Regional Failure:</b>
+
+Region A (Failed) ← ✗ Not accessible
+
+Region B (Now Primary)
+    ├─ Promoted Instance (was replica, now standalone)
+    │   - Accepts writes
+    │   - Serves reads
+    │
+    ↓ Create new read replica
+    │
+Region C (New DR)
+    └─ New Read Replica
+        - Geographic redundancy restored
+</pre><br>
+
+<b>Implementation Steps:</b>
+<pre>
+# 1. Create primary RDS instance with Multi-AZ
+aws rds create-db-instance \
+  --db-instance-identifier prod-db-us-east-1 \
+  --db-instance-class db.r5.xlarge \
+  --engine mysql \
+  --multi-az \
+  --allocated-storage 100
+
+# 2. Create cross-region read replica
+aws rds create-db-instance-read-replica \
+  --db-instance-identifier prod-db-us-west-2 \
+  --source-db-instance-identifier arn:aws:rds:us-east-1:account:db:prod-db-us-east-1 \
+  --region us-west-2 \
+  --db-instance-class db.r5.xlarge
+
+# 3. During disaster: Promote read replica
+aws rds promote-read-replica \
+  --db-instance-identifier prod-db-us-west-2 \
+  --region us-west-2
+
+# 4. Update Route 53 to point to new primary
+aws route53 change-resource-record-sets \
+  --hosted-zone-id Z123 \
+  --change-batch file://change-db-endpoint.json
+
+# 5. Create new read replica in another region
+aws rds create-db-instance-read-replica \
+  --db-instance-identifier prod-db-eu-west-1 \
+  --source-db-instance-identifier arn:aws:rds:us-west-2:account:db:prod-db-us-west-2 \
+  --region eu-west-1
+</pre><br>
+
+<b>Failover Process:</b>
+<ol>
+<li><b>Detection:</b> Region A becomes unavailable</li>
+<li><b>Promotion:</b> Promote us-west-2 replica (2-5 minutes)</li>
+<li><b>DNS Update:</b> Route 53 points to new endpoint</li>
+<li><b>Application Recovery:</b> App connects to new primary</li>
+<li><b>Replica Recreation:</b> Create new replica in Region C</li>
+<li><b>RTO:</b> 5-10 minutes</li>
+<li><b>RPO:</b> Seconds to minutes (depending on replication lag)</li>
+</ol><br>
+
+<b>Read Replica Features:</b>
+<ul>
+<li>Asynchronous replication from primary</li>
+<li>Can be promoted to standalone instance</li>
+<li>After promotion, becomes independent (no more replication)</li>
+<li>Can create new replicas from promoted instance</li>
+<li>Support cross-region replication</li>
+<li>Typically <1 second replication lag</li>
+</ul><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Automated Backups:</b>
+<ul>
+<li>✗ <b>Slow recovery:</b> Restoring from backup takes hours</li>
+<li>✗ <b>High RPO:</b> Last backup could be 24 hours old</li>
+<li>✗ <b>Manual process:</b> Not automatic failover</li>
+<li>✗ <b>Single region:</b> Backup in same region (regional failure = loss)</li>
+<li>✗ <b>Not "highest availability":</b> Hours of downtime</li>
+</ul>
+
+Recovery time comparison:
+<pre>
+Backup restoration: 1-4 hours (large databases)
+Read replica promotion: 2-5 minutes
+</pre><br>
+
+<b>Option B - "Global Tables" on RDS:</b>
+<ul>
+<li>✗ <b>Global Tables don't exist for RDS:</b> That's a DynamoDB feature</li>
+<li>✗ <b>Invalid option:</b> RDS doesn't have this capability</li>
+<li>✗ <b>"Copy replicas with Lambda":</b> Not how it works</li>
+<li>✗ <b>Demonstrates confusion between RDS and DynamoDB</b></li>
+</ul><br>
+
+<b>Option C - Same as B:</b>
+<ul>
+<li>✗ <b>Global tables don't exist for RDS</b></li>
+<li>✗ <b>Lambda copying replicas:</b> Not a valid pattern</li>
+<li>✗ <b>Read replicas already handle replication:</b> No Lambda needed</li>
+</ul><br>
+
+<b>RDS vs DynamoDB Terminology:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>DynamoDB</th><th>RDS</th></tr>
+<tr><td>Multi-Region Writes</td><td>Global Tables</td><td>Not supported</td></tr>
+<tr><td>Multi-Region Reads</td><td>Global Tables</td><td>Read Replicas</td></tr>
+<tr><td>Within-Region HA</td><td>Automatic</td><td>Multi-AZ</td></tr>
+<tr><td>Failover</td><td>Automatic</td><td>Manual (promote replica)</td></tr>
+</table><br>
+
+<b>Complete HA Architecture:</b>
+<pre>
+<b>Multi-Layer Protection:</b>
+
+Layer 1: Multi-AZ (within region)
+    - Primary in AZ-A
+    - Standby in AZ-B
+    - Automatic failover: 1-2 minutes
+    - Handles: AZ failures, instance failures
+
+Layer 2: Cross-Region Read Replica
+    - Replica in different region
+    - Manual promotion: 2-5 minutes
+    - Handles: Regional failures
+
+Layer 3: Automated Backups
+    - Daily snapshots
+    - Transaction logs
+    - Cross-region backup copy
+    - Handles: Data corruption, human error
+
+<b>Combined RTO/RPO:</b>
+- AZ failure: RTO=1-2 min, RPO=0
+- Region failure: RTO=5-10 min, RPO=seconds
+- Data corruption: RTO=hours, RPO=backup frequency
+</pre><br>
+
+<b>Enhanced Architecture with Route 53:</b>
+<pre>
+Route 53 (DNS)
+    ├─ Primary Record (us-east-1)
+    │   - Health Check: Enabled
+    │   - Failover: Primary
+    │
+    └─ Secondary Record (us-west-2)
+        - Health Check: Enabled
+        - Failover: Secondary
+
+Automatic DNS failover when primary unhealthy
+Application automatically connects to replica
+</pre><br>
+
+<b>Monitoring Setup:</b>
+<pre>
+CloudWatch Alarms:
+- ReplicaLag > 60 seconds → Alert
+- ReadLatency > 100ms → Alert
+- CPUUtilization > 80% → Alert
+
+Route 53 Health Checks:
+- Endpoint: Primary DB endpoint
+- Protocol: TCP
+- Port: 3306
+- Interval: 30 seconds
+- Failure threshold: 3
+</pre><br>
+
+<b>Cost Considerations:</b>
+<pre>
+Primary: db.r5.xlarge Multi-AZ
+- $0.58/hour × 2 (Multi-AZ) = $1.16/hour
+- Monthly: ~$840
+
+Cross-Region Replica: db.r5.xlarge
+- $0.58/hour = $0.58/hour
+- Monthly: ~$420
+- Data transfer: $0.02/GB (out of region)
+
+Total: ~$1,260/month + data transfer
+
+Worth it for highest availability!
+</pre><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Always enable Multi-AZ for production primary</li>
+<li>Create cross-region replicas for critical workloads</li>
+<li>Test failover procedures regularly</li>
+<li>Monitor replication lag continuously</li>
+<li>Use Route 53 health checks and failover</li>
+<li>Document runbook for promotion procedure</li>
+<li>Enable enhanced monitoring</li>
+<li>Use parameter groups for consistent configuration</li>
+<li>Copy automated backups to another region</li>
+</ul><br>
+
+<b>Aurora Alternative:</b>
+<pre>
+Note: If using Aurora (not standard RDS):
+- Aurora Global Database provides better solution
+- Sub-second replication to secondary region
+- Automatic failover to secondary region
+- RPO: <1 second
+- RTO: <1 minute
+
+But question specifies RDS MySQL, not Aurora
+</pre>
+</div>
+</div>
+
+<!-- ================= Q7 ================= -->
+<div class="question">
+<pre>
+77) Example Corp. has an on-premises data center and a VPC named VPC A in the Example Corp. AWS account. The on-premises network connects to VPC A through an AWS Site-To-Site VPN. The on-premises servers can properly access VPC A. Example Corp. just acquired AnyCompany, which has a VPC named VPC B. There is no IP address overlap among these networks. Example Corp. has peered VPC A and VPC B.
+
+Example Corp. wants to connect from its on-premise servers to VPC B. Example Corp. has properly set up the network ACL and security groups.
+
+Which solution will meet this requirement with the LEAST operational effort?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q7">
+A. Create a transit gateway. Attach the Site-to-Site VPN, VPC A, and VPC B to the transit gateway. Update the transit gateway route tables for all networks to add IP range routes for all other networks.
+</label>
+
+<label>
+<input type="radio" name="q7">
+B. Create a transit gateway. Create a Site-to-Site VPN connection between the on-premises network and VPC B, and connect the VPN connection to the transit gateway. Add a route to direct traffic to the peered VPCs, and add an authorization rule to give clients access to the VPCs A and B.
+</label>
+
+<label>
+<input type="radio" name="q7">
+C. Update the route tables for the Site-to-Site VPN and both VPCs for all three networks. Configure BGP propagation for all three networks. Wait for up to 5 minutes for BGP propagation to finish.
+</label>
+
+<label>
+<input type="radio" name="q7">
+D. Modify the Site-to-Site VPN's virtual private gateway definition to include VPC A and VPC B. Split the two routers of the virtual private getaway between the two VPCs.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests <b>AWS Transit Gateway for VPC peering and VPN connectivity</b>.<br><br>
+
+<b>Current Setup:</b>
+<ul>
+<li>On-premises ← VPN → VPC A (working)</li>
+<li>VPC A ← Peering → VPC B (working)</li>
+<li><b>Problem:</b> On-premises cannot reach VPC B</li>
+<li><b>Why?</b> VPC peering is NOT transitive</li>
+</ul><br>
+
+<b>VPC Peering Limitation:</b>
+<pre>
+On-Premises ← VPN → VPC A ← Peering → VPC B
+
+<b>This DOESN'T work:</b>
+On-Premises → VPC A → VPC B ✗
+
+VPC Peering is NON-TRANSITIVE:
+- Traffic cannot route through peered VPC
+- On-premises can only reach VPC A (direct VPN connection)
+- Cannot use VPC A as "router" to reach VPC B
+</pre><br>
+
+<b>Why Option A is Correct:</b><br>
+
+<b>Transit Gateway Solution:</b>
+<ul>
+<li>✓ <b>Central Hub:</b> Single connection point for all networks</li>
+<li>✓ <b>Transitive Routing:</b> Traffic can route through TGW</li>
+<li>✓ <b>Simplifies Architecture:</b> Hub-and-spoke model</li>
+<li>✓ <b>Scalable:</b> Easy to add more VPCs/VPNs</li>
+<li>✓ <b>Replaces VPC Peering:</b> Better long-term solution</li>
+<li>✓ <b>Minimal Configuration:</b> Attach and configure routes</li>
+</ul><br>
+
+<b>Transit Gateway Architecture:</b>
+<pre>
+                Transit Gateway (Central Hub)
+                        |
+        +---------------+---------------+
+        |               |               |
+        |               |               |
+   On-Premises        VPC A          VPC B
+   (Site-to-Site      (10.1.0.0/16)  (10.2.0.0/16)
+    VPN)              
+
+<b>All networks can communicate through Transit Gateway</b>
+
+TGW Route Table:
+- 192.168.0.0/16 → VPN attachment
+- 10.1.0.0/16 → VPC A attachment
+- 10.2.0.0/16 → VPC B attachment
+
+VPC A Route Table:
+- 10.2.0.0/16 → TGW
+- 192.168.0.0/16 → TGW
+
+VPC B Route Table:
+- 10.1.0.0/16 → TGW
+- 192.168.0.0/16 → TGW
+
+On-Premises Routes (via BGP or static):
+- 10.1.0.0/16 → VPN tunnel
+- 10.2.0.0/16 → VPN tunnel
+</pre><br>
+
+<b>Implementation Steps:</b>
+<pre>
+# 1. Create Transit Gateway
+aws ec2 create-transit-gateway \
+  --description "Hub for on-premises and VPCs" \
+  --options AmazonSideAsn=64512
+
+# 2. Attach VPN to Transit Gateway
+# First, detach VPN from VGW, then attach to TGW
+aws ec2 create-vpn-connection \
+  --type ipsec.1 \
+  --transit-gateway-id tgw-xxxxx \
+  --customer-gateway-id cgw-xxxxx
+
+# 3. Attach VPC A to Transit Gateway
+aws ec2 create-transit-gateway-vpc-attachment \
+  --transit-gateway-id tgw-xxxxx \
+  --vpc-id vpc-aaaa \
+  --subnet-ids subnet-1a subnet-1b
+
+# 4. Attach VPC B to Transit Gateway
+aws ec2 create-transit-gateway-vpc-attachment \
+  --transit-gateway-id tgw-xxxxx \
+  --vpc-id vpc-bbbb \
+  --subnet-ids subnet-2a subnet-2b
+
+# 5. Update TGW route table (usually automatic with propagation)
+aws ec2 enable-transit-gateway-route-table-propagation \
+  --transit-gateway-route-table-id tgw-rtb-xxxxx \
+  --transit-gateway-attachment-id tgw-attach-vpca
+
+# 6. Update VPC route tables
+aws ec2 create-route \
+  --route-table-id rtb-vpca \
+  --destination-cidr-block 10.2.0.0/16 \
+  --transit-gateway-id tgw-xxxxx
+
+aws ec2 create-route \
+  --route-table-id rtb-vpcb \
+  --destination-cidr-block 192.168.0.0/16 \
+  --transit-gateway-id tgw-xxxxx
+</pre><br>
+
+<b>Traffic Flow After Implementation:</b>
+<pre>
+On-Premises (192.168.1.10) wants to reach VPC B (10.2.0.5):
+
+1. On-Premises → VPN tunnel → Transit Gateway
+2. Transit Gateway checks route table
+3. Destination 10.2.0.0/16 → VPC B attachment
+4. Transit Gateway → VPC B
+5. VPC B security groups/NACLs allow traffic
+6. Response: VPC B → TGW → VPN → On-Premises
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option B - Second VPN + TGW (Partial):</b>
+<ul>
+<li>✓ Creates Transit Gateway (good start)</li>
+<li>✗ <b>Creates SECOND VPN:</b> Unnecessary complexity and cost</li>
+<li>✗ <b>Two VPN connections:</b> Double the management overhead</li>
+<li>✗ <b>"Peered VPCs" mention:</b> Confusing, TGW replaces peering</li>
+<li>✗ <b>Not least operational effort:</b> Managing two VPNs</li>
+<li>✗ <b>Higher cost:</b> Two VPN connections ($0.05/hour each)</li>
+</ul>
+
+Why it's worse:
+<pre>
+Option A: 1 VPN → TGW ← VPC A, VPC B
+Option B: VPN1 → TGW ← VPN2, VPC A, VPC B
+          (why two VPNs??)
+</pre><br>
+
+<b>Option C - Update Route Tables + BGP:</b>
+<ul>
+<li>✗ <b>Doesn't solve transitivity:</b> VPC peering is still non-transitive</li>
+<li>✗ <b>BGP doesn't help:</b> Can't make peering transitive</li>
+<li>✗ <b>Fundamentally flawed:</b> Routing won't work through peered VPC</li>
+<li>✗ <b>Wrong understanding:</b> No amount of routing fixes peering limitation</li>
+</ul>
+
+Why it fails:
+<pre>
+On-Premises → VPN → VPC A [peering] VPC B
+
+Even with routes configured:
+VPC A routing table: 10.2.0.0/16 → peering connection
+Problem: VPC A cannot forward traffic from VPN to peering!
+VPC peering ONLY works for traffic originating IN the VPCs
+</pre><br>
+
+<b>Option D - Modify VGW to Include Both VPCs:</b>
+<ul>
+<li>✗ <b>Not possible:</b> VGW can only attach to ONE VPC</li>
+<li>✗ <b>Invalid configuration:</b> Cannot "split routers"</li>
+<li>✗ <b>Nonsensical:</b> This isn't how VGW works</li>
+<li>✗ <b>AWS limitation:</b> 1 VGW = 1 VPC (one-to-one relationship)</li>
+</ul><br>
+
+<b>VGW vs Transit Gateway:</b>
+<table border="1" cellpadding="5">
+<tr><th>Feature</th><th>Virtual Private Gateway</th><th>Transit Gateway</th></tr>
+<tr><td>VPCs per Gateway</td><td>1 only</td><td>5,000</td></tr>
+<tr><td>Transitive Routing</td><td>No</td><td>Yes</td></tr>
+<tr><td>VPN Connections</td><td>10 per VGW</td><td>5,000</td></tr>
+<tr><td>Inter-VPC Traffic</td><td>Requires Peering</td><td>Through TGW</td></tr>
+<tr><td>Bandwidth</td><td>1.25 Gbps per tunnel</td><td>50 Gbps per AZ</td></tr>
+<tr><td>Use Case</td><td>Simple VPN to single VPC</td><td>Hub for multiple networks</td></tr>
+</table><br>
+
+<b>Migration from VPC Peering to Transit Gateway:</b>
+<pre>
+<b>Before (Current State):</b>
+On-Premises ← VPN → VPC A ← Peering → VPC B
+
+<b>After (Option A):</b>
+                    TGW
+                     |
+        +------------+------------+
+        |            |            |
+   On-Premises     VPC A        VPC B
+
+<b>Benefits:</b>
+✓ Transitive routing works
+✓ Easy to add VPC C, VPC D, etc.
+✓ Simplified network architecture
+✓ Better scalability
+✓ Single point of management
+</pre><br>
+
+<b>Additional Transit Gateway Features:</b>
+<ul>
+<li><b>Route Table Isolation:</b> Multiple route tables for segmentation</li>
+<li><b>Multicast Support:</b> Unlike VPC peering</li>
+<li><b>Cross-Region Peering:</b> Connect TGWs in different regions</li>
+<li><b>Direct Connect Support:</b> Attach DX gateway</li>
+<li><b>Network Manager:</b> Global network monitoring</li>
+</ul><br>
+
+<b>Cost Comparison:</b>
+<pre>
+<b>Option A (Transit Gateway):</b>
+- TGW attachment: $0.05/hour × 3 = $0.15/hour = $109/month
+- Data processing: $0.02/GB
+- VPN: $0.05/hour = $36/month
+Total base: $145/month + data transfer
+
+<b>Option B (Two VPNs):</b>
+- TGW attachment: $0.05/hour × 4 = $0.20/hour = $146/month
+- VPN 1: $36/month
+- VPN 2: $36/month
+Total base: $218/month (50% more expensive!)
+
+<b>Current Setup (VPC Peering):</b>
+- VPC Peering: Free (same region)
+- VPN: $36/month
+- Data transfer: $0.01/GB
+Total: $36/month + data
+
+Note: TGW more expensive but provides better architecture
+</pre><br>
+
+<b>Advanced TGW Architecture:</b>
+<pre>
+# Multiple route tables for isolation
+
+TGW Route Table (Production):
+- Associates: VPC-Prod-A, VPC-Prod-B
+- Propagates: On-Premises VPN
+
+TGW Route Table (Development):
+- Associates: VPC-Dev-A, VPC-Dev-B  
+- Propagates: Dev-VPN
+
+This isolates prod and dev environments
+</pre><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use Transit Gateway for >2 VPCs</li>
+<li>Enable route propagation for automatic updates</li>
+<li>Use multiple TGW route tables for isolation</li>
+<li>Monitor TGW CloudWatch metrics</li>
+<li>Document CIDR ranges to avoid overlaps</li>
+<li>Use Transit Gateway Network Manager for visibility</li>
+<li>Consider AWS Resource Access Manager for multi-account</li>
+<li>Enable VPC Flow Logs for troubleshooting</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q8 ================= -->
+<div class="question">
+<pre>
+78) A company recently completed the migration from an on-premises data center to the AWS Cloud by using a replatforming strategy. One of the migrated servers is running a legacy Simple Mail Transfer Protocol (SMTP) service that a critical application relies upon. The application sends outbound email messages to the company's customers. The legacy SMTP server does not support TLS encryption and uses TCP port 25. The application can use SMTP only.
+
+The company decides to use Amazon Simple Email Service (Amazon SES) and to decommission the legacy SMTP server. The company has created and validated the SES domain. The company has lifted the SES limits.
+
+What should the company do to modify the application to send email messages from Amazon SES?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q8">
+A. Configure the application to connect to Amazon SES by using TLS Wrapper. Create an IAM role that has ses:SendEmail and ses:SendRawEmail permissions. Attach the IAM role to an Amazon EC2 instance.
+</label>
+
+<label>
+<input type="radio" name="q8">
+B. Configure the application to connect to Amazon SES by using STARTTLS. Obtain Amazon SES SMTP credentials. Use the credentials to authenticate with Amazon SES.
+</label>
+
+<label>
+<input type="radio" name="q8">
+C. Configure the application to use the SES API to send email messages. Create an IAM role that has ses:SendEmail and ses:SendRawEmail permissions. Use the IAM role as a service role for Amazon SES.
+</label>
+
+<label>
+<input type="radio" name="q8">
+D. Configure the application to use AWS SDKs to send email messages. Create an IAM user for Amazon SES. Generate API access keys. Use the access keys to authenticate with Amazon SES.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>migrating legacy SMTP applications to Amazon SES</b>.<br><br>
+
+<b>Constraints:</b>
+<ul>
+<li>Legacy application using SMTP only (cannot use APIs)</li>
+<li>Current setup: TCP port 25, no TLS</li>
+<li>Need to migrate to Amazon SES</li>
+<li>Application cannot be modified to use SES API</li>
+</ul><br>
+
+<b>Why Option B is Correct:</b><br>
+
+<b>Amazon SES SMTP Interface:</b>
+<ul>
+<li>✓ <b>SMTP Compatible:</b> Works with existing SMTP applications</li>
+<li>✓ <b>STARTTLS Support:</b> Secure SMTP on port 587 or 2587</li>
+<li>✓ <b>SMTP Credentials:</b> Username/password authentication</li>
+<li>✓ <b>Minimal Code Changes:</b> Just update endpoint and credentials</li>
+<li>✓ <b>Standard SMTP:</b> No application rewrite needed</li>
+</ul><br>
+
+<b>SES SMTP Interface Architecture:</b>
+<pre>
+Legacy Application
+    ↓
+    ↓ SMTP protocol (unchanged)
+    ↓
+Amazon SES SMTP Endpoint
+    ├─ Endpoint: email-smtp.us-east-1.amazonaws.com
+    ├─ Port: 587 (STARTTLS) or 465 (TLS Wrapper)
+    ├─ Authentication: SMTP credentials
+    └─ Encryption: TLS 1.2+
+    ↓
+Amazon SES Service
+    ├─ Spam/virus checking
+    ├─ DKIM signing
+    ├─ Reputation management
+    └─ Delivery optimization
+    ↓
+Recipient Email Servers
+</pre><br>
+
+<b>Implementation Steps:</b>
+<pre>
+# 1. Generate SES SMTP credentials in AWS Console
+# IAM → Users → Create SMTP Credentials
+# This creates an IAM user with SES sending permissions
+
+Credentials format:
+- SMTP Username: AKIAIOSFODNN7EXAMPLE
+- SMTP Password: Wjalrxutnfemi/K7MDENG/bPxRfiCYEXAMPLEKEY
+
+# 2. Update application SMTP configuration
+Old Configuration:
+    Host: legacy-smtp-server.local
+    Port: 25
+    Auth: None
+    TLS: Disabled
+
+New Configuration:
+    Host: email-smtp.us-east-1.amazonaws.com
+    Port: 587
+    Auth: LOGIN
+    Username: AKIAIOSFODNN7EXAMPLE
+    Password: Wjalrxutnfemi/K7MDENG/bPxRfiCYEXAMPLEKEY
+    TLS: STARTTLS
+
+# 3. Test email sending
+</pre><br>
+
+<b>STARTTLS vs TLS Wrapper:</b>
+<pre>
+<b>STARTTLS (Opportunistic TLS):</b>
+1. Client connects on plain TCP (port 587)
+2. Client issues STARTTLS command
+3. Connection upgraded to TLS
+4. SMTP communication continues encrypted
+
+<b>TLS Wrapper (Implicit TLS):</b>
+1. Client connects directly with TLS (port 465)
+2. TLS established before any SMTP commands
+3. All communication encrypted from start
+
+SES supports both:
+- Port 587: STARTTLS (recommended)
+- Port 2587: STARTTLS (alternative)
+- Port 465: TLS Wrapper
+- Port 25: Blocked by AWS for EC2 (anti-spam)
+</pre><br>
+
+<b>Code Example (Python):</b>
+<pre>
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+# SES SMTP configuration
+SMTP_HOST = "email-smtp.us-east-1.amazonaws.com"
+SMTP_PORT = 587
+SMTP_USERNAME = "AKIAIOSFODNN7EXAMPLE"
+SMTP_PASSWORD = "Wjalrxutnfemi/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+# Create message
+msg = MIMEMultipart()
+msg['From'] = 'sender@example.com'
+msg['To'] = 'recipient@example.com'
+msg['Subject'] = 'Test Email'
+msg.attach(MIMEText('This is a test email', 'plain'))
+
+# Send via SES SMTP
+server = smtplib.SMTP(SMTP_HOST, SMTP_PORT)
+server.starttls()  # Enable STARTTLS
+server.login(SMTP_USERNAME, SMTP_PASSWORD)
+server.send_message(msg)
+server.quit()
+</pre><br>
+
+<b>Java Example:</b>
+<pre>
+Properties props = new Properties();
+props.put("mail.smtp.host", "email-smtp.us-east-1.amazonaws.com");
+props.put("mail.smtp.port", "587");
+props.put("mail.smtp.auth", "true");
+props.put("mail.smtp.starttls.enable", "true");
+props.put("mail.smtp.starttls.required", "true");
+
+Session session = Session.getInstance(props, new Authenticator() {
+    protected PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication(SMTP_USERNAME, SMTP_PASSWORD);
+    }
+});
+
+Message message = new MimeMessage(session);
+message.setFrom(new InternetAddress("sender@example.com"));
+message.setRecipients(Message.RecipientType.TO, 
+    InternetAddress.parse("recipient@example.com"));
+message.setSubject("Test Email");
+message.setText("This is a test email");
+
+Transport.send(message);
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - TLS Wrapper + IAM Role:</b>
+<ul>
+<li>✓ TLS Wrapper is supported (port 465)</li>
+<li>✗ <b>IAM role doesn't work with SMTP:</b> SMTP requires username/password</li>
+<li>✗ <b>IAM roles for API/SDK only:</b> Not for SMTP protocol</li>
+<li>✗ <b>Wrong authentication method:</b> SMTP needs SMTP credentials</li>
+</ul>
+
+Clarification:
+<pre>
+SMTP Authentication: Username/Password (SMTP credentials)
+API/SDK Authentication: IAM roles, access keys, SigV4
+Cannot mix them!
+</pre><br>
+
+<b>Option C - SES API + IAM Role:</b>
+<ul>
+<li>✗ <b>Application uses SMTP only:</b> Cannot use SES API</li>
+<li>✗ <b>Requires code rewrite:</b> Change from SMTP to API calls</li>
+<li>✗ <b>Violates constraint:</b> "application can use SMTP only"</li>
+<li>✗ <b>"Service role for SES":</b> Doesn't exist/make sense</li>
+</ul>
+
+Would require rewrite:
+<pre>
+# Before (SMTP):
+server.connect("smtp-server", 25)
+server.send_message(msg)
+
+# After (SES API):
+import boto3
+ses = boto3.client('ses')
+ses.send_email(
+    Source='sender@example.com',
+    Destination={'ToAddresses': ['recipient@example.com']},
+    Message={...}
+)
+
+This violates "SMTP only" constraint!
+</pre><br>
+
+<b>Option D - AWS SDK + IAM User:</b>
+<ul>
+<li>✗ <b>Same as Option C:</b> Requires code rewrite to use SDK</li>
+<li>✗ <b>Not SMTP:</b> Uses SES API instead</li>
+<li>✗ <b>IAM user access keys:</b> Less secure than IAM roles (but not the main issue)</li>
+<li>✗ <b>Violates "SMTP only" requirement</b></li>
+</ul><br>
+
+<b>Authentication Methods Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Method</th><th>Use Case</th><th>Protocol</th><th>Credentials</th></tr>
+<tr><td><b>SMTP Credentials</b></td><td><b>Legacy apps, SMTP clients</b></td><td><b>SMTP</b></td><td><b>Username/Password</b></td></tr>
+<tr><td>IAM Role</td><td>EC2, Lambda, ECS</td><td>API/SDK</td><td>Temporary</td></tr>
+<tr><td>IAM User Keys</td><td>External apps, scripts</td><td>API/SDK</td><td>Access Key ID/Secret</td></tr>
+<tr><td>Cognito</td><td>User authentication</td><td>API/SDK</td><td>JWT tokens</td></tr>
+</table><br>
+
+<b>SES SMTP Endpoints by Region:</b>
+<pre>
+us-east-1: email-smtp.us-east-1.amazonaws.com
+us-west-2: email-smtp.us-west-2.amazonaws.com
+eu-west-1: email-smtp.eu-west-1.amazonaws.com
+ap-southeast-1: email-smtp.ap-southeast-1.amazonaws.com
+
+All support ports: 25*, 587, 2587, 465
+*Port 25 throttled/blocked from EC2
+</pre><br>
+
+<b>Port 25 Restrictions:</b>
+<ul>
+<li>AWS throttles port 25 from EC2 by default (anti-spam)</li>
+<li>Can request port 25 removal through support</li>
+<li>Better to use 587 or 465 anyway (encrypted)</li>
+<li>Port 2587 is alternative to 587 (if ISP blocks it)</li>
+</ul><br>
+
+<b>SES SMTP Features:</b>
+<ul>
+<li>Message size limit: 10 MB (including attachments)</li>
+<li>Sending quota: 200 emails/day (sandbox), request increase</li>
+<li>Sending rate: 1 email/second (sandbox), scales up</li>
+<li>DKIM signing: Automatic if configured</li>
+<li>Bounce/complaint handling: Via SNS notifications</li>
+<li>Configuration sets: Track sending metrics</li>
+</ul><br>
+
+<b>Migration Checklist:</b>
+<ol>
+<li>✓ Verify SES domain (DONE in question)</li>
+<li>✓ Request sending limit increase (DONE in question)</li>
+<li>Generate SMTP credentials</li>
+<li>Configure DKIM for domain</li>
+<li>Set up bounce/complaint handling</li>
+<li>Update application SMTP settings</li>
+<li>Test email delivery</li>
+<li>Monitor SES metrics</li>
+<li>Decommission legacy SMTP server</li>
+</ol><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use STARTTLS on port 587 (industry standard)</li>
+<li>Store SMTP credentials in AWS Secrets Manager</li>
+<li>Enable DKIM signing for better deliverability</li>
+<li>Set up SNS topics for bounces/complaints</li>
+<li>Use Configuration Sets for tracking</li>
+<li>Monitor SES reputation dashboard</li>
+<li>Implement retry logic in application</li>
+<li>Use dedicated IP for high volume (optional)</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Q9 ================= -->
+<div class="question">
+<pre>
+79) A company recently acquired several other companies. Each company has a separate AWS account with a different billing and reporting method. The acquiring company has consolidated all the accounts into one organization in AWS Organizations. However, the acquiring company has found it difficult to generate a cost report that contains meaningful groups for all the teams.
+
+The acquiring company's finance team needs a solution to report on costs for all the companies through a self-managed application.
+
+Which solution will meet these requirements?
+</pre>
+<div class="options">
+<label>
+<input type="radio" name="q9">
+A. Create an AWS Cost and Usage Report for the organization. Define tags and cost categories in the report. Create a table in Amazon Athena. Create an Amazon QuickSight dataset based on the Athena table. Share the dataset with the finance team.
+</label>
+
+<label>
+<input type="radio" name="q9">
+B. Create an AWS Cost and Usage Report for the organization. Define tags and cost categories in the report. Create a specialized template in AWS Cost Explorer that the finance department will use to build reports.
+</label>
+
+<label>
+<input type="radio" name="q9">
+C. Create an Amazon QuickSight dataset that receives spending information from the AWS Price List Query API. Share the dataset with the finance team.
+</label>
+
+<label>
+<input type="radio" name="q9">
+D. Use the AWS Price List Query API to collect account spending information. Create a specialized template in AWS Cost Explorer that the finance department will use to build reports.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests <b>AWS Cost and Usage Reports with custom analytics using Athena and QuickSight</b>.<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Multiple AWS accounts in one organization</li>
+<li>Need meaningful cost grouping</li>
+<li>Self-managed application (custom reporting)</li>
+<li>Finance team needs flexible reporting</li>
+</ul><br>
+
+<b>Why Option A is Correct:</b><br>
+
+<b>AWS Cost and Usage Report (CUR):</b>
+<ul>
+<li>✓ <b>Detailed Billing Data:</b> Line-item level costs</li>
+<li>✓ <b>Organization Support:</b> All accounts in one report</li>
+<li>✓ <b>Custom Tags:</b> Group costs by any dimension</li>
+<li>✓ <b>Cost Categories:</b> Business logic for grouping</li>
+<li>✓ <b>Raw Data Access:</b> CSV/Parquet files in S3</li>
+<li>✓ <b>Athena Integration:</b> SQL queries on cost data</li>
+<li>✓ <b>QuickSight Visualization:</b> Self-service BI dashboards</li>
+</ul><br>
+
+<b>Solution Architecture:</b>
+<pre>
+AWS Organization (All Accounts)
+    ↓
+    ↓ Generate hourly/daily reports
+    ↓
+Cost and Usage Report (CUR)
+    ├─ Tags: Department, Project, Environment
+    ├─ Cost Categories: By company, by team
+    └─ Format: Parquet (optimized for Athena)
+    ↓
+Amazon S3 Bucket
+    └─ s3://my-cur-bucket/reports/
+    ↓
+AWS Glue Data Catalog
+    └─ Tables/schemas for CUR data
+    ↓
+Amazon Athena
+    ├─ SQL queries on cost data
+    ├─ Joins, aggregations, filtering
+    └─ Views for common queries
+    ↓
+Amazon QuickSight
+    ├─ Interactive dashboards
+    ├─ Drill-down capabilities
+    ├─ Scheduled reports
+    └─ Self-service for finance team
+
+Finance Team
+    ├─ View dashboards
+    ├─ Create custom reports
+    └─ Export data
+</pre><br>
+
+<b>Implementation Steps:</b>
+<pre>
+# 1. Create Cost and Usage Report
+AWS Console → Billing → Cost & Usage Reports → Create
+
+Settings:
+- Report name: organization-cur
+- Time granularity: Hourly
+- Include resource IDs: Yes
+- Enable data integration: Amazon Athena
+- Compression: Parquet
+- S3 bucket: my-cur-bucket
+- Report path prefix: reports/
+
+# 2. Define Cost Categories
+{
+  "Name": "Company",
+  "Rules": [
+    {
+      "Value": "CompanyA",
+      "Rule": {
+        "Tags": {
+          "Key": "Company",
+          "Values": ["CompanyA"]
+        }
+      }
+    },
+    {
+      "Value": "CompanyB",
+      "Rule": {
+        "Accounts": ["111122223333", "444455556666"]
+      }
+    }
+  ]
+}
+
+# 3. Set up Athena
+# CUR automatically creates Glue tables
+
+# Create view for common queries
+CREATE VIEW finance_monthly_costs AS
+SELECT
+  line_item_usage_account_id as account_id,
+  product_product_name as service,
+  DATE_FORMAT(line_item_usage_start_date, '%Y-%m') as month,
+  resource_tags_user_company as company,
+  cost_category_company as cost_category,
+  SUM(line_item_unblended_cost) as total_cost
+FROM
+  cur_database.cur_table
+WHERE
+  year = '2024'
+GROUP BY 1, 2, 3, 4, 5;
+
+# 4. Create QuickSight Dashboard
+# Connect QuickSight to Athena
+# Create datasets from Athena views
+# Build visualizations
+</pre><br>
+
+<b>Cost Category Example:</b>
+<pre>
+Cost Category: "Business Unit"
+├─ Rule 1: Company A
+│   - Condition: Account ID in [111122223333, 222233334444]
+│   - Or: Tag "Company" = "CompanyA"
+│
+├─ Rule 2: Company B
+│   - Condition: Account ID in [555566667777]
+│   - Or: Tag "Company" = "CompanyB"
+│
+└─ Rule 3: Shared Services
+    - Condition: Tag "Department" = "IT"
+    - And: Tag "CostCenter" = "Shared"
+
+Now can query: "Show costs by Business Unit"
+</pre><br>
+
+<b>Sample Athena Queries:</b>
+<pre>
+-- Monthly costs by company
+SELECT
+  cost_category_company,
+  DATE_FORMAT(line_item_usage_start_date, '%Y-%m') as month,
+  SUM(line_item_unblended_cost) as cost
+FROM cur_table
+WHERE year = '2024'
+GROUP BY 1, 2
+ORDER BY 2, 1;
+
+-- Top 10 most expensive services
+SELECT
+  product_product_name,
+  SUM(line_item_unblended_cost) as total_cost
+FROM cur_table
+WHERE year = '2024' AND month = '01'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10;
+
+-- Costs by tag (Department)
+SELECT
+  resource_tags_user_department,
+  SUM(line_item_unblended_cost) as cost
+FROM cur_table
+WHERE year = '2024'
+  AND resource_tags_user_department IS NOT NULL
+GROUP BY 1;
+</pre><br>
+
+<b>QuickSight Dashboard Example:</b>
+<pre>
+Dashboard: "Multi-Company Cost Overview"
+
+Visuals:
+1. Total Cost Trend (Line Chart)
+   - X-axis: Month
+   - Y-axis: Total Cost
+   - Color: Company
+
+2. Cost by Service (Pie Chart)
+   - Segments: Top 10 services
+   - Values: Total cost
+
+3. Cost by Account (Bar Chart)
+   - X-axis: Account ID
+   - Y-axis: Cost
+   - Color: Company
+
+4. Cost Category Breakdown (Treemap)
+   - Hierarchy: Company → Department → Service
+   - Size: Total cost
+
+Filters:
+- Date range
+- Company
+- Account ID
+- Service
+- Tags
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option B - Cost Explorer Templates:</b>
+<ul>
+<li>✓ CUR with tags/categories is correct</li>
+<li>✗ <b>Cost Explorer is AWS-managed:</b> Not "self-managed application"</li>
+<li>✗ <b>Limited customization:</b> Cannot create fully custom applications</li>
+<li>✗ <b>No programmatic access to templates:</b> Manual usage only</li>
+<li>✗ <b>Less flexible:</b> Cannot build custom workflows</li>
+<li>✗ <b>Doesn't meet "self-managed application" requirement</b></li>
+</ul>
+
+Cost Explorer limitations:
+<pre>
+- Pre-built visualizations only
+- Cannot embed in custom apps
+- No API for templates
+- Limited to AWS Console access
+- Cannot integrate with other data sources
+</pre><br>
+
+<b>Option C - Price List Query API:</b>
+<ul>
+<li>✗ <b>Wrong API:</b> Price List API shows service pricing, not actual costs</li>
+<li>✗ <b>No usage data:</b> Only lists on-demand prices</li>
+<li>✗ <b>Doesn't show actual spending:</b> No billing information</li>
+<li>✗ <b>Cannot generate cost reports:</b> Fundamentally wrong tool</li>
+</ul>
+
+What Price List API actually does:
+<pre>
+# Returns: Pricing information for AWS services
+# Example: "EC2 t3.micro costs $0.0104/hour in us-east-1"
+# Does NOT return: "Your company spent $5,000 on EC2 last month"
+
+This is for price discovery, not cost reporting!
+</pre><br>
+
+<b>Option D - Price List API + Cost Explorer:</b>
+<ul>
+<li>✗ <b>Same issue as C:</b> Price List API doesn't have spending data</li>
+<li>✗ <b>Mixing wrong tools:</b> Price List for pricing, not costs</li>
+<li>✗ <b>Cost Explorer not self-managed</b></li>
+</ul><br>
+
+<b>Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Tool</th><th>Purpose</th><th>Data Type</th><th>Customizable</th></tr>
+<tr><td><b>CUR + Athena + QuickSight</b></td><td><b>Custom cost analytics</b></td><td><b>Actual costs</b></td><td><b>High</b></td></tr>
+<tr><td>Cost Explorer</td><td>AWS-managed reporting</td><td>Actual costs</td><td>Low</td></tr>
+<tr><td>Price List API</td><td>Service pricing</td><td>List prices</td><td>N/A</td></tr>
+<tr><td>Billing Console</td><td>View bills</td><td>Actual costs</td><td>None</td></tr>
+</table><br>
+
+<b>CUR Data Fields (Examples):</b>
+<pre>
+Identity Fields:
+- line_item_usage_account_id
+- line_item_usage_type
+- product_product_name
+
+Cost Fields:
+- line_item_unblended_cost
+- line_item_blended_cost
+- pricing_public_on_demand_cost
+- reservation_effective_cost
+
+Resource Fields:
+- line_item_resource_id
+- resource_tags_user_*
+- product_region
+
+Time Fields:
+- line_item_usage_start_date
+- line_item_usage_end_date
+- bill_billing_period_start_date
+</pre><br>
+
+<b>Tagging Strategy for Multi-Company:</b>
+<pre>
+Required Tags:
+├─ Company: CompanyA, CompanyB, CompanyC
+├─ Department: Engineering, Finance, Sales
+├─ Project: ProjectX, ProjectY
+├─ Environment: Prod, Dev, Test
+├─ CostCenter: CC-1001, CC-1002
+└─ Owner: team-alpha@company.com
+
+Tag Policies (AWS Organizations):
+{
+  "tags": {
+    "Company": {
+      "tag_key": "Company",
+      "tag_value": ["CompanyA", "CompanyB"],
+      "enforced_for": ["ec2:instance", "rds:db", "s3:bucket"]
+    }
+  }
+}
+</pre><br>
+
+<b>Cost Allocation Tags:</b>
+<pre>
+1. Activate cost allocation tags in Billing Console
+2. Tags become dimensions in CUR
+3. Can group/filter costs by tags
+4. Takes 24 hours to appear in reports
+
+# Example
+aws ce get-cost-and-usage \
+  --time-period Start=2024-01-01,End=2024-01-31 \
+  --granularity MONTHLY \
+  --metrics UnblendedCost \
+  --group-by Type=TAG,Key=Company
+</pre><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Enable CUR at organization level (consolidated view)</li>
+<li>Use Parquet format for better Athena performance</li>
+<li>Create Athena views for common queries</li>
+<li>Partition CUR data by year/month for efficiency</li>
+<li>Use QuickSight SPICE for faster dashboards</li>
+<li>Implement tag governance with AWS Tag Policies</li>
+<li>Set up scheduled QuickSight reports</li>
+<li>Monitor S3 costs for CUR storage</li>
+<li>Use cost categories for business logic</li>
+</ul><br>
+
+<b>Cost Optimization:</b>
+<pre>
+CUR Storage Costs:
+- S3 Standard: ~$23/TB/month
+- CUR size: ~5-50 GB/month (typical)
+- Use S3 lifecycle policies: Move old reports to Glacier
+
+Athena Query Costs:
+- $5 per TB scanned
+- Use Parquet format: 90% less data scanned vs CSV
+- Partition data: Scan only needed months
+
+QuickSight Costs:
+- Standard: $12/user/month
+- Enterprise: $24/user/month
+- Reader sessions: $0.30/session (max $5/month)
+</pre>
+</div>
+</div>
+
+<!-- ================= Q10 ================= -->
+<div class="question">
+<pre>
+80) A company runs an IoT platform on AWS. IoT sensors in various locations send data to the company's Node.js API servers on Amazon EC2 instances running behind an Application Load Balancer. The data is stored in an Amazon RDS MySQL DB instance that uses a 4 TB General Purpose SSD volume.
+
+The number of sensors the company has deployed in the field has increased over time, and is expected to grow significantly. The API servers are consistently overloaded and RDS metrics show high write latency.
+
+Which of the following steps together will resolve the issues permanently and enable growth as new sensors are provisioned, while keeping this platform cost-efficient? (Choose two.)
+</pre>
+<div class="options">
+<label>
+<input type="checkbox" name="q10">
+A. Resize the MySQL General Purpose SSD storage to 6 TB to improve the volume's IOPS.
+</label>
+
+<label>
+<input type="checkbox" name="q10">
+B. Re-architect the database tier to use Amazon Aurora instead of an RDS MySQL DB instance and add read replicas.
+</label>
+
+<label>
+<input type="checkbox" name="q10">
+C. Leverage Amazon Kinesis Data Streams and AWS Lambda to ingest and process the raw data.
+</label>
+
+<label>
+<input type="checkbox" name="q10">
+D. Use AWS X-Ray to analyze and debug application issues and add more API servers to match the load.
+</label>
+
+<label>
+<input type="checkbox" name="q10">
+E. Re-architect the database tier to use Amazon DynamoDB instead of an RDS MySQL DB instance.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2,4])">Check Answer</button>
+<button onclick="showAnswer(this,[2,4])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C, E</b><br><br>
+
+This question tests <b>scaling IoT data ingestion architecture for high write throughput</b>.<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>API servers overloaded (synchronous processing bottleneck)</li>
+<li>RDS high write latency (wrong database for IoT workload)</li>
+<li>Expected significant growth (current architecture won't scale)</li>
+<li>Need cost-efficient, scalable solution</li>
+</ul><br>
+
+<b>Why Options C + E Are Correct:</b><br>
+
+<b>Option C - Kinesis Data Streams + Lambda:</b>
+<ul>
+<li>✓ <b>Decouples Ingestion:</b> Sensors → Kinesis (asynchronous)</li>
+<li>✓ <b>Buffering:</b> Handles traffic spikes</li>
+<li>✓ <b>Scalable:</b> Kinesis auto-scales to millions of records/second</li>
+<li>✓ <b>Reduces API Load:</b> Sensors send to Kinesis, not API</li>
+<li>✓ <b>Stream Processing:</b> Lambda processes data in real-time</li>
+<li>✓ <b>Cost-Efficient:</b> Pay per GB ingested</li>
+</ul><br>
+
+<b>Option E - DynamoDB:</b>
+<ul>
+<li>✓ <b>High Write Throughput:</b> Millions of writes/second</li>
+<li>✓ <b>Low Latency:</b> Single-digit millisecond writes</li>
+<li>✓ <b>Auto-Scaling:</b> Handles variable load</li>
+<li>✓ <b>No Administration:</b> Fully managed, no capacity planning</li>
+<li>✓ <b>Cost-Effective:</b> On-demand pricing for variable workloads</li>
+<li>✓ <b>Perfect for IoT:</b> Designed for high-volume time-series data</li>
+</ul><br>
+
+<b>New Architecture:</b>
+<pre>
+IoT Sensors (Thousands → Millions)
+    ↓ ↓ ↓
+    ↓ ↓ ↓ HTTP/HTTPS
+    ↓ ↓ ↓
+Amazon Kinesis Data Streams
+    ├─ Shards: Auto-scale based on load
+    ├─ Retention: 24 hours - 365 days
+    ├─ Throughput: MB/second per shard
+    └─ Cost: $0.015/shard-hour + $0.014/million PUT requests
+    ↓
+    ↓ Event-driven trigger
+    ↓
+AWS Lambda Functions
+    ├─ Process/transform data
+    ├─ Validate and filter
+    ├─ Aggregate if needed
+    └─ Auto-scales to match Kinesis throughput
+    ↓
+    ↓ Batch writes
+    ↓
+Amazon DynamoDB
+    ├─ Table: IoTSensorData
+    ├─ Partition Key: sensorId
+    ├─ Sort Key: timestamp
+    ├─ Auto-Scaling: On-demand or provisioned
+    └─ Low latency reads/writes
+
+<b>Benefits:</b>
+✓ API servers eliminated (or minimal for queries only)
+✓ Asynchronous, decoupled architecture
+✓ Scales to millions of sensors
+✓ Low latency, high throughput
+✓ Cost-efficient
+</pre><br>
+
+<b>Implementation:</b>
+<pre>
+# 1. Create Kinesis Data Stream
+aws kinesis create-stream \
+  --stream-name iot-sensor-data \
+  --shard-count 5
+
+# 2. Create DynamoDB table
+aws dynamodb create-table \
+  --table-name IoTSensorData \
+  --attribute-definitions \
+    AttributeName=sensorId,AttributeType=S \
+    AttributeName=timestamp,AttributeType=N \
+  --key-schema \
+    AttributeName=sensorId,KeyType=HASH \
+    AttributeName=timestamp,KeyType=RANGE \
+  --billing-mode PAY_PER_REQUEST
+
+# 3. Create Lambda function
+# lambda_function.py
+import boto3
+import json
+from decimal import Decimal
+
+dynamodb = boto3.resource('dynamodb')
+table = dynamodb.Table('IoTSensorData')
+
+def lambda_handler(event, context):
+    for record in event['Records']:
+        # Decode Kinesis data
+        payload = json.loads(record['kinesis']['data'])
+        
+        # Write to DynamoDB
+        table.put_item(Item={
+            'sensorId': payload['sensorId'],
+            'timestamp': Decimal(str(payload['timestamp'])),
+            'temperature': Decimal(str(payload['temp'])),
+            'humidity': Decimal(str(payload['humidity'])),
+            'location': payload['location']
+        })
+    
+    return {'statusCode': 200}
+
+# 4. Connect Lambda to Kinesis
+aws lambda create-event-source-mapping \
+  --function-name processIoTData \
+  --event-source arn:aws:kinesis:region:account:stream/iot-sensor-data \
+  --batch-size 100 \
+  --starting-position LATEST
+</pre><br>
+
+<b>Data Flow:</b>
+<pre>
+Sensor Device:
+POST https://kinesis.us-east-1.amazonaws.com/
+{
+  "StreamName": "iot-sensor-data",
+  "Data": {
+    "sensorId": "sensor-12345",
+    "timestamp": 1640000000,
+    "temp": 25.5,
+    "humidity": 60,
+    "location": "warehouse-A"
+  },
+  "PartitionKey": "sensor-12345"
+}
+
+↓ Kinesis buffers and delivers to Lambda
+
+Lambda processes and writes to DynamoDB:
+{
+  "sensorId": "sensor-12345",
+  "timestamp": 1640000000,
+  "temperature": 25.5,
+  "humidity": 60,
+  "location": "warehouse-A"
+}
+</pre><br>
+
+<b>Why Other Options Are Wrong:</b><br>
+
+<b>Option A - Resize RDS Storage:</b>
+<ul>
+<li>✗ <b>Temporary fix:</b> Will saturate again as sensors grow</li>
+<li>✗ <b>Doesn't solve fundamental issue:</b> RDS not designed for this workload</li>
+<li>✗ <b>IOPS increase is linear:</b> gp2 = 3 IOPS/GB (4TB = 12K IOPS, 6TB = 18K IOPS)</li>
+<li>✗ <b>Limited scaling:</b> Max 16TB and 64K IOPS for gp2</li>
+<li>✗ <b>Expensive:</b> Increasing storage costs more than DynamoDB at scale</li>
+<li>✗ <b>Doesn't address "permanently" requirement</b></li>
+</ul>
+
+IOPS math:
+<pre>
+General Purpose SSD (gp2): 3 IOPS per GB
+- 4 TB = 12,000 IOPS (current)
+- 6 TB = 18,000 IOPS (+50% improvement)
+
+But with millions of sensors:
+- Each sensor writes every 5 seconds
+- 1M sensors = 200K writes/second
+- Need 200,000+ IOPS!
+
+gp2 max: 64,000 IOPS (not enough!)
+io1 max: 64,000 IOPS (very expensive!)
+</pre><br>
+
+<b>Option B - Aurora + Read Replicas:</b>
+<ul>
+<li>✓ Better than RDS MySQL (Aurora has better write performance)</li>
+<li>✗ <b>Read replicas don't help writes:</b> Problem is write latency</li>
+<li>✗ <b>Still relational DB:</b> Not optimal for high-volume IoT data</li>
+<li>✗ <b>More expensive than DynamoDB:</b> For this use case</li>
+<li>✗ <b>Complex scaling:</b> Need to manage instance sizes</li>
+<li>✗ <b>Better but not best solution</b></li>
+</ul>
+
+Comparison:
+<pre>
+Aurora:
+- Write throughput: ~200K writes/sec (high-end instance)
+- Cost: $500-5000/month (depending on instance)
+- Scaling: Vertical (larger instances)
+
+DynamoDB:
+- Write throughput: Millions of writes/sec
+- Cost: $1.25 per million writes (on-demand)
+- Scaling: Horizontal (automatic)
+
+For IoT workload: DynamoDB wins
+</pre><br>
+
+<b>Option D - X-Ray + More API Servers:</b>
+<ul>
+<li>✓ X-Ray useful for debugging (but not solving the problem)</li>
+<li>✗ <b>Horizontal scaling API servers:</b> Addresses symptom, not cause</li>
+<li>✗ <b>Database still bottleneck:</b> More API servers = more DB pressure</li>
+<li>✗ <b>Doesn't fix architectural flaw:</b> Synchronous processing model</li>
+<li>✗ <b>Expensive:</b> Many EC2 instances vs serverless</li>
+<li>✗ <b>Doesn't enable "growth":</b> Same problems at larger scale</li>
+</ul><br>
+
+<b>Architecture Comparison:</b>
+<table border="1" cellpadding="5">
+<tr><th>Architecture</th><th>Max Throughput</th><th>Latency</th><th>Cost at Scale</th><th>Operational Overhead</th></tr>
+<tr><td>Current (EC2+RDS)</td><td>~10K writes/sec</td><td>High</td><td>High</td><td>High</td></tr>
+<tr><td>A (Bigger RDS)</td><td>~20K writes/sec</td><td>Medium</td><td>Very High</td><td>High</td></tr>
+<tr><td>B (Aurora)</td><td>~200K writes/sec</td><td>Medium</td><td>High</td><td>Medium</td></tr>
+<tr><td>D (More EC2)</td><td>~50K writes/sec</td><td>High</td><td>Very High</td><td>Very High</td></tr>
+<tr><td><b>C+E (Kinesis+DynamoDB)</b></td><td><b>Millions/sec</b></td><td><b>Low</b></td><td><b>Low</b></td><td><b>None</b></td></tr>
+</table><br>
+
+<b>Cost Analysis (1 Million Sensors, 1 write/min):</b>
+<pre>
+<b>Current Architecture (EC2 + RDS):</b>
+- EC2 (20 × m5.2xlarge): $6,000/month
+- RDS (db.r5.8xlarge): $4,000/month
+- Total: $10,000/month
+- Can't handle the load!
+
+<b>Option C + E (Kinesis + DynamoDB):</b>
+- Kinesis: 10 shards × $11/shard = $110/month
+- Kinesis PUT: 1.44B writes × $0.014/million = $20/month
+- DynamoDB: 1.44B writes × $1.25/million = $1,800/month
+- Lambda: Negligible (free tier covers most)
+- Total: ~$1,930/month
+- Can handle 10x growth!
+
+<b>Savings: 80% reduction + better scalability</b>
+</pre><br>
+
+<b>Advanced Architecture:</b>
+<pre>
+For even better scalability:
+
+IoT Sensors
+    ↓
+API Gateway (optional, for auth)
+    ↓
+Kinesis Data Streams
+    ↓
+AWS Lambda (process)
+    ├─ Hot path: DynamoDB (real-time queries)
+    └─ Cold path: S3 + Athena (analytics)
+
+Kinesis Data Firehose (parallel)
+    └─ S3 → Athena (historical analysis)
+
+Benefits:
+- Real-time: DynamoDB
+- Analytics: S3 + Athena
+- Cost optimization: Tiered storage
+</pre><br>
+
+<b>DynamoDB Table Design:</b>
+<pre>
+Table: IoTSensorData
+- Partition Key: sensorId (distributes load)
+- Sort Key: timestamp (range queries)
+- TTL: expirationTime (auto-delete old data)
+
+Indexes:
+- GSI: location-timestamp (query by location)
+- LSI: sensorId-datatype (different sensor readings)
+
+Access Patterns:
+- Get latest reading: Query(sensorId, timestamp DESC, limit=1)
+- Get time range: Query(sensorId, timestamp BETWEEN)
+- Get by location: Query(GSI: location-timestamp)
+</pre><br>
+
+<b>Kinesis Scaling:</b>
+<pre>
+Shard capacity:
+- 1 MB/sec input
+- 1,000 records/sec input
+- 2 MB/sec output
+
+Calculation for 1M sensors (1 msg/min):
+- 1M / 60 seconds = 16,667 writes/sec
+- Record size: ~500 bytes
+- Throughput: 16,667 × 500 bytes = 8.3 MB/sec
+- Shards needed: 8.3 / 1 = 9 shards
+
+Enable auto-scaling for variable load
+</pre><br>
+
+<b>Best Practices:</b>
+<ul>
+<li>Use Kinesis for high-throughput ingestion</li>
+<li>DynamoDB for IoT time-series data</li>
+<li>Lambda for serverless processing</li>
+<li>Enable DynamoDB auto-scaling or on-demand</li>
+<li>Use DynamoDB TTL for data retention</li>
+<li>Archive old data to S3 for analytics</li>
+<li>Monitor Kinesis shard metrics</li>
+<li>Implement error handling and DLQ</li>
+<li>Use batch operations when possible</li>
+</ul>
+</div>
+</div>
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0;">
+  <a href="page7.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page9.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div> <!-- end container -->
+
+<script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const isMultiSelect = q.querySelector('input[type="checkbox"]') !== null;
+  const inputs = q.querySelectorAll(isMultiSelect ? 'input[type="checkbox"]' : 'input[type="radio"]');
+  const labels = q.querySelectorAll("label");
+  const selected = [];
+
+  inputs.forEach((inp, idx) => {
+    if (inp.checked) selected.push(idx);
+  });
+
+  labels.forEach((label, idx) => {
+    label.classList.remove("user-correct", "user-wrong", "correct");
+    if (selected.includes(idx)) {
+      if (correct.includes(idx)) {
+        label.classList.add("user-correct");
+      } else {
+        label.classList.add("user-wrong");
+      }
+    }
+  });
+
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    q.appendChild(resultMsg);
+  }
+
+  const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+  if (isCorrect) {
+    resultMsg.textContent = "✔ Correct!";
+    resultMsg.style.color = "#10b981";
+    resultMsg.style.fontWeight = "600";
+  } else {
+    resultMsg.textContent = "✖ Incorrect. Try again or click 'Show Answer'.";
+    resultMsg.style.color = "#ef4444";
+    resultMsg.style.fontWeight = "600";
+  }
+  resultMsg.style.display = "block";
+}
+
+function showAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const labels = q.querySelectorAll("label");
+  
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  correct.forEach(i => labels[i].classList.add("correct"));
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
+}
+</script>
+
+</body>
+</html>
