@@ -65,6 +65,23 @@ pre {
     border-color: #34d399 !important;
 }
 
+/* User answer feedback */
+label.user-correct {
+  background-color: #d1fae5;
+  border-left: 4px solid #10b981;
+}
+
+label.user-wrong {
+  background-color: #fee2e2;
+  border-left: 4px solid #ef4444;
+}
+
+/* Existing correct answer style */
+label.correct {
+  background-color: #d1fae5;
+  border-left: 4px solid #10b981;
+}
+
 button {
     margin-top: 14px;
     padding: 10px 20px;
@@ -102,5 +119,23 @@ button:hover {
     content: "";
     display: block;
     margin-bottom: 10px;  /* extra spacing between paragraphs */
+}
+
+/* Close explanation button */
+.close-explanation {
+  float: right;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.close-explanation:hover {
+  background: #dc2626;
 }
 

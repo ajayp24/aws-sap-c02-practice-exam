@@ -2,13 +2,29 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>AWS Solution Architect Practice Test – Page 1</title>
+<title>AWS Solution Architect Practice Test – Page 2</title>
 <link rel="stylesheet" href="style.css">
 
 </head>
 
 <body>
 <div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page1.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    ← Previous Page
+  </a>
+</div>
 
 <h1>AWS Solution Architect – Practice Test (Page 2)</h1>
 
@@ -48,9 +64,11 @@ E. Create a resource share in AWS Resource Access Manager in the infrastructure 
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[1,3])">Check Answer</button>
 <button onclick="showAnswer(this,[1,3])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answers: B and D</b><br><br>
 
 This question is about <b>centralized network ownership with decentralized resource creation</b> in a multi-account AWS Organization.
@@ -112,9 +130,11 @@ D. Create an AWS PrivateLink endpoint service. Ask the third-party SaaS provider
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
 <button onclick="showAnswer(this,[0])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: A</b><br><br>
 
 This question is testing <b>secure, private consumption of a third-party SaaS application</b> while strictly following the <b>principle of least privilege</b>.
@@ -183,9 +203,11 @@ D. Use AWS OpsWorks to manage patches on the on-premises servers and EC2 instanc
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
 <button onclick="showAnswer(this,[0])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: A</b><br><br>
 
 AWS Systems Manager is designed to provide a <b>single unified management plane</b> for both Amazon EC2 instances and on-premises servers.
@@ -232,9 +254,11 @@ D. Create an AWS Systems Manager document with a script to copy log files to Ama
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
 <button onclick="showAnswer(this,[1])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: B</b><br><br>
 
 Auto Scaling lifecycle hooks allow an EC2 instance to pause during termination.
@@ -285,9 +309,11 @@ E. Associate a new VPC in Account B with a hosted zone in Account A. Delete the 
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[2,4])">Check Answer</button>
 <button onclick="showAnswer(this,[2,4])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answers: C, E</b><br><br>
 
 Private hosted zones only resolve DNS names for VPCs that are explicitly associated.
@@ -334,9 +360,11 @@ D. Set up an Amazon CloudFront distribution for all site contents, and point the
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
 <button onclick="showAnswer(this,[2])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: C</b><br><br>
 
 The performance issue is caused by a sudden increase in demand for large video files.
@@ -391,9 +419,11 @@ D. Provision a transit gateway. Delete the existing private virtual interface fr
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
 <button onclick="showAnswer(this,[0])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: A</b><br><br>
 
 This question tests knowledge of Direct Connect scalability and redundancy.
@@ -447,9 +477,11 @@ D. Use AWS Elastic Beanstalk to launch EC2 instances in an Auto Scaling group fo
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
 <button onclick="showAnswer(this,[2])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: C</b><br><br>
 
 The goal is to remove operational overhead and eliminate EC2-based processing.
@@ -501,9 +533,11 @@ D. Create and deploy an AWS CloudFormation stack that consists of a new API Gate
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
 <button onclick="showAnswer(this,[1])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: B</b><br><br>
 
 AWS SAM integrates directly with AWS CodeDeploy to support safe and automated Lambda deployments.
@@ -552,9 +586,11 @@ D. Create an Amazon S3 bucket. Configure the S3 bucket to use the S3 Glacier Dee
 </label>
 </div>
 
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
 <button onclick="showAnswer(this,[0])">Show Answer</button>
 
 <div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
 <b>Correct Answer: A</b><br><br>
 
 The primary requirement is lowest cost with private access.
@@ -576,12 +612,114 @@ This solution meets security requirements while minimizing cost.
 
 </div>
 
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0;">
+  <a href="page1.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right: 15px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page3.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#2563eb;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
 <script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const inputs = q.querySelectorAll("input[type='radio'], input[type='checkbox']");
+  const labels = q.querySelectorAll("label");
+  
+  // Get selected indices
+  const selected = [];
+  inputs.forEach((input, i) => {
+    if (input.checked) {
+      selected.push(i);
+    }
+  });
+  
+  // Check if answer is correct
+  const isCorrect = selected.length === correct.length && 
+                    selected.every(idx => correct.includes(idx));
+  
+  // Clear previous feedback
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  // Add feedback to selected options
+  selected.forEach(i => {
+    if (correct.includes(i)) {
+      labels[i].classList.add("user-correct");
+    } else {
+      labels[i].classList.add("user-wrong");
+    }
+  });
+  
+  // Show result message
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    btn.parentNode.insertBefore(resultMsg, btn.nextSibling);
+  }
+  
+  if (selected.length === 0) {
+    resultMsg.textContent = "Please select an answer first!";
+    resultMsg.style.color = "#f59e0b";
+  } else if (isCorrect) {
+    resultMsg.textContent = "✓ Correct!";
+    resultMsg.style.color = "#10b981";
+  } else {
+    resultMsg.textContent = "✗ Incorrect. Try again or click 'Show Answer'";
+    resultMsg.style.color = "#ef4444";
+  }
+  resultMsg.style.display = "block";
+  resultMsg.style.fontWeight = "600";
+  resultMsg.style.marginTop = "10px";
+}
+
 function showAnswer(btn, correct) {
   const q = btn.parentElement;
   const labels = q.querySelectorAll("label");
+  
+  // Clear check answer feedback
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  // Show correct answers
   correct.forEach(i => labels[i].classList.add("correct"));
-  q.querySelector(".explanation").style.display = "block";
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  // Hide result message if exists
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
 }
 </script>
 

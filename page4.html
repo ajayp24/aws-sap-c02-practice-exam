@@ -1,0 +1,2958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 4</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page3.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    ← Previous Page
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 4)</h1>
+
+<!-- ================= Q1 ================= -->
+<div class="question">
+<pre>
+31) An enterprise company wants to allow its developers to purchase third-party software through AWS Marketplace. 
+The company uses an AWS Organizations account structure with full features enabled, and has a shared services account in each organizational unit (OU) that will be used by procurement managers. 
+The procurement team's policy indicates that developers should be able to obtain third-party software from an approved list only and use Private Marketplace in AWS Marketplace to achieve this requirement. 
+The procurement team wants administration of Private Marketplace to be restricted to a role named procurement-manager-role, which could be assumed by procurement managers. 
+Other IAM users, groups, roles, and account administrators in the company should be denied Private Marketplace administrative access.
+What is the MOST efficient way to design an architecture to meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q1">
+A. Create an IAM role named procurement-manager-role in all AWS accounts in the organization. Add the PowerUserAccess managed policy to the role. Apply an inline policy to all IAM users and roles in every AWS account to deny permissions on the AWSPrivateMarketplaceAdminFullAccess managed policy.
+</label>
+
+<label>
+<input type="radio" name="q1">
+B. Create an IAM role named procurement-manager-role in all AWS accounts in the organization. Add the AdministratorAccess managed policy to the role. Define a permissions boundary with the AWSPrivateMarketplaceAdminFullAccess managed policy and attach it to all the developer roles.
+</label>
+
+<label>
+<input type="radio" name="q1">
+C. Create an IAM role named procurement-manager-role in all the shared services accounts in the organization. Add the AWSPrivateMarketplaceAdminFullAccess managed policy to the role. Create an organization root-level SCP to deny permissions to administer Private Marketplace to everyone except the role named procurement-manager-role. Create another organization root-level SCP to deny permissions to create an IAM role named procurement-manager-role to everyone in the organization.
+</label>
+
+<label>
+<input type="radio" name="q1">
+D. Create an IAM role named procurement-manager-role in all AWS accounts that will be used by developers. Add the AWSPrivateMarketplaceAdminFullAccess managed policy to the role. Create an SCP in Organizations to deny permissions to administer Private Marketplace to everyone except the role named procurement-manager-role. Apply the SCP to all the shared services accounts in the organization.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question addresses <b>centralized governance of AWS Private Marketplace using AWS Organizations Service Control Policies (SCPs)</b>.
+
+<br><br>
+
+<b>Key Requirements:</b>
+<ul>
+<li>Restrict Private Marketplace administration to procurement-manager-role only</li>
+<li>Deny all other users, groups, roles, and account admins from Private Marketplace admin access</li>
+<li>Procurement managers work from shared services accounts in each OU</li>
+<li>Most efficient solution (minimal management overhead)</li>
+</ul>
+
+<br>
+
+<b>Understanding AWS Private Marketplace:</b>
+<ul>
+<li>Allows organizations to create curated catalogs of approved software from AWS Marketplace</li>
+<li>Centrally managed at the organization level</li>
+<li>Requires specific permissions to administer (AWSPrivateMarketplaceAdminFullAccess)</li>
+<li>Prevents developers from subscribing to unapproved software</li>
+</ul>
+
+<br>
+
+<b>Service Control Policies (SCPs) for Permission Boundaries:</b>
+<ul>
+<li>Applied at AWS Organization root, OU, or account level</li>
+<li>Define maximum permissions - cannot grant permissions, only restrict</li>
+<li>Override all IAM policies including account administrator permissions</li>
+<li>Perfect for organization-wide security guardrails</li>
+</ul>
+
+<br>
+
+<b>Option C is correct because:</b>
+
+<br><br>
+
+<b>1. Create procurement-manager-role in shared services accounts:</b>
+<ul>
+<li>Each OU has a shared services account for centralized functions</li>
+<li>Procurement managers operate from these accounts</li>
+<li>Role has AWSPrivateMarketplaceAdminFullAccess policy</li>
+<li>Focused placement - only in accounts where procurement managers work</li>
+</ul>
+
+<br>
+
+<b>2. First SCP: Deny Private Marketplace admin to everyone except procurement-manager-role:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyPrivateMarketplaceAdmin",
+      "Effect": "Deny",
+      "Action": [
+        "aws-marketplace:AssociateProductsWithPrivateMarketplace",
+        "aws-marketplace:DisassociateProductsFromPrivateMarketplace",
+        "aws-marketplace:UpdatePrivateMarketplaceSettings"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/procurement-manager-role"
+        }
+      }
+    }
+  ]
+}
+</pre>
+
+<b>How this works:</b>
+<ul>
+<li>Explicit DENY on Private Marketplace admin actions</li>
+<li>Applied to organization root (affects all accounts)</li>
+<li>Condition excludes procurement-manager-role from the deny</li>
+<li>Even account administrators cannot administer Private Marketplace</li>
+<li>Only procurement-manager-role can perform these actions</li>
+</ul>
+
+<br>
+
+<b>3. Second SCP: Deny creation of procurement-manager-role:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyCreationOfProcurementRole",
+      "Effect": "Deny",
+      "Action": [
+        "iam:CreateRole",
+        "iam:PutRolePolicy",
+        "iam:AttachRolePolicy"
+      ],
+      "Resource": "arn:aws:iam::*:role/procurement-manager-role"
+    }
+  ]
+}
+</pre>
+
+<b>Why this is critical:</b>
+<ul>
+<li>Prevents malicious users from creating their own procurement-manager-role</li>
+<li>Closes privilege escalation vulnerability</li>
+<li>Ensures only the legitimate role in shared services accounts can administer Private Marketplace</li>
+<li>Prevents account admins from bypassing the restriction</li>
+</ul>
+
+<br>
+
+<b>4. Organization root-level application:</b>
+<ul>
+<li>SCPs applied at organization root affect ALL accounts</li>
+<li>Single point of management</li>
+<li>Automatic enforcement for new accounts</li>
+<li>Cannot be overridden by individual account policies</li>
+</ul>
+
+<br>
+
+<b>Why this is the most efficient solution:</b>
+<ul>
+<li>Centralized enforcement via SCPs (no need to modify policies in every account)</li>
+<li>Automatic application to new accounts added to the organization</li>
+<li>Immutable restriction - even root users in member accounts cannot bypass</li>
+<li>Two SCPs manage the entire organization's Private Marketplace governance</li>
+<li>Role only exists in shared services accounts where needed</li>
+</ul>
+
+<br>
+
+<b>Complete Architecture:</b>
+<ol>
+<li>Procurement managers assume procurement-manager-role in their OU's shared services account</li>
+<li>They administer Private Marketplace (create approved product lists)</li>
+<li>Developers in member accounts can subscribe to approved products only</li>
+<li>No one else (including account admins) can modify Private Marketplace settings</li>
+<li>No one can create a fake procurement-manager-role to gain unauthorized access</li>
+</ol>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Applying inline deny policies to all IAM users and roles in every account is extremely inefficient and not scalable. New users/roles would need manual policy updates. PowerUserAccess doesn't include Private Marketplace admin permissions anyway. This doesn't prevent the role from being created by others.<br>
+<b>Option B:</b> Permissions boundaries restrict what a principal can do, but don't prevent others from accessing Private Marketplace. AdministratorAccess with a boundary still allows too many permissions. This doesn't enforce organization-wide denial - individual accounts could still have admin access.<br>
+<b>Option D:</b> Creating the role in all developer accounts defeats centralization. Applying SCP only to shared services accounts doesn't protect the rest of the organization - developers in other accounts could still gain access. The restriction should apply organization-wide, not just to shared services accounts.
+</div>
+</div>
+
+
+<!-- ================= Q2 ================= -->
+<div class="question">
+<pre>
+32) A company is in the process of implementing AWS Organizations to constrain its developers to use only Amazon EC2, Amazon S3, and Amazon DynamoDB. The developers account resides in a dedicated organizational unit (OU). The solutions architect has implemented the following SCP on the developers account:
+{
+	"vesion":
+	"statement": [
+		{
+			"sid":"AllowEC2",
+			"Effect":"Allow",
+			"Action":"ec2.*",
+			"Resource":"*"
+		},
+		{
+			"sid":"AllowDynomoDB",
+			"Effect":"Allow",
+			"Action":"dynomodb.*",
+			"Resource":"*"
+		},
+		{
+			"sid":"AllowS3",
+			"Effect":"Allow",
+			"Action":"s3.*",
+			"Resource":"*"
+		}
+	
+	]
+}
+
+When this policy is deployed, IAM users in the developers account are still able to use AWS services that are not listed in the policy.
+What should the solutions architect do to eliminate the developers' ability to use services outside the scope of this policy?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q2">
+A. Create an explicit deny statement for each AWS service that should be constrained.
+</label>
+
+<label>
+<input type="radio" name="q2">
+B. Remove the FullAWSAccess SCP from the developers account's OU.
+</label>
+
+<label>
+<input type="radio" name="q2">
+C. Modify the FullAWSAccess SCP to explicitly deny all services.
+</label>
+
+<label>
+<input type="radio" name="q2">
+D. Add an explicit deny statement using a wildcard to the end of the SCP.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests understanding of <b>how AWS Organizations Service Control Policies (SCPs) work as permission boundaries</b>.
+
+<br><br>
+
+<b>Critical Concept - SCPs are Permission Boundaries:</b>
+<ul>
+<li>SCPs define the <b>maximum permissions</b> available to accounts</li>
+<li>SCPs do NOT grant permissions - they only restrict</li>
+<li>The effective permissions are the <b>intersection</b> of:
+  <ul>
+    <li>IAM policies (what's allowed in the account)</li>
+    <li>AND all SCPs (what's allowed by the organization)</li>
+  </ul>
+</li>
+<li>If an SCP doesn't explicitly allow something, it's not automatically denied</li>
+</ul>
+
+<br>
+
+<b>Why the Current SCP Doesn't Work:</b>
+
+<br><br>
+
+The SCP provided only has Allow statements for EC2, S3, and DynamoDB. However, SCPs with only Allow statements don't restrict anything unless other SCPs are also in effect.
+
+<br><br>
+
+<b>Default SCP in AWS Organizations:</b>
+
+<br>
+
+When you enable AWS Organizations, AWS automatically attaches a default SCP called <b>FullAWSAccess</b> to:
+<ul>
+<li>The organization root</li>
+<li>All OUs</li>
+<li>All accounts</li>
+</ul>
+
+<br>
+
+<b>The FullAWSAccess SCP looks like:</b>
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "*",
+      "Resource": "*"
+    }
+  ]
+}
+</pre>
+
+<br>
+
+<b>The Problem:</b>
+
+<br>
+
+When both SCPs are applied:
+<ul>
+<li><b>FullAWSAccess</b>: Allows all actions on all services</li>
+<li><b>Custom SCP</b>: Allows EC2, S3, DynamoDB</li>
+</ul>
+
+<br>
+
+The effective permissions are the <b>union</b> of both Allow statements when multiple SCPs are attached, which means ALL AWS services are still allowed because FullAWSAccess permits everything.
+
+<br><br>
+
+<b>Option B is correct:</b>
+
+<br><br>
+
+<b>Remove the FullAWSAccess SCP from the developers account's OU</b>
+
+<br><br>
+
+<b>How this fixes the problem:</b>
+
+<br>
+
+<ol>
+<li><b>Detach FullAWSAccess</b> from the developers OU</li>
+<li>Now only the custom SCP applies to the developers account</li>
+<li>The custom SCP explicitly allows only:
+  <ul>
+    <li>ec2:*</li>
+    <li>s3:*</li>
+    <li>dynamodb:*</li>
+  </ul>
+</li>
+<li>Everything else is implicitly denied (not in the Allow list)</li>
+<li>Developers can only use EC2, S3, and DynamoDB</li>
+</ol>
+
+<br>
+
+<b>SCP Evaluation Logic:</b>
+
+<br>
+
+For an action to be allowed:
+<ol>
+<li>Must be explicitly allowed in at least one SCP, AND</li>
+<li>Must NOT be explicitly denied in any SCP</li>
+</ol>
+
+<br>
+
+After removing FullAWSAccess:
+<ul>
+<li>Only EC2, S3, DynamoDB are explicitly allowed</li>
+<li>All other services have no Allow statement, so they're denied</li>
+<li>IAM users in the account cannot access other services, even if their IAM policies allow it</li>
+</ul>
+
+<br>
+
+<b>Example:</b>
+
+<br>
+
+An IAM user has this IAM policy:
+<pre>
+{
+  "Effect": "Allow",
+  "Action": "lambda:*",
+  "Resource": "*"
+}
+</pre>
+
+<b>Before removing FullAWSAccess:</b>
+<ul>
+<li>IAM policy: Allow lambda:*</li>
+<li>FullAWSAccess SCP: Allow *</li>
+<li>Custom SCP: Allow ec2:*, s3:*, dynamodb:*</li>
+<li><b>Result:</b> Lambda access ALLOWED (FullAWSAccess permits it)</li>
+</ul>
+
+<br>
+
+<b>After removing FullAWSAccess:</b>
+<ul>
+<li>IAM policy: Allow lambda:*</li>
+<li>Custom SCP: Allow ec2:*, s3:*, dynamodb:* (no lambda)</li>
+<li><b>Result:</b> Lambda access DENIED (not in SCP allow list)</li>
+</ul>
+
+<br>
+
+<b>Best Practice Implementation:</b>
+
+<br>
+
+<ol>
+<li>Remove FullAWSAccess from specific OUs or accounts where you want restrictions</li>
+<li>Apply custom SCPs with only the services you want to allow</li>
+<li>Keep FullAWSAccess on the organization root or other OUs that need full access</li>
+<li>Test thoroughly before applying to production accounts</li>
+</ol>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Creating explicit deny statements for every AWS service (200+ services) is extremely inefficient and unmaintainable. New AWS services would be allowed by default until manually added to the deny list. This is the opposite of a security best practice (deny by default).<br>
+<b>Option C:</b> Modifying FullAWSAccess to deny all services would break all accounts in the organization where FullAWSAccess is attached. FullAWSAccess is typically attached at the organization root level, affecting everyone. This would be catastrophic.<br>
+<b>Option D:</b> Adding an explicit deny with wildcard (Deny *) would deny everything, including EC2, S3, and DynamoDB. The custom SCP's Allow statements would be overridden by the Deny (since Deny always wins), breaking the intended functionality.
+</div>
+</div>
+
+
+<!-- ================= Q3 ================= -->
+<div class="question">
+<pre>
+33) A company is hosting a monolithic REST-based API for a mobile app on five Amazon EC2 instances in public subnets of a VPC. 
+Mobile clients connect to the API by using a domain name that is hosted on Amazon Route 53. 
+The company has created a Route 53 multivalue answer routing policy with the IP addresses of all the EC2 instances.
+Recently, the app has been overwhelmed by large and sudden increases to traffic. The app has not been able to keep up with the traffic.
+A solutions architect needs to implement a solution so that the app can handle the new and varying load.
+Which solution will meet these requirements with the LEAST operational overhead?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q3">
+A. Separate the API into individual AWS Lambda functions. Configure an Amazon API Gateway REST API with Lambda integration for the backend. Update the Route 53 record to point to the API Gateway API.
+</label>
+
+<label>
+<input type="radio" name="q3">
+B. Containerize the API logic. Create an Amazon Elastic Kubernetes Service (Amazon EKS) cluster. Run the containers in the cluster by using Amazon EC2. Create a Kubernetes ingress. Update the Route 53 record to point to the Kubernetes ingress.
+</label>
+
+<label>
+<input type="radio" name="q3">
+C. Create an Auto Scaling group. Place all the EC2 instances in the Auto Scaling group. Configure the Auto Scaling group to perform scaling actions that are based on CPU utilization. Create an AWS Lambda function that reacts to Auto Scaling group changes and updates the Route 53 record.
+</label>
+
+<label>
+<input type="radio" name="q3">
+D. Create an Application Load Balancer (ALB) in front of the API. Move the EC2 instances to private subnets in the VPC. Add the EC2 instances as targets for the ALB. Update the Route 53 record to point to the ALB.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question focuses on <b>modernizing an API architecture for scalability and high availability with minimal operational overhead</b>.
+
+<br><br>
+
+<b>Current Architecture Problems:</b>
+<ul>
+<li>Fixed number of EC2 instances (cannot scale dynamically)</li>
+<li>Route 53 multivalue answer returns multiple IPs, but doesn't do health checking or intelligent routing</li>
+<li>No automatic failover if instances become unhealthy</li>
+<li>Manual management of instance IPs in Route 53</li>
+<li>No load distribution - clients randomly select from multiple IPs</li>
+<li>Public subnets expose instances directly to internet</li>
+</ul>
+
+<br>
+
+<b>Option D is correct:</b>
+
+<br><br>
+
+<b>1. Application Load Balancer (ALB) in Front:</b>
+
+<br>
+
+<b>ALB Benefits:</b>
+<ul>
+<li>Automatically distributes incoming traffic across multiple targets</li>
+<li>Built-in health checks - only routes to healthy instances</li>
+<li>Scales automatically to handle traffic spikes</li>
+<li>Provides a single DNS endpoint (no need to manage multiple IPs)</li>
+<li>Perfect for HTTP/HTTPS REST APIs (Layer 7)</li>
+<li>Can route based on URL paths, headers, query parameters</li>
+<li>SSL/TLS termination support</li>
+<li>WebSocket and HTTP/2 support</li>
+</ul>
+
+<br>
+
+<b>2. Move EC2 Instances to Private Subnets:</b>
+
+<br>
+
+<b>Security Benefits:</b>
+<ul>
+<li>Instances not directly accessible from internet</li>
+<li>ALB acts as a security barrier</li>
+<li>Reduces attack surface</li>
+<li>Traffic flows: Internet → ALB (public subnet) → EC2 (private subnet)</li>
+<li>Instances can still reach internet via NAT Gateway if needed</li>
+<li>Better compliance with security best practices</li>
+</ul>
+
+<br>
+
+<b>3. Add EC2 Instances as ALB Targets:</b>
+
+<br>
+
+<b>Target Group Features:</b>
+<ul>
+<li>Register instances in a target group</li>
+<li>ALB performs health checks (e.g., GET /health every 30 seconds)</li>
+<li>Unhealthy instances automatically removed from rotation</li>
+<li>Supports multiple Availability Zones for high availability</li>
+<li>Easy to add/remove instances without DNS changes</li>
+<li>Sticky sessions support if needed</li>
+</ul>
+
+<br>
+
+<b>4. Update Route 53 to Point to ALB:</b>
+
+<br>
+
+<b>DNS Configuration:</b>
+<ul>
+<li>Create an A record (Alias) pointing to ALB DNS name</li>
+<li>Alias records are free (no query charges)</li>
+<li>Automatic updates if ALB IP addresses change</li>
+<li>Health checking at Route 53 level (optional)</li>
+<li>Single endpoint for clients to connect to</li>
+</ul>
+
+<br>
+
+<b>5. Easy Path to Auto Scaling:</b>
+
+<br>
+
+Once ALB is in place, adding Auto Scaling is straightforward:
+<ul>
+<li>Create an Auto Scaling group with the EC2 instances</li>
+<li>Attach the Auto Scaling group to the ALB target group</li>
+<li>Configure scaling policies (CPU, request count, custom metrics)</li>
+<li>Instances automatically added/removed based on demand</li>
+<li>ALB automatically routes traffic to new instances</li>
+</ul>
+
+<br>
+
+<b>Why This Has the LEAST Operational Overhead:</b>
+
+<br>
+
+<ul>
+<li><b>Minimal code changes:</b> Existing API runs as-is on EC2</li>
+<li><b>Quick implementation:</b> ALB setup takes minutes via console/CloudFormation</li>
+<li><b>Automatic health management:</b> No custom health check scripts needed</li>
+<li><b>No application refactoring:</b> Monolithic API doesn't need to be split</li>
+<li><b>AWS-managed service:</b> ALB is fully managed, no patching or maintenance</li>
+<li><b>Simple DNS change:</b> One-time Route 53 update</li>
+<li><b>Immediate improvement:</b> Better load distribution and failover from day one</li>
+<li><b>Future-ready:</b> Easy to add Auto Scaling later for dynamic scaling</li>
+</ul>
+
+<br>
+
+<b>Architecture Flow:</b>
+
+<br>
+
+<ol>
+<li>Mobile client resolves domain name via Route 53 → Gets ALB DNS</li>
+<li>Client connects to ALB endpoint</li>
+<li>ALB receives REST API request</li>
+<li>ALB selects healthy instance from target group (round-robin or least outstanding requests)</li>
+<li>ALB forwards request to selected EC2 instance in private subnet</li>
+<li>EC2 instance processes request and returns response</li>
+<li>ALB returns response to client</li>
+</ol>
+
+<br>
+
+<b>Complete Solution:</b>
+
+<br>
+
+<pre>
+1. Create ALB in public subnets across multiple AZs
+2. Create target group for EC2 instances
+3. Configure health check: /health endpoint, 30s interval
+4. Move EC2 instances to private subnets (or launch new ones)
+5. Register instances with target group
+6. Update Route 53 A record: 
+   - Change from multivalue answer with IP addresses
+   - To Alias record pointing to ALB DNS name
+7. Test API endpoint through new domain
+8. (Optional) Add Auto Scaling group for dynamic scaling
+</pre>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Refactoring a monolithic API into individual Lambda functions is a massive undertaking requiring significant code changes, testing, and potential architectural redesign. This is the highest operational overhead. While it provides excellent scalability, it's not the "least overhead" solution for immediate relief.<br>
+<b>Option B:</b> Setting up EKS, containerizing the application, managing Kubernetes clusters, and creating ingress controllers involves significant operational complexity. EKS requires expertise in Kubernetes, container orchestration, and ongoing cluster management. This is far more overhead than simply adding an ALB.<br>
+<b>Option C:</b> While Auto Scaling helps with capacity, creating a Lambda function to update Route 53 records whenever instances are added/removed is custom code that needs maintenance. This is a fragile solution - if the Lambda function fails, DNS becomes stale. An ALB handles this automatically without custom code.
+</div>
+</div>
+
+
+<!-- ================= Q4 ================= -->
+<div class="question">
+<pre>
+34) A company has created an OU in AWS Organizations for each of its engineering teams. Each OU owns multiple AWS accounts. 
+The organization has hundreds of AWS accounts.
+A solutions architect must design a solution so that each OU can view a breakdown of usage costs across its AWS accounts.
+Which solution meets these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q4">
+A. Create an AWS Cost and Usage Report (CUR) for each OU by using AWS Resource Access Manager. Allow each team to visualize the CUR through an Amazon QuickSight dashboard.
+</label>
+
+<label>
+<input type="radio" name="q4">
+B. Create an AWS Cost and Usage Report (CUR) from the AWS Organizations management account. Allow each team to visualize the CUR through an Amazon QuickSight dashboard.
+</label>
+
+<label>
+<input type="radio" name="q4">
+C. Create an AWS Cost and Usage Report (CUR) in each AWS Organizations member account. Allow each team to visualize the CUR through an Amazon QuickSight dashboard.
+</label>
+
+<label>
+<input type="radio" name="q4">
+D. Create an AWS Cost and Usage Report (CUR) by using AWS Systems Manager. Allow each team to visualize the CUR through Systems Manager OpsCenter dashboards.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests understanding of <b>centralized cost reporting in AWS Organizations using Cost and Usage Reports</b>.
+
+<br><br>
+
+<b>Key Requirements:</b>
+<ul>
+<li>Organization with multiple OUs, each OU has multiple accounts</li>
+<li>Hundreds of AWS accounts total</li>
+<li>Each OU needs visibility into costs across their accounts</li>
+<li>Breakdown by account within each OU</li>
+</ul>
+
+<br>
+
+<b>AWS Organizations Cost Management:</b>
+
+<br>
+
+<ul>
+<li>AWS Organizations provides <b>consolidated billing</b></li>
+<li>Management account receives a single bill for all member accounts</li>
+<li>All cost data is aggregated in the management account</li>
+<li>Cost and Usage Reports (CUR) can be generated from the management account</li>
+</ul>
+
+<br>
+
+<b>AWS Cost and Usage Report (CUR):</b>
+
+<br>
+
+<ul>
+<li>Most comprehensive cost and usage data available in AWS</li>
+<li>Includes line-item details for every AWS service</li>
+<li>Delivered to S3 bucket in CSV or Parquet format</li>
+<li>Updated multiple times per day</li>
+<li>Contains data for ALL accounts in the organization when created from management account</li>
+<li>Includes metadata: account ID, OU, tags, resource IDs, etc.</li>
+</ul>
+
+<br>
+
+<b>Option B is correct:</b>
+
+<br><br>
+
+<b>1. Create CUR from Management Account:</b>
+
+<br>
+
+<b>Why management account:</b>
+<ul>
+<li>Has consolidated view of all accounts in the organization</li>
+<li>CUR automatically includes data from all member accounts</li>
+<li>Single source of truth for organizational costs</li>
+<li>No need to aggregate data from multiple sources</li>
+<li>Inherently includes OU structure information</li>
+</ul>
+
+<br>
+
+<b>CUR Configuration:</b>
+<pre>
+1. Navigate to Billing Console in Management Account
+2. Create Cost and Usage Report
+3. Report name: org-wide-cur
+4. Include resource IDs: Yes
+5. Data refresh settings: Automatically refresh
+6. S3 bucket: s3://org-billing-data
+7. Report path prefix: cur/
+8. Time granularity: Hourly or Daily
+9. Report versioning: Overwrite existing report
+10. Compression: GZIP or Parquet
+</pre>
+
+<br>
+
+<b>CUR Data Structure:</b>
+
+<br>
+
+The CUR includes columns like:
+<ul>
+<li><b>line_item_usage_account_id:</b> Which account incurred the cost</li>
+<li><b>bill_payer_account_id:</b> Management account ID</li>
+<li><b>line_item_product_code:</b> AWS service (EC2, S3, etc.)</li>
+<li><b>line_item_usage_type:</b> Specific usage type</li>
+<li><b>line_item_unblended_cost:</b> Actual cost</li>
+<li><b>resource_tags_user_*:</b> Custom tags (including OU tags)</li>
+</ul>
+
+<br>
+
+<b>2. Visualize with Amazon QuickSight:</b>
+
+<br>
+
+<b>QuickSight Integration with CUR:</b>
+<ul>
+<li>QuickSight can directly query CUR data from S3</li>
+<li>Use AWS Glue or Athena to create a queryable database from CUR</li>
+<li>Create dashboards with filters for OU or account</li>
+<li>Row-level security to show each team only their costs</li>
+</ul>
+
+<br>
+
+<b>Implementation Steps:</b>
+
+<br>
+
+<b>Step 1: Create Athena Database from CUR</b>
+<pre>
+1. CUR data lands in S3
+2. AWS Glue Crawler catalogs the CUR data
+3. Creates an Athena table
+4. Now CUR data is queryable with SQL
+</pre>
+
+<br>
+
+<b>Step 2: Set Up QuickSight</b>
+<pre>
+1. Create QuickSight account in management account
+2. Grant QuickSight access to S3 bucket with CUR
+3. Create data source: Athena
+4. Select the CUR database/table
+5. Import or use direct query
+</pre>
+
+<br>
+
+<b>Step 3: Create Dashboards per OU</b>
+<pre>
+1. Create calculated fields to group by OU
+2. Add filters for account IDs or OU tags
+3. Visualizations:
+   - Pie chart: Cost by service
+   - Line chart: Cost trend over time
+   - Bar chart: Cost by account
+   - Table: Detailed cost breakdown
+</pre>
+
+<br>
+
+<b>Step 4: Implement Row-Level Security (RLS)</b>
+
+<br>
+
+<b>RLS allows each team to see only their data:</b>
+<ul>
+<li>Create dataset rules that filter by OU or account ID</li>
+<li>Map IAM users/roles to specific OUs</li>
+<li>Engineering Team A sees only their accounts</li>
+<li>Engineering Team B sees only their accounts</li>
+<li>Management sees all data</li>
+</ul>
+
+<br>
+
+<b>Example RLS Rule:</b>
+<pre>
+Column: line_item_usage_account_id
+Rule: user_account_list IN (account_ids)
+
+User Group: TeamA-Engineers
+Account IDs: 111111111111, 222222222222
+
+User Group: TeamB-Engineers  
+Account IDs: 333333333333, 444444444444
+</pre>
+
+<br>
+
+<b>Step 5: Share Dashboards</b>
+<ul>
+<li>Publish dashboard to QuickSight users</li>
+<li>Each team accesses via web portal or embed in internal tools</li>
+<li>Automatic updates as CUR data refreshes</li>
+<li>Subscribe teams to email reports</li>
+</ul>
+
+<br>
+
+<b>Example Athena Query for OU Cost Breakdown:</b>
+<pre>
+SELECT 
+  line_item_usage_account_id,
+  product_product_name,
+  SUM(line_item_unblended_cost) as total_cost
+FROM 
+  cur_database.cur_table
+WHERE 
+  line_item_usage_account_id IN (
+    '111111111111', '222222222222'  -- Team A's accounts
+  )
+  AND year = '2026'
+  AND month = '01'
+GROUP BY 
+  line_item_usage_account_id,
+  product_product_name
+ORDER BY 
+  total_cost DESC;
+</pre>
+
+<br>
+
+<b>Benefits of This Approach:</b>
+
+<br>
+
+<ul>
+<li><b>Single source of truth:</b> One CUR for entire organization</li>
+<li><b>Automatic consolidation:</b> No manual aggregation needed</li>
+<li><b>Real-time visibility:</b> Updated multiple times daily</li>
+<li><b>Flexible analysis:</b> Teams can create custom views</li>
+<li><b>Cost-effective:</b> One CUR, shared QuickSight deployment</li>
+<li><b>Scalable:</b> Works for hundreds of accounts</li>
+<li><b>Secure:</b> RLS ensures teams only see their data</li>
+<li><b>Self-service:</b> Teams can explore data without IT help</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> You cannot create a CUR "for each OU" - CUR is created at the account level. AWS Resource Access Manager (RAM) is for sharing AWS resources like Transit Gateways and subnets, not for creating cost reports. This option fundamentally misunderstands how CUR works.<br>
+<b>Option C:</b> Creating a CUR in each member account would result in hundreds of separate reports that would need to be manually aggregated. This defeats the purpose of consolidated billing. Each member account only sees its own costs, not costs across the OU. This is extremely inefficient and doesn't meet the requirement.<br>
+<b>Option D:</b> AWS Systems Manager does not create Cost and Usage Reports - that's a Billing Console function. Systems Manager OpsCenter is for operational issues and incident management, not cost analysis and reporting. This option uses the wrong services entirely.
+</div>
+</div>
+
+
+<!-- ================= Q5 ================= -->
+<div class="question">
+<pre>
+35) A company is storing data on premises on a Windows file server. The company produces 5 GB of new data daily.
+The company migrated part of its Windows-based workload to AWS and needs the data to be available on a file system in the cloud. 
+The company already has established an AWS Direct Connect connection between the on-premises network and AWS.
+Which data migration strategy should the company use?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q5">
+A. Use the file gateway option in AWS Storage Gateway to replace the existing Windows file server, and point the existing file share to the new file gateway.
+</label>
+
+<label>
+<input type="radio" name="q5">
+B. Use AWS DataSync to schedule a daily task to replicate data between the on-premises Windows file server and Amazon FSx.
+</label>
+
+<label>
+<input type="radio" name="q5">
+C. Use AWS Data Pipeline to schedule a daily task to replicate data between the on-premises Windows file server and Amazon Elastic File System (Amazon EFS).
+</label>
+
+<label>
+<input type="radio" name="q5">
+D. Use AWS DataSync to schedule a daily task to replicate data between the on-premises Windows file server and Amazon Elastic File System (Amazon EFS).
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question addresses <b>hybrid cloud data synchronization for Windows workloads using AWS services</b>.
+
+<br><br>
+
+<b>Key Requirements:</b>
+<ul>
+<li>Source: On-premises Windows file server</li>
+<li>Target: AWS cloud file system</li>
+<li>5 GB of new data daily (ongoing sync needed)</li>
+<li>Windows-based workload (needs Windows-compatible file system)</li>
+<li>Direct Connect already established (high-bandwidth, low-latency connection)</li>
+</ul>
+
+<br>
+
+<b>File System Compatibility:</b>
+
+<br>
+
+<b>Windows workloads require:</b>
+<ul>
+<li>SMB (Server Message Block) protocol support</li>
+<li>Windows file system semantics (NTFS features)</li>
+<li>Active Directory integration</li>
+<li>Windows ACLs and permissions</li>
+<li>Case-insensitive file names</li>
+</ul>
+
+<br>
+
+<b>Amazon FSx for Windows File Server:</b>
+<ul>
+<li><b>Fully managed Windows file system</b></li>
+<li>Built on Windows Server</li>
+<li>Native SMB protocol support</li>
+<li>Active Directory integration</li>
+<li>Full Windows NTFS support</li>
+<li>DFS namespaces and DFS replication</li>
+<li>Shadow copies (previous versions)</li>
+<li>Encryption at rest and in transit</li>
+<li><b>Perfect for Windows workloads</b></li>
+</ul>
+
+<br>
+
+<b>Amazon EFS (Elastic File System):</b>
+<ul>
+<li>Designed for Linux workloads</li>
+<li>NFS protocol (not SMB)</li>
+<li>POSIX-compliant</li>
+<li>Case-sensitive file names</li>
+<li><b>Not compatible with Windows workloads natively</b></li>
+</ul>
+
+<br>
+
+<b>AWS DataSync:</b>
+
+<br>
+
+<b>Purpose-built for data transfer and synchronization:</b>
+<ul>
+<li>Automates moving data between on-premises and AWS</li>
+<li>Optimized for large-scale data transfers</li>
+<li>Built-in scheduling capabilities</li>
+<li>Incremental transfers (only changed data)</li>
+<li>Data validation and verification</li>
+<li>Bandwidth throttling</li>
+<li>Encryption in transit</li>
+<li>Works over Direct Connect or VPN</li>
+</ul>
+
+<br>
+
+<b>Option B is correct:</b>
+
+<br><br>
+
+<b>AWS DataSync with Amazon FSx for Windows File Server</b>
+
+<br><br>
+
+<b>Why this solution is optimal:</b>
+
+<br><br>
+
+<b>1. DataSync Agent on Premises:</b>
+<ul>
+<li>Deploy DataSync agent as a VM in on-premises environment</li>
+<li>Agent accesses Windows file server via SMB share</li>
+<li>Connects to AWS DataSync service over Direct Connect</li>
+<li>Optimizes data transfer with compression and incremental sync</li>
+</ul>
+
+<br>
+
+<b>2. Amazon FSx as Target:</b>
+<ul>
+<li>Create FSx for Windows File Server in AWS VPC</li>
+<li>Fully compatible with Windows applications</li>
+<li>AWS workloads can access data via standard SMB protocol</li>
+<li>Maintains Windows permissions and metadata</li>
+<li>Multi-AZ deployment for high availability</li>
+</ul>
+
+<br>
+
+<b>3. Scheduled Daily Synchronization:</b>
+<ul>
+<li>Create DataSync task: Source = on-prem SMB share, Destination = FSx</li>
+<li>Schedule task to run daily (e.g., nightly at low usage time)</li>
+<li>DataSync transfers only changed files (incremental)</li>
+<li>5 GB/day transfers quickly over Direct Connect</li>
+<li>Automatic retries on failures</li>
+<li>CloudWatch metrics for monitoring</li>
+</ul>
+
+<br>
+
+<b>Implementation Steps:</b>
+
+<br>
+
+<pre>
+1. Deploy DataSync Agent:
+   - Download DataSync agent OVA/VHD
+   - Deploy on VMware/Hyper-V on-premises
+   - Activate agent in AWS console
+   - Configure network (uses Direct Connect)
+
+2. Create Amazon FSx File System:
+   - Choose FSx for Windows File Server
+   - Select deployment type (Single-AZ or Multi-AZ)
+   - Storage capacity and throughput
+   - Join to Active Directory (optional)
+   - Configure VPC, subnets, security groups
+
+3. Create DataSync Task:
+   - Source location: SMB share on Windows file server
+     - Server: file-server.company.local
+     - Share: \\fileserver\data
+     - User credentials for access
+   - Destination location: Amazon FSx
+     - FSx file system ID
+     - Share path
+   - Task configuration:
+     - Verification mode: Check integrity
+     - Overwrite mode: Always
+     - Transfer mode: Changed data only
+
+4. Schedule Task:
+   - Create schedule: Daily at 2:00 AM
+   - CloudWatch Events trigger
+   - Enable notifications via SNS
+
+5. Monitor:
+   - CloudWatch metrics: bytes transferred, files transferred
+   - CloudWatch Logs: detailed task logs
+   - SNS alerts for failures
+</pre>
+
+<br>
+
+<b>Data Flow:</b>
+
+<br>
+
+<ol>
+<li>Daily at 2:00 AM, DataSync task starts</li>
+<li>DataSync agent scans source Windows file server</li>
+<li>Identifies new and changed files (5 GB)</li>
+<li>Transfers data over Direct Connect to AWS</li>
+<li>Writes data to Amazon FSx file system</li>
+<li>Preserves Windows metadata, permissions, timestamps</li>
+<li>Verifies data integrity</li>
+<li>Task completion notification sent</li>
+<li>AWS workloads access updated data on FSx via SMB</li>
+</ol>
+
+<br>
+
+<b>Benefits:</b>
+
+<br>
+
+<ul>
+<li><b>Automatic:</b> Scheduled sync with no manual intervention</li>
+<li><b>Efficient:</b> Only transfers changed data (incremental)</li>
+<li><b>Fast:</b> Optimized transfers over Direct Connect</li>
+<li><b>Reliable:</b> Built-in verification and error handling</li>
+<li><b>Compatible:</b> FSx fully supports Windows workloads</li>
+<li><b>Scalable:</b> Handles growth in data volume</li>
+<li><b>Secure:</b> Encryption in transit and at rest</li>
+<li><b>Monitored:</b> CloudWatch integration for visibility</li>
+</ul>
+
+<br>
+
+<b>Cost Optimization:</b>
+
+<br>
+
+<ul>
+<li>DataSync charges per GB transferred (only 5 GB/day)</li>
+<li>Direct Connect already exists (no additional connection cost)</li>
+<li>FSx costs based on storage and throughput capacity</li>
+<li>Incremental sync minimizes data transfer</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> File Gateway is designed for caching cloud data on-premises, not for replicating on-premises data to the cloud. It's the reverse use case. File Gateway stores primary data in S3, not in a Windows-compatible file system. It doesn't meet the requirement of having data available in AWS in a file system that Windows workloads can use directly.<br>
+<b>Option C:</b> AWS Data Pipeline is for orchestrating data workflows (ETL), not for file-level synchronization. It's designed for data processing pipelines, not file server replication. Also, Amazon EFS is a Linux NFS file system, incompatible with Windows workloads that expect SMB and Windows file system features.<br>
+<b>Option D:</b> While DataSync is correct, Amazon EFS is wrong for Windows workloads. EFS uses NFS protocol which Windows doesn't natively support well. EFS lacks Windows-specific features like NTFS permissions, Windows ACLs, and SMB protocol that Windows applications expect. This would require additional configuration and wouldn't work seamlessly with Windows-based workloads.
+</div>
+</div>
+
+
+<!-- ================= Q6 ================= -->
+<div class="question">
+<pre>
+36) A company's solutions architect is reviewing a web application that runs on AWS. 
+The application references static assets in an Amazon S3 bucket in the us-east-1 Region. 
+The company needs resiliency across multiple AWS Regions. The company already has created an S3 bucket in a second Region.
+Which solution will meet these requirements with the LEAST operational overhead?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q6">
+A. Configure the application to write each object to both S3 buckets. Set up an Amazon Route 53 public hosted zone with a record set by using a weighted routing policy for each S3 bucket. Configure the application to reference the objects by using the Route 53 DNS name.
+</label>
+
+<label>
+<input type="radio" name="q6">
+B. Create an AWS Lambda function to copy objects from the S3 bucket in us-east-1 to the S3 bucket in the second Region. Invoke the Lambda function each time an object is written to the S3 bucket in us-east-1. Set up an Amazon CloudFront distribution with an origin group that contains the two S3 buckets as origins.
+</label>
+
+<label>
+<input type="radio" name="q6">
+C. Configure replication on the S3 bucket in us-east-1 to replicate objects to the S3 bucket in the second Region. Set up an Amazon CloudFront distribution with an origin group that contains the two S3 buckets as origins.
+</label>
+
+<label>
+<input type="radio" name="q6">
+D. Configure replication on the S3 bucket in us-east-1 to replicate objects to the S3 bucket in the second Region. If failover is required, update the application code to load S3 objects from the S3 bucket in the second Region.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question focuses on <b>multi-region resiliency for static assets using S3 replication and CloudFront</b>.
+
+<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Static assets currently in S3 bucket in us-east-1</li>
+<li>Need resiliency across multiple regions</li>
+<li>Second S3 bucket already created</li>
+<li>Least operational overhead</li>
+</ul>
+
+<br>
+
+<b>Option C is correct:</b>
+
+<br><br>
+
+<b>Component 1: S3 Cross-Region Replication (CRR)</b>
+
+<br><br>
+
+<b>S3 Replication Features:</b>
+<ul>
+<li>Automatically replicates objects from source to destination bucket</li>
+<li>Asynchronous replication (typically within minutes)</li>
+<li>One-time setup with zero ongoing maintenance</li>
+<li>Replicates new objects automatically</li>
+<li>Can replicate existing objects (batch replication)</li>
+<li>Preserves metadata, tags, object ACLs</li>
+<li>Supports versioning</li>
+</ul>
+
+<br>
+
+<b>CRR Configuration:</b>
+<pre>
+1. Enable versioning on both buckets (required)
+2. Create replication rule on source bucket:
+   - Source: us-east-1 bucket
+   - Destination: second region bucket
+   - IAM role: Grants S3 permission to replicate
+   - Replicate: All objects or filtered (prefix/tags)
+   - Storage class: Keep same or change
+   - Replication Time Control (optional): 15-min SLA
+</pre>
+
+<br>
+
+<b>Benefits of CRR:</b>
+<ul>
+<li><b>Automatic:</b> No code changes needed</li>
+<li><b>Native service:</b> Built into S3</li>
+<li><b>Reliable:</b> AWS-managed, highly durable</li>
+<li><b>Efficient:</b> Only changed objects replicated</li>
+<li><b>No maintenance:</b> Works continuously without intervention</li>
+</ul>
+
+<br>
+
+<b>Component 2: CloudFront with Origin Group</b>
+
+<br><br>
+
+<b>CloudFront Origin Groups:</b>
+<ul>
+<li>Defines primary and secondary origins</li>
+<li>Automatic failover if primary origin fails</li>
+<li>Health-based failover (based on HTTP status codes)</li>
+<li>Transparent to end users</li>
+<li>No DNS changes or application updates needed</li>
+</ul>
+
+<br>
+
+<b>Origin Group Configuration:</b>
+<pre>
+Origin Group:
+  Primary Origin: us-east-1 S3 bucket
+  Secondary Origin: second region S3 bucket
+  Failover Criteria:
+    - HTTP 500, 502, 503, 504 status codes
+    - Origin timeout
+  Failover Behavior:
+    - Retry primary: 0 times (immediate failover)
+    - Or retry 1-2 times before failing over
+</pre>
+
+<br>
+
+<b>How It Works:</b>
+
+<br>
+
+<ol>
+<li><b>Normal Operation:</b>
+   <ul>
+     <li>User requests static asset via CloudFront URL</li>
+     <li>CloudFront checks edge cache (if cached, return immediately)</li>
+     <li>If not cached, request from primary origin (us-east-1 S3)</li>
+     <li>Cache at edge location for future requests</li>
+     <li>Return to user</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Primary Region Failure:</b>
+   <ul>
+     <li>User requests asset</li>
+     <li>CloudFront requests from primary origin</li>
+     <li>Primary returns 503 or times out</li>
+     <li>CloudFront automatically tries secondary origin (second region)</li>
+     <li>Secondary origin returns object (already replicated by CRR)</li>
+     <li>Cache at edge location</li>
+     <li>Return to user</li>
+     <li><b>No application code changes needed</b></li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>After Primary Recovers:</b>
+   <ul>
+     <li>CloudFront automatically returns to using primary</li>
+     <li>Seamless transition back</li>
+   </ul>
+</li>
+</ol>
+
+<br>
+
+<b>Complete Architecture:</b>
+
+<br>
+
+<pre>
+Application → CloudFront Distribution → Origin Group:
+                                         ├─ Primary: S3 us-east-1
+                                         └─ Secondary: S3 second-region
+                                                       ↑
+                                                       │
+                                            S3 Cross-Region Replication
+</pre>
+
+<br>
+
+<b>Implementation Steps:</b>
+
+<br>
+
+<pre>
+Step 1: Configure S3 Replication
+- Enable versioning on both buckets
+- Create replication rule: us-east-1 → second-region
+- Optionally enable existing object replication
+
+Step 2: Create CloudFront Distribution
+- Create origin for us-east-1 bucket
+- Create origin for second-region bucket
+- Create origin group with both origins
+- Set us-east-1 as primary, second-region as failover
+- Configure cache behaviors
+- Enable HTTPS
+- Set TTL for static assets
+
+Step 3: Update Application
+- Change asset URLs from direct S3 URLs
+- To CloudFront distribution URL: 
+  d1234567890abc.cloudfront.net/image.jpg
+- Or use custom domain (CNAME)
+</pre>
+
+<br>
+
+<b>Additional Benefits:</b>
+
+<br>
+
+<b>1. Performance Improvement:</b>
+<ul>
+<li>CloudFront edge caching reduces latency globally</li>
+<li>Assets served from nearest edge location</li>
+<li>Faster than direct S3 access for global users</li>
+</ul>
+
+<br>
+
+<b>2. Cost Optimization:</b>
+<ul>
+<li>CloudFront data transfer often cheaper than S3</li>
+<li>Reduced S3 GET requests (caching at edge)</li>
+<li>Fewer cross-region data transfers from failover bucket</li>
+</ul>
+
+<br>
+
+<b>3. Security:</b>
+<ul>
+<li>Origin Access Identity (OAI) restricts S3 bucket access</li>
+<li>Force HTTPS for all requests</li>
+<li>DDoS protection via AWS Shield</li>
+<li>WAF integration if needed</li>
+</ul>
+
+<br>
+
+<b>Why This Has the LEAST Operational Overhead:</b>
+
+<br>
+
+<ul>
+<li><b>No code changes:</b> Application just points to CloudFront URL</li>
+<li><b>Automatic replication:</b> S3 CRR handles data sync</li>
+<li><b>Automatic failover:</b> CloudFront origin group handles region failures</li>
+<li><b>Zero maintenance:</b> All AWS-managed services</li>
+<li><b>No custom scripts:</b> No Lambda functions to write or maintain</li>
+<li><b>No monitoring code:</b> AWS handles health checks</li>
+<li><b>No manual intervention:</b> Failover and recovery are automatic</li>
+</ul>
+
+<br>
+
+<b>Resilience Guarantee:</b>
+
+<br>
+
+<ul>
+<li>Can withstand complete failure of us-east-1 region</li>
+<li>Users continue accessing assets without interruption</li>
+<li>Assets already replicated to second region</li>
+<li>CloudFront automatically routes to healthy origin</li>
+<li>RPO: ~15 minutes (time for replication)</li>
+<li>RTO: Seconds (automatic failover)</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Requires application code changes to write to both buckets (doubles write operations). Route 53 weighted routing doesn't provide automatic failover based on health - it just distributes traffic. If one S3 bucket fails, 50% of requests still go there and fail. This is not true resiliency and adds significant operational overhead.<br>
+<b>Option B:</b> Writing custom Lambda functions to replicate objects is reinventing S3 Cross-Region Replication. This adds operational overhead: Lambda code to maintain, error handling, retries, monitoring, potential for sync failures. S3 CRR does this natively with zero code. Why build it yourself when AWS provides it?<br>
+<b>Option D:</b> Requires manual intervention or application code changes to switch to the second region during failover. This is not automatic resiliency - someone must detect the failure and update the application. High operational overhead and downtime during manual failover. Defeats the purpose of having a backup region if you can't automatically use it.
+</div>
+</div>
+
+
+<!-- ================= Q7 ================= -->
+<div class="question">
+<pre>
+37) A company is hosting a three-tier web application in an on-premises environment. Due to a recent surge in traffic that resulted in downtime and a significant financial impact, company management has ordered that the application be moved to AWS.
+The application is written in .NET and has a dependency on a MySQL database. A solutions architect must design a scalable and highly available solution to meet the demand of 200,000 daily users.
+Which steps should the solutions architect take to design an appropriate solution?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q7">
+A. Use AWS Elastic Beanstalk to create a new application with a web server environment and an Amazon RDS MySQL Multi-AZ DB instance. The environment should launch a Network Load Balancer (NLB) in front of an Amazon EC2 Auto Scaling group in multiple Availability Zones. Use an Amazon Route 53 alias record to route traffic from the company's domain to the NLB.
+</label>
+
+<label>
+<input type="radio" name="q7">
+B. Use AWS CloudFormation to launch a stack containing an Application Load Balancer (ALB) in front of an Amazon EC2 Auto Scaling group spanning three Availability Zones. The stack should launch a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a Retain deletion policy. Use an Amazon Route 53 alias record to route traffic from the company's domain to the ALB.
+</label>
+
+<label>
+<input type="radio" name="q7">
+C. Use AWS Elastic Beanstalk to create an automatically scaling web server environment that spans two separate Regions with an Application Load Balancer (ALB) in each Region. Create a Multi-AZ deployment of an Amazon Aurora MySQL DB cluster with a cross-Region read replica. Use Amazon Route 53 with a geoproximity routing policy to route traffic between the two Regions.
+</label>
+
+<label>
+<input type="radio" name="q7">
+D. Use AWS CloudFormation to launch a stack containing an Application Load Balancer (ALB) in front of an Amazon ECS cluster of Spot instances spanning three Availability Zones. The stack should launch an Amazon RDS MySQL DB instance with a Snapshot deletion policy. Use an Amazon Route 53 alias record to route traffic from the company's domain to the ALB.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question tests <b>designing a highly available, scalable three-tier web application architecture on AWS</b>.
+
+<br><br>
+
+<b>Requirements Analysis:</b>
+<ul>
+<li>.NET web application (Windows or .NET Core)</li>
+<li>MySQL database dependency</li>
+<li>200,000 daily users (significant concurrent load)</li>
+<li>Must be scalable (handle traffic surges)</li>
+<li>Must be highly available (avoid downtime)</li>
+<li>Recent downtime caused financial impact (reliability is critical)</li>
+</ul>
+
+<br>
+
+<b>Option B is correct:</b>
+
+<br><br>
+
+<b>Component 1: AWS CloudFormation for Infrastructure as Code</b>
+
+<br>
+
+<b>Why CloudFormation:</b>
+<ul>
+<li>Define entire stack as code (version controlled, repeatable)</li>
+<li>Automated deployment (reduces human error)</li>
+<li>Easy to replicate environment for dev/test/prod</li>
+<li>Rollback capabilities if deployment fails</li>
+<li>Stack updates for changes</li>
+<li>Declarative syntax - specify what you want, AWS figures out how</li>
+</ul>
+
+<br>
+
+<b>Component 2: Application Load Balancer (ALB)</b>
+
+<br>
+
+<b>Why ALB for .NET web application:</b>
+<ul>
+<li>Layer 7 (HTTP/HTTPS) load balancing - perfect for web apps</li>
+<li>Content-based routing (path, headers, query strings)</li>
+<li>SSL/TLS termination</li>
+<li>Sticky sessions (important for stateful .NET apps)</li>
+<li>Health checks to route only to healthy instances</li>
+<li>Integrates with Auto Scaling groups</li>
+<li>Multi-AZ deployment by default</li>
+<li>WebSocket support</li>
+</ul>
+
+<br>
+
+<b>Component 3: EC2 Auto Scaling Group Spanning Three AZs</b>
+
+<br>
+
+<b>Auto Scaling Benefits:</b>
+<ul>
+<li><b>Scalability:</b> Automatically adds/removes instances based on demand</li>
+<li><b>High Availability:</b> Three AZs protect against AZ failure</li>
+<li><b>Cost Optimization:</b> Scale down during low traffic periods</li>
+<li><b>Health Monitoring:</b> Replaces unhealthy instances automatically</li>
+</ul>
+
+<br>
+
+<b>Configuration:</b>
+<pre>
+Auto Scaling Group:
+  Min Capacity: 3 (one per AZ for baseline HA)
+  Desired Capacity: 6 (starting point for 200K users)
+  Max Capacity: 20 (handle traffic surges)
+  
+  Scaling Policies:
+    - Target Tracking: 70% CPU utilization
+    - Or: Target request count per instance
+    - Or: Custom CloudWatch metric (app-specific)
+  
+  Health Checks:
+    - EC2 status checks
+    - ELB health checks (application-level)
+  
+  Distribution:
+    - Evenly across 3 AZs
+    - Launch template: Windows Server with .NET installed
+    - Or Amazon Linux with .NET Core
+</pre>
+
+<br>
+
+<b>Three AZs for Maximum Availability:</b>
+<ul>
+<li>Can lose an entire AZ and still have 67% capacity</li>
+<li>Better than 2 AZs (would only have 50% if one fails)</li>
+<li>Balanced distribution of load</li>
+<li>Meets enterprise-grade availability requirements</li>
+</ul>
+
+<br>
+
+<b>Component 4: Amazon Aurora MySQL Multi-AZ</b>
+
+<br>
+
+<b>Why Aurora over RDS MySQL:</b>
+<ul>
+<li><b>Performance:</b> Up to 5x faster than standard MySQL</li>
+<li><b>Scalability:</b> Up to 128 TB storage, auto-scaling</li>
+<li><b>High Availability:</b> 
+  <ul>
+    <li>Multi-AZ with automatic failover (< 30 seconds)</li>
+    <li>6 copies of data across 3 AZs</li>
+    <li>Self-healing storage</li>
+  </ul>
+</li>
+<li><b>Durability:</b> 99.999999999% (11 nines)</li>
+<li><b>Read Replicas:</b> Up to 15 read replicas for read scaling</li>
+<li><b>Automated Backups:</b> Continuous backup to S3</li>
+<li><b>Point-in-Time Recovery:</b> Restore to any second in retention period</li>
+<li><b>MySQL Compatible:</b> Drop-in replacement for existing MySQL</li>
+</ul>
+
+<br>
+
+<b>Aurora Multi-AZ Architecture:</b>
+<pre>
+Aurora Cluster:
+  Writer Instance: Primary database in AZ-1
+  Reader Instances: Read replicas in AZ-2 and AZ-3
+  
+  Storage:
+    - 6 copies across 3 AZs (2 per AZ)
+    - Automatic replication
+    - Automatic failover to replica if primary fails
+  
+  Endpoints:
+    - Cluster Endpoint: Points to writer (for writes)
+    - Reader Endpoint: Load balances reads across replicas
+    - Instance Endpoints: Direct access to specific instances
+</pre>
+
+<br>
+
+<b>Failover Behavior:</b>
+<ul>
+<li>Primary instance fails → Aurora promotes reader to writer</li>
+<li>Failover time: 30 seconds (faster than RDS MySQL ~2 minutes)</li>
+<li>Application reconnects to same cluster endpoint</li>
+<li>Zero data loss (synchronous replication to replicas)</li>
+</ul>
+
+<br>
+
+<b>Component 5: CloudFormation Retain Deletion Policy</b>
+
+<br>
+
+<b>Why Retain policy for Aurora:</b>
+<pre>
+Resources:
+  AuroraDBCluster:
+    Type: AWS::RDS::DBCluster
+    DeletionPolicy: Retain
+    Properties:
+      Engine: aurora-mysql
+      MasterUsername: admin
+      MasterUserPassword: !Ref DBPassword
+</pre>
+
+<b>Benefits:</b>
+<ul>
+<li>Prevents accidental database deletion if stack is deleted</li>
+<li>Database persists even if CloudFormation stack is torn down</li>
+<li>Critical for production data protection</li>
+<li>Manual cleanup required (intentional safety measure)</li>
+<li>Stack can be recreated and reconnected to existing DB</li>
+</ul>
+
+<br>
+
+<b>Component 6: Route 53 Alias Record</b>
+
+<br>
+
+<b>DNS Configuration:</b>
+<pre>
+Route 53 Hosted Zone: example.com
+  
+  Record:
+    Name: www.example.com
+    Type: A (Alias)
+    Alias Target: ALB DNS name
+      - dualstack.app-alb-123456.us-east-1.elb.amazonaws.com
+    Routing Policy: Simple
+    Evaluate Target Health: Yes
+</pre>
+
+<b>Alias Benefits:</b>
+<ul>
+<li>Free queries (no charge for alias queries to AWS resources)</li>
+<li>Automatic updates if ALB IP changes</li>
+<li>IPv4 and IPv6 support (dualstack)</li>
+<li>Health check integration</li>
+</ul>
+
+<br>
+
+<b>Complete Architecture:</b>
+
+<br>
+
+<pre>
+Users
+  ↓
+Route 53 (www.example.com → ALB)
+  ↓
+Application Load Balancer (Multi-AZ)
+  ↓
+┌──────────────┬──────────────┬──────────────┐
+│   AZ-1       │   AZ-2       │   AZ-3       │
+│ EC2 Instances│ EC2 Instances│ EC2 Instances│
+│ (.NET App)   │ (.NET App)   │ (.NET App)   │
+└──────┬───────┴──────┬───────┴──────┬───────┘
+       │              │              │
+       └──────────────┼──────────────┘
+                      ↓
+         Aurora MySQL Cluster
+         ┌──────────────────────────┐
+         │ Writer (AZ-1)            │
+         │ Reader (AZ-2)            │
+         │ Reader (AZ-3)            │
+         │ 6 storage copies         │
+         └──────────────────────────┘
+</pre>
+
+<br>
+
+<b>Scalability Characteristics:</b>
+
+<br>
+
+<ul>
+<li><b>Compute Layer:</b> Auto Scaling from 3 to 20 instances</li>
+<li><b>Database Layer:</b> 
+  <ul>
+    <li>Vertical: Scale instance class (t3 → r5 → r6g)</li>
+    <li>Horizontal: Add read replicas (up to 15)</li>
+    <li>Storage: Auto-scales to 128 TB</li>
+  </ul>
+</li>
+<li><b>Network Layer:</b> ALB auto-scales with load</li>
+</ul>
+
+<br>
+
+<b>High Availability Features:</b>
+
+<br>
+
+<ul>
+<li>ALB: Multi-AZ by default, no single point of failure</li>
+<li>EC2: 3 AZs, continues if one AZ fails</li>
+<li>Aurora: 6 copies across 3 AZs, automatic failover</li>
+<li>Route 53: Global anycast DNS (100% uptime SLA)</li>
+</ul>
+
+<br>
+
+<b>Why This Meets All Requirements:</b>
+
+<br>
+
+<ul>
+<li>✅ Scalable: Auto Scaling handles traffic surges</li>
+<li>✅ Highly Available: 3 AZs, Multi-AZ Aurora</li>
+<li>✅ MySQL Compatible: Aurora MySQL</li>
+<li>✅ .NET Support: EC2 instances with Windows/.NET</li>
+<li>✅ 200K Users: Can scale to handle load</li>
+<li>✅ Infrastructure as Code: CloudFormation</li>
+<li>✅ Data Protection: Retain deletion policy</li>
+<li>✅ Enterprise-Grade: Production-ready architecture</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Elastic Beanstalk launches NLB by default for .NET environments, but NLB (Layer 4) is less suitable for web applications than ALB (Layer 7). ALB provides better features for HTTP/HTTPS traffic. Also uses RDS MySQL instead of Aurora - less performant and slower failover. Elastic Beanstalk is good but CloudFormation provides more control for enterprise applications.<br>
+<b>Option C:</b> Multi-region deployment is overly complex for the requirements. Not needed for 200K users. Cross-region read replicas add complexity and cost without clear benefit. The requirement is for scalability and HA, not disaster recovery across continents. Two regions would also complicate database writes (which region is primary?).<br>
+<b>Option D:</b> Spot instances for production web tier is risky - instances can be terminated with 2-minute notice, causing service disruption. For user-facing applications serving 200K users, On-Demand or Reserved Instances are more appropriate. Also uses snapshot deletion policy instead of Retain - riskier for production data. Single-AZ RDS MySQL is less available than Multi-AZ Aurora.
+</div>
+</div>
+
+
+<!-- ================= Q8 ================= -->
+<div class="question">
+<pre>
+38) A company is using AWS Organizations to manage multiple AWS accounts. For security purposes, the company requires the creation of an Amazon Simple Notification Service (Amazon SNS) topic that enables integration with a third-party alerting system in all the Organizations member accounts.
+A solutions architect used an AWS CloudFormation template to create the SNS topic and stack sets to automate the deployment of CloudFormation stacks. Trusted access has been enabled in Organizations.
+What should the solutions architect do to deploy the CloudFormation StackSets in all AWS accounts?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q8">
+A. Create a stack set in the Organizations member accounts. Use service-managed permissions. Set deployment options to deploy to an organization. Use CloudFormation StackSets drift detection.
+</label>
+
+<label>
+<input type="radio" name="q8">
+B. Create stacks in the Organizations member accounts. Use self-service permissions. Set deployment options to deploy to an organization. Enable the CloudFormation StackSets automatic deployment.
+</label>
+
+<label>
+<input type="radio" name="q8">
+C. Create a stack set in the Organizations management account. Use service-managed permissions. Set deployment options to deploy to the organization. Enable CloudFormation StackSets automatic deployment.
+</label>
+
+<label>
+<input type="radio" name="q8">
+D. Create stacks in the Organizations management account. Use service-managed permissions. Set deployment options to deploy to the organization. Enable CloudFormation StackSets drift detection.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question addresses <b>automated multi-account resource deployment using CloudFormation StackSets with AWS Organizations integration</b>.
+
+<br><br>
+
+<b>Key Concepts:</b>
+
+<br><br>
+
+<b>CloudFormation StackSets:</b>
+<ul>
+<li>Deploy CloudFormation stacks across multiple accounts and regions</li>
+<li>Single template, multiple stack instances</li>
+<li>Centralized management and updates</li>
+<li>Perfect for organizational standards and compliance resources</li>
+</ul>
+
+<br>
+
+<b>Service-Managed vs. Self-Service Permissions:</b>
+
+<br>
+
+<b>Service-Managed Permissions (Recommended with Organizations):</b>
+<ul>
+<li>AWS Organizations integration</li>
+<li>No need to create IAM roles manually in each account</li>
+<li>AWS automatically manages execution roles</li>
+<li>Simplified permission model</li>
+<li>Automatic deployment to new accounts</li>
+<li>Requires "Trusted access" enabled in Organizations</li>
+</ul>
+
+<br>
+
+<b>Self-Service Permissions (Legacy approach):</b>
+<ul>
+<li>Manual IAM role creation in each target account</li>
+<li>Requires AWSCloudFormationStackSetAdministrationRole in source account</li>
+<li>Requires AWSCloudFormationStackSetExecutionRole in each target account</li>
+<li>More complex setup</li>
+<li>Manual role management as accounts are added</li>
+<li>Used when not integrated with Organizations</li>
+</ul>
+
+<br>
+
+<b>Option C is correct:</b>
+
+<br><br>
+
+<b>1. Create Stack Set in Management Account:</b>
+
+<br>
+
+<b>Why Management Account:</b>
+<ul>
+<li>StackSets must be created in a <b>delegated administrator account</b> or management account</li>
+<li>Management account has visibility across all member accounts</li>
+<li>Can deploy to organizational units (OUs) and entire organization</li>
+<li>Centralized control and governance</li>
+</ul>
+
+<br>
+
+<b>Stack Set vs. Individual Stacks:</b>
+<ul>
+<li><b>Stack Set:</b> One StackSet → many stack instances across accounts</li>
+<li><b>Individual Stacks:</b> Would need to create separately in each account (not automated)</li>
+</ul>
+
+<br>
+
+<b>2. Use Service-Managed Permissions:</b>
+
+<br>
+
+<b>Why Service-Managed:</b>
+<ul>
+<li>Trusted access is already enabled (stated in question)</li>
+<li>AWS Organizations automatically provisions execution roles</li>
+<li>No manual IAM role creation needed</li>
+<li>Works seamlessly with organization deployment</li>
+<li>Simpler and more maintainable</li>
+</ul>
+
+<br>
+
+<b>How Service-Managed Works:</b>
+<pre>
+1. Trusted access enabled between CloudFormation and Organizations
+2. Management account creates StackSet with service-managed permissions
+3. AWS automatically creates execution roles in target accounts
+4. StackSet deploys to specified OUs/accounts
+5. New accounts added to OU automatically get stack instances
+</pre>
+
+<br>
+
+<b>3. Deploy to Organization:</b>
+
+<br>
+
+<b>Deployment Target Options:</b>
+<ul>
+<li><b>Deploy to organization:</b> All current and future accounts in the organization</li>
+<li><b>Deploy to specific OUs:</b> Only accounts in selected OUs</li>
+<li><b>Deploy to specific accounts:</b> Individual account IDs</li>
+</ul>
+
+<br>
+
+For this requirement (all member accounts), deploying to the organization root or all OUs ensures comprehensive coverage.
+
+<br><br>
+
+<b>4. Enable Automatic Deployment:</b>
+
+<br>
+
+<b>Why Automatic Deployment is Critical:</b>
+<ul>
+<li>New accounts added to the organization automatically receive the SNS topic</li>
+<li>No manual intervention when accounts are created</li>
+<li>Ensures compliance across all accounts</li>
+<li>Maintains consistency</li>
+</ul>
+
+<br>
+
+<b>Automatic Deployment Settings:</b>
+<pre>
+Automatic Deployment:
+  Enabled: Yes
+  Retain stacks on account removal: Yes/No
+    - Yes: Keep SNS topic if account leaves organization
+    - No: Delete SNS topic if account leaves
+</pre>
+
+<br>
+
+<b>Implementation Steps:</b>
+
+<br>
+
+<pre>
+Step 1: Verify Prerequisites
+- Trusted access enabled for CloudFormation in Organizations ✓
+- Logged into management account ✓
+- CloudFormation template ready (SNS topic) ✓
+
+Step 2: Create StackSet
+Navigate to CloudFormation → StackSets → Create StackSet
+
+  Template:
+    - Upload template file or specify S3 URL
+    - SNS topic template with third-party integration
+  
+  StackSet Name: OrgWideSNSAlertingTopic
+  
+  Permissions:
+    ☑ Service-managed permissions
+    
+  Deployment Targets:
+    ☑ Deploy to organization
+    Or: Select specific OUs
+    
+  Automatic Deployment:
+    ☑ Enabled
+    ☑ Account removal behavior: Retain stacks
+    
+  Regions:
+    - Select regions: us-east-1, us-west-2, etc.
+    
+  Deployment Options:
+    - Maximum concurrent accounts: 10
+    - Failure tolerance: 2 accounts
+    - Region concurrency: Parallel or Sequential
+
+Step 3: Review and Create
+- Review configuration
+- Create StackSet
+
+Step 4: Monitor Deployment
+- CloudFormation creates stack instances in all accounts
+- View operation status and details
+- Check for failures
+
+Step 5: Verify
+- Log into sample member accounts
+- Confirm SNS topic exists
+- Test integration with third-party system
+</pre>
+
+<br>
+
+<b>Example CloudFormation Template:</b>
+
+<br>
+
+<pre>
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Organization-wide SNS topic for third-party alerting'
+
+Resources:
+  AlertingTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: ThirdPartyAlertingTopic
+      DisplayName: Alerts for Third-Party System
+      
+  ThirdPartySubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      Protocol: https
+      TopicArn: !Ref AlertingTopic
+      Endpoint: https://alerts.thirdparty.com/webhook
+      
+Outputs:
+  TopicArn:
+    Description: ARN of the SNS topic
+    Value: !Ref AlertingTopic
+    Export:
+      Name: !Sub '${AWS::StackName}-TopicArn'
+</pre>
+
+<br>
+
+<b>Benefits of This Approach:</b>
+
+<br>
+
+<ul>
+<li><b>Centralized Management:</b> Single StackSet controls all instances</li>
+<li><b>Automated Scaling:</b> New accounts automatically provisioned</li>
+<li><b>Consistency:</b> Same SNS configuration across all accounts</li>
+<li><b>Easy Updates:</b> Update StackSet → all accounts updated</li>
+<li><b>Compliance:</b> Ensures security requirements met organization-wide</li>
+<li><b>No Manual Work:</b> Service-managed permissions eliminate IAM role management</li>
+<li><b>Auditability:</b> CloudFormation tracks all changes</li>
+</ul>
+
+<br>
+
+<b>Updating the SNS Topic Later:</b>
+
+<br>
+
+<pre>
+1. Modify CloudFormation template
+2. Update StackSet in management account
+3. AWS automatically updates all stack instances
+4. Can specify update behavior:
+   - Maximum concurrent accounts
+   - Failure tolerance
+   - Override parameters per account/OU
+</pre>
+
+<br>
+
+<b>Monitoring and Troubleshooting:</b>
+
+<br>
+
+<ul>
+<li><b>StackSet Operations:</b> View deployment progress and history</li>
+<li><b>Stack Instance Status:</b> See which accounts succeeded/failed</li>
+<li><b>CloudWatch Events:</b> Notifications for StackSet operations</li>
+<li><b>Drift Detection:</b> Identify manual changes to stack resources</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> StackSets cannot be created in member accounts - they must be created in the management account or a delegated administrator account. Member accounts receive stack instances from the StackSet, but don't create the StackSet itself. Also, drift detection is a monitoring feature, not a deployment requirement.<br>
+<b>Option B:</b> "Create stacks" (not stack set) would mean creating individual CloudFormation stacks in each account manually - not automated. Self-service permissions require manual IAM role setup in every account, which defeats the purpose of service-managed permissions when Organizations integration is available. This is the legacy approach.<br>
+<b>Option D:</b> "Create stacks" (plural) instead of "create a stack set" suggests manual stack creation in each account. While service-managed permissions are correct, drift detection is for monitoring configuration drift, not for deployment or automatic deployment to new accounts. It doesn't enable the automatic deployment feature needed for new accounts.
+</div>
+</div>
+
+
+<!-- ================= Q9 ================= -->
+<div class="question">
+<pre>
+39) A company wants to migrate its workloads from on premises to AWS. The workloads run on Linux and Windows. The company has a large on-premises infrastructure that consists of physical machines and VMs that host numerous applications.
+
+The company must capture details about the system configuration, system performance, running processes, and network connections of its on-premises workloads. The company also must divide the on-premises applications into groups for AWS migrations. The company needs recommendations for Amazon EC2 instance types so that the company can run its workloads on AWS in the most cost-effective manner.
+
+Which combination of steps should a solutions architect take to meet these requirements? (Choose three.)
+</pre>
+
+<div class="options">
+<label>
+<input type="checkbox">
+A. Assess the existing applications by installing AWS Application Discovery Agent on the physical machines and VMs.
+</label>
+
+<label>
+<input type="checkbox">
+B. Assess the existing applications by installing AWS Systems Manager Agent on the physical machines and VMs.
+</label>
+
+<label>
+<input type="checkbox">
+C. Group servers into applications for migration by using AWS Systems Manager Application Manager.
+</label>
+
+<label>
+<input type="checkbox">
+D. Group servers into applications for migration by using AWS Migration Hub.
+</label>
+
+<label>
+<input type="checkbox">
+E. Generate recommended instance types and associated costs by using AWS Migration Hub.
+</label>
+
+<label>
+<input type="checkbox">
+F. Import data about server sizes into AWS Trusted Advisor. Follow the recommendations for cost optimization.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0,3,4])">Check Answer</button>
+<button onclick="showAnswer(this,[0,3,4])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answers: A, D, and E</b><br><br>
+
+This question focuses on <b>AWS migration planning and discovery using AWS Application Discovery Service and AWS Migration Hub</b>.
+
+<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Capture detailed system information (config, performance, processes, network)</li>
+<li>Both Linux and Windows workloads</li>
+<li>Physical machines and VMs</li>
+<li>Group applications for migration planning</li>
+<li>Get EC2 instance type recommendations for cost optimization</li>
+</ul>
+
+<br>
+
+<b>Option A - AWS Application Discovery Agent:</b>
+
+<br><br>
+
+<b>What is Application Discovery Service:</b>
+<ul>
+<li>AWS service designed specifically for migration planning</li>
+<li>Discovers on-premises infrastructure details</li>
+<li>Two discovery methods:
+  <ul>
+    <li><b>Agentless Discovery:</b> VMware vCenter integration (limited data)</li>
+    <li><b>Agent-Based Discovery:</b> Deep visibility with installed agent</li>
+  </ul>
+</li>
+</ul>
+
+<br>
+
+<b>Application Discovery Agent Capabilities:</b>
+
+<br>
+
+<b>System Configuration:</b>
+<ul>
+<li>Hostname, IP addresses, MAC addresses</li>
+<li>Operating system type and version</li>
+<li>CPU, memory, disk configuration</li>
+<li>Installed software and applications</li>
+</ul>
+
+<br>
+
+<b>System Performance:</b>
+<ul>
+<li>CPU utilization over time</li>
+<li>Memory usage patterns</li>
+<li>Disk I/O metrics</li>
+<li>Network throughput</li>
+<li>Time-series performance data (critical for rightsizing)</li>
+</ul>
+
+<br>
+
+<b>Running Processes:</b>
+<ul>
+<li>All active processes and services</li>
+<li>Process resource consumption</li>
+<li>Application dependencies</li>
+</ul>
+
+<br>
+
+<b>Network Connections:</b>
+<ul>
+<li>Inbound and outbound connections</li>
+<li>Communication between servers</li>
+<li>Network dependencies</li>
+<li>Port usage</li>
+<li>Connection frequency and volume</li>
+</ul>
+
+<br>
+
+<b>Installation:</b>
+<pre>
+Linux:
+  wget https://s3.amazonaws.com/aws-discovery-agent.linux/latest/aws-discovery-agent.tar.gz
+  tar -xzf aws-discovery-agent.tar.gz
+  sudo bash install -r us-west-2 -k ACCESS_KEY -s SECRET_KEY
+
+Windows:
+  Download: AWSDiscoveryAgentInstaller.exe
+  Run installer
+  Configure: AWS region and credentials
+</pre>
+
+<br>
+
+<b>Supported Platforms:</b>
+<ul>
+<li>Windows Server 2003 R2 and later</li>
+<li>Amazon Linux, Ubuntu, RHEL, CentOS, SUSE</li>
+<li>Physical servers and VMs (VMware, Hyper-V)</li>
+</ul>
+
+<br>
+
+<b>Why Application Discovery Agent is Correct:</b>
+<ul>
+<li>✓ Captures system configuration</li>
+<li>✓ Captures performance metrics</li>
+<li>✓ Captures running processes</li>
+<li>✓ Captures network connections</li>
+<li>✓ Works on both Linux and Windows</li>
+<li>✓ Works on physical machines and VMs</li>
+<li>✓ Provides data needed for rightsizing recommendations</li>
+</ul>
+
+<br>
+
+<b>Option D - AWS Migration Hub for Grouping:</b>
+
+<br><br>
+
+<b>What is AWS Migration Hub:</b>
+<ul>
+<li>Central location to track migration progress</li>
+<li>Aggregates data from Application Discovery Service</li>
+<li>Provides application grouping capabilities</li>
+<li>Tracks migration status across multiple tools</li>
+</ul>
+
+<br>
+
+<b>Application Grouping in Migration Hub:</b>
+
+<br>
+
+<b>Process:</b>
+<ol>
+<li><b>Data Collection:</b>
+   <ul>
+     <li>Application Discovery Agent sends data to AWS</li>
+     <li>Data appears in Migration Hub discovery dashboard</li>
+     <li>View all discovered servers and their attributes</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Analyze Dependencies:</b>
+   <ul>
+     <li>Migration Hub shows network connection map</li>
+     <li>Identifies which servers communicate with each other</li>
+     <li>Helps understand application boundaries</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Create Application Groups:</b>
+   <ul>
+     <li>Select servers that form a logical application</li>
+     <li>Example: Web servers + App servers + Database servers = "ERP Application"</li>
+     <li>Tag groups with names and metadata</li>
+     <li>Group based on discovered dependencies</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Migration Planning:</b>
+   <ul>
+     <li>Plan migration waves</li>
+     <li>Prioritize applications</li>
+     <li>Track migration status per application</li>
+   </ul>
+</li>
+</ol>
+
+<br>
+
+<b>Example Application Grouping:</b>
+<pre>
+Application: Customer Portal
+  ├─ web-server-01 (Linux, 4 vCPU, 8 GB RAM)
+  ├─ web-server-02 (Linux, 4 vCPU, 8 GB RAM)
+  ├─ app-server-01 (Windows, 8 vCPU, 16 GB RAM)
+  ├─ app-server-02 (Windows, 8 vCPU, 16 GB RAM)
+  └─ db-server-01 (Linux, 16 vCPU, 64 GB RAM)
+
+Dependencies:
+  web-server-01 → app-server-01, app-server-02
+  app-server-01 → db-server-01
+  app-server-02 → db-server-01
+</pre>
+
+<br>
+
+<b>Why Migration Hub is Correct:</b>
+<ul>
+<li>✓ Purpose-built for grouping servers into applications</li>
+<li>✓ Uses dependency data from Application Discovery Agent</li>
+<li>✓ Visual representation of application groups</li>
+<li>✓ Integrated with migration planning tools</li>
+<li>✓ Tracks migration progress per application group</li>
+</ul>
+
+<br>
+
+<b>Option E - Instance Recommendations via Migration Hub:</b>
+
+<br><br>
+
+<b>How Migration Hub Generates Recommendations:</b>
+
+<br>
+
+<ol>
+<li><b>Data Analysis:</b>
+   <ul>
+     <li>Analyzes performance data collected by Application Discovery Agent</li>
+     <li>Examines CPU, memory, disk, network usage over time</li>
+     <li>Identifies peak and average utilization</li>
+     <li>Considers workload patterns (steady vs. variable)</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Rightsizing Algorithm:</b>
+   <ul>
+     <li>Matches workload characteristics to EC2 instance families</li>
+     <li>Considers:
+       <ul>
+         <li>CPU requirements (compute-optimized vs. general purpose)</li>
+         <li>Memory requirements (memory-optimized if high RAM usage)</li>
+         <li>Storage requirements (EBS-optimized if high I/O)</li>
+         <li>Network requirements (enhanced networking for high throughput)</li>
+       </ul>
+     </li>
+     <li>Recommends smallest instance that meets performance needs</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Cost Calculation:</b>
+   <ul>
+     <li>Estimates monthly EC2 costs for recommended instances</li>
+     <li>Compares On-Demand vs. Reserved Instances vs. Savings Plans</li>
+     <li>Shows cost comparison: On-premises vs. AWS</li>
+     <li>Includes storage costs (EBS volumes)</li>
+   </ul>
+</li>
+
+<br>
+
+<li><b>Recommendations Report:</b>
+   <ul>
+     <li>Export recommendations to CSV</li>
+     <li>Share with stakeholders</li>
+     <li>Use for budget planning</li>
+   </ul>
+</li>
+</ol>
+
+<br>
+
+<b>Example Recommendation:</b>
+<pre>
+On-Premises Server:
+  Name: app-server-01
+  CPU: 8 cores, avg 45% utilization
+  Memory: 16 GB, avg 60% utilization
+  Disk: 500 GB, moderate I/O
+  OS: Windows Server 2019
+
+Migration Hub Recommendation:
+  Instance Type: m5.large (2 vCPU, 8 GB RAM)
+  Reasoning: 
+    - Current server is over-provisioned
+    - Peak usage: 60% CPU, 10 GB memory
+    - m5.large provides headroom with cost savings
+  
+  Estimated Monthly Cost:
+    - On-Demand: $135/month
+    - 1-Year Reserved: $80/month (40% savings)
+    - 3-Year Reserved: $54/month (60% savings)
+  
+  Alternative Options:
+    - m5.xlarge: Higher capacity, $270/month
+    - m5.medium: Lower cost but tight on memory
+</pre>
+
+<br>
+
+<b>Why Migration Hub Recommendations are Correct:</b>
+<ul>
+<li>✓ Uses actual performance data from Application Discovery Agent</li>
+<li>✓ Provides specific EC2 instance type recommendations</li>
+<li>✓ Calculates associated costs</li>
+<li>✓ Optimizes for cost-effectiveness based on real usage</li>
+<li>✓ Accounts for both Linux and Windows workloads</li>
+<li>✓ Integrated workflow: Discovery → Grouping → Recommendations</li>
+</ul>
+
+<br>
+
+<b>Complete Migration Planning Workflow:</b>
+
+<br>
+
+<pre>
+Step 1: Discovery (Option A)
+  - Install Application Discovery Agent on servers
+  - Collect data for 2-4 weeks (get representative performance data)
+  - Data sent to AWS Application Discovery Service
+
+Step 2: Grouping (Option D)
+  - View discovered servers in Migration Hub
+  - Analyze network dependencies
+  - Create application groups
+  - Example: Group "ERP", "CRM", "Website", etc.
+
+Step 3: Recommendations (Option E)
+  - Migration Hub generates EC2 instance recommendations
+  - Review recommended instance types per server
+  - Estimate total monthly AWS costs
+  - Compare different pricing models (On-Demand, RI, SP)
+
+Step 4: Migration Execution
+  - Prioritize application groups
+  - Choose migration strategy per app:
+    - Rehost: AWS Application Migration Service (MGN)
+    - Replatform: Database Migration Service (DMS)
+    - Refactor: Modernize applications
+  - Track progress in Migration Hub
+
+Step 5: Optimization
+  - Post-migration, use AWS Compute Optimizer
+  - Further refine instance types based on actual AWS usage
+  - Implement Auto Scaling, Spot Instances
+</pre>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> AWS Systems Manager Agent (SSM Agent) is for managing AWS resources and some hybrid environments, but it's not designed for migration discovery. It doesn't collect the deep discovery data needed for migration planning (network dependencies, detailed process information, comprehensive performance metrics over time). It's used for patch management, run commands, and configuration management - not migration assessment.<br>
+<b>Option C:</b> Systems Manager Application Manager is for managing applications that are already running on AWS, not for discovering and grouping on-premises applications for migration. It helps with application-centric management post-migration, not pre-migration discovery and planning.<br>
+<b>Option F:</b> AWS Trusted Advisor doesn't accept imports of on-premises server data. Trusted Advisor provides best practice recommendations for AWS resources that are already running in your AWS account (cost optimization, security, performance). It has no functionality for analyzing on-premises infrastructure or providing migration recommendations.
+</div>
+</div>
+
+
+<!-- ================= Q10 ================= -->
+<div class="question">
+<pre>
+40) A company is hosting an image-processing service on AWS in a VPC. The VPC extends across two Availability Zones. Each Availability Zone contains one public subnet and one private subnet.
+
+The service runs on Amazon EC2 instances in the private subnets. An Application Load Balancer in the public subnets is in front of the service. The service needs to communicate with the internet and does so through two NAT gateways. The service uses Amazon S3 for image storage. The EC2 instances retrieve approximately 1 ТВ of data from an S3 bucket each day.
+
+The company has promoted the service as highly secure. A solutions architect must reduce cloud expenditures as much as possible without compromising the service's security posture or increasing the time spent on ongoing operations.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q10">
+A. Replace the NAT gateways with NAT instances. In the VPC route table, create a route from the private subnets to the NAT instances.
+</label>
+
+<label>
+<input type="radio" name="q10">
+B. Move the EC2 instances to the public subnets. Remove the NAT gateways.
+</label>
+
+<label>
+<input type="radio" name="q10">
+C. Set up an S3 gateway VPC endpoint in the VPC Attach an endpoint policy to the endpoint to allow the required actions on the S3 bucket.
+</label>
+
+<label>
+<input type="radio" name="q10">
+D. Attach an Amazon Elastic File System (Amazon EFS) volume to the EC2 instances. Host the images on the EFS volume.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question addresses <b>cost optimization for S3 access from private subnets using VPC endpoints</b>.
+
+<br><br>
+
+<b>Current Architecture Analysis:</b>
+
+<br>
+
+<pre>
+VPC (2 Availability Zones)
+├─ AZ-1
+│  ├─ Public Subnet: ALB, NAT Gateway 1
+│  └─ Private Subnet: EC2 instances
+└─ AZ-2
+   ├─ Public Subnet: ALB, NAT Gateway 2
+   └─ Private Subnet: EC2 instances
+
+Data Flow for S3 Access:
+EC2 (private subnet) → NAT Gateway (public subnet) → Internet Gateway → S3 (public internet)
+</pre>
+
+<br>
+
+<b>Cost Problem:</b>
+
+<br>
+
+<ul>
+<li><b>NAT Gateway costs:</b>
+  <ul>
+    <li>$0.045 per hour × 2 gateways × 730 hours = ~$65/month just for running</li>
+    <li><b>Data processing charges:</b> $0.045 per GB processed</li>
+    <li>1 TB/day = 30 TB/month = 30,720 GB</li>
+    <li>30,720 GB × $0.045 = <b>$1,382/month for data transfer!</b></li>
+  </ul>
+</li>
+<li><b>Total NAT Gateway cost:</b> ~$1,447/month</li>
+</ul>
+
+<br>
+
+<b>Option C is correct:</b>
+
+<br><br>
+
+<b>S3 Gateway VPC Endpoint</b>
+
+<br><br>
+
+<b>What is a VPC Endpoint:</b>
+<ul>
+<li>Private connection between VPC and AWS services</li>
+<li>Traffic stays within AWS network (never goes to public internet)</li>
+<li>Two types:
+  <ul>
+    <li><b>Gateway Endpoints:</b> For S3 and DynamoDB (free!)</li>
+    <li><b>Interface Endpoints:</b> For other services (charged per hour + data)</li>
+  </ul>
+</li>
+</ul>
+
+<br>
+
+<b>S3 Gateway Endpoint Benefits:</b>
+
+<br>
+
+<b>1. No Cost:</b>
+<ul>
+<li>Gateway endpoints for S3 are <b>completely free</b></li>
+<li>No hourly charges</li>
+<li>No data processing charges</li>
+<li>No data transfer charges (within same region)</li>
+<li><b>Savings: $1,382/month!</b></li>
+</ul>
+
+<br>
+
+<b>2. Better Performance:</b>
+<ul>
+<li>Direct connection to S3 within AWS network</li>
+<li>Lower latency (no NAT gateway hop)</li>
+<li>Higher bandwidth</li>
+<li>More reliable</li>
+</ul>
+
+<br>
+
+<b>3. Enhanced Security:</b>
+<ul>
+<li>Traffic never leaves AWS network</li>
+<li>Not exposed to public internet</li>
+<li>Can enforce access via VPC endpoint only (bucket policy)</li>
+<li>Fine-grained access control via endpoint policies</li>
+</ul>
+
+<br>
+
+<b>4. No Operational Overhead:</b>
+<ul>
+<li>Fully managed by AWS</li>
+<li>No maintenance required</li>
+<li>No scaling concerns</li>
+<li>No availability concerns</li>
+</ul>
+
+<br>
+
+<b>Implementation:</b>
+
+<br>
+
+<pre>
+Step 1: Create S3 Gateway Endpoint
+  1. VPC Console → Endpoints → Create Endpoint
+  2. Service Category: AWS services
+  3. Service Name: com.amazonaws.us-east-1.s3 (gateway type)
+  4. VPC: Select your VPC
+  5. Route Tables: Select private subnet route tables
+     - This automatically adds routes to the route tables
+  6. Policy: Attach endpoint policy (see below)
+
+Step 2: Endpoint Policy (Fine-grained Control)
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": "*",
+        "Action": [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket"
+        ],
+        "Resource": [
+          "arn:aws:s3:::my-image-bucket",
+          "arn:aws:s3:::my-image-bucket/*"
+        ]
+      }
+    ]
+  }
+
+Step 3: Automatic Route Table Update
+  AWS automatically adds this route to selected route tables:
+  
+  Destination: pl-12345678 (S3 prefix list)
+  Target: vpce-1a2b3c4d (Gateway endpoint)
+  
+  This route has higher priority than 0.0.0.0/0 → NAT Gateway
+
+Step 4: Verify
+  - EC2 instance in private subnet
+  - Run: aws s3 ls s3://my-image-bucket/
+  - Traffic goes through VPC endpoint (not NAT gateway)
+</pre>
+
+<br>
+
+<b>New Architecture After VPC Endpoint:</b>
+
+<br>
+
+<pre>
+VPC (2 Availability Zones)
+├─ AZ-1
+│  ├─ Public Subnet: ALB, NAT Gateway 1
+│  └─ Private Subnet: EC2 instances ──┐
+└─ AZ-2                                │
+   ├─ Public Subnet: ALB, NAT Gateway 2│
+   └─ Private Subnet: EC2 instances ──┤
+                                       │
+                                       ├─→ S3 Gateway VPC Endpoint
+                                       │   (Direct private connection)
+                                       │   No internet, no NAT gateway
+                                       │   FREE!
+                                       │
+                                       └─→ NAT Gateway (for other internet traffic)
+                                           (Can potentially remove if S3 is only need)
+</pre>
+
+<br>
+
+<b>Traffic Flow:</b>
+
+<br>
+
+<b>S3 Traffic:</b>
+<ul>
+<li>EC2 instance → Private subnet route table → VPC endpoint → S3</li>
+<li>Stays entirely within AWS backbone network</li>
+<li>No NAT gateway traversal</li>
+<li>Free data transfer</li>
+</ul>
+
+<br>
+
+<b>Other Internet Traffic:</b>
+<ul>
+<li>If service needs general internet access (updates, APIs)</li>
+<li>EC2 instance → NAT Gateway → Internet</li>
+<li>Still goes through NAT (but much less data)</li>
+</ul>
+
+<br>
+
+<b>Enhanced Security with Endpoint Policy:</b>
+
+<br>
+
+The attached endpoint policy provides additional security:
+<ul>
+<li>Restricts which S3 buckets can be accessed via endpoint</li>
+<li>Limits actions (e.g., only GetObject, PutObject, no DeleteObject)</li>
+<li>Can restrict by principal (IAM roles/users)</li>
+<li>Works in conjunction with S3 bucket policies and IAM policies</li>
+</ul>
+
+<br>
+
+<b>S3 Bucket Policy Enhancement (Optional):</b>
+
+<br>
+
+Force all access to come only through VPC endpoint:
+<pre>
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::my-image-bucket",
+        "arn:aws:s3:::my-image-bucket/*"
+      ],
+      "Condition": {
+        "StringNotEquals": {
+          "aws:sourceVpce": "vpce-1a2b3c4d"
+        }
+      }
+    }
+  ]
+}
+</pre>
+
+This ensures:
+<ul>
+<li>Data can only be accessed from within VPC</li>
+<li>Even if credentials leak, cannot access from public internet</li>
+<li>Additional security layer</li>
+</ul>
+
+<br>
+
+<b>Cost Savings Breakdown:</b>
+
+<br>
+
+<pre>
+Before (with NAT Gateway for S3):
+  - NAT Gateway hourly: $65/month
+  - NAT Gateway data processing: $1,382/month (30 TB × $0.045/GB)
+  - Total: $1,447/month
+
+After (with S3 VPC Endpoint):
+  - S3 Gateway VPC Endpoint: $0/month
+  - S3 data transfer (same region): $0/month
+  - Total: $0/month
+
+Annual Savings: $1,447 × 12 = $17,364/year
+</pre>
+
+<br>
+
+<b>Requirements Satisfied:</b>
+
+<br>
+
+<ul>
+<li>✅ Reduces cloud expenditures (saves $17,364/year)</li>
+<li>✅ No compromise to security (actually enhances it)</li>
+<li>✅ No increase in operational overhead (fully managed, zero maintenance)</li>
+<li>✅ No application changes needed (transparent to applications)</li>
+<li>✅ Better performance (lower latency, higher bandwidth)</li>
+</ul>
+
+<br>
+
+<b>Additional Considerations:</b>
+
+<br>
+
+<b>Can NAT Gateways be fully removed?</b>
+<ul>
+<li>Depends on whether EC2 instances need other internet access</li>
+<li>If only S3 access is needed: Yes, remove NAT gateways (save additional $65/month)</li>
+<li>If needed for software updates, API calls, etc.: Keep NAT gateways but save on data transfer</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> NAT instances are EC2 instances that you manage yourself. While cheaper than NAT gateways ($20-40/month vs. $65), they still incur data processing charges ($0.045/GB) and require significant operational overhead: patching, updates, scaling, high availability configuration, monitoring. This violates the "without increasing operational overhead" requirement. Also less reliable than managed NAT gateways.<br>
+<b>Option B:</b> Moving EC2 instances to public subnets exposes them directly to the internet, which severely compromises the security posture. The question states the service is "promoted as highly secure." Public instances with public IPs are vulnerable to direct attacks, port scanning, and require much more complex security group rules. This violates the "without compromising security" requirement.<br>
+<b>Option D:</b> EFS is a file storage service, not an object storage service like S3. This would require significant application refactoring to change from S3 API calls to file system operations. EFS is also more expensive than S3 for storage ($0.30/GB vs. S3 Standard $0.023/GB). Completely changes the architecture and doesn't address the NAT gateway cost issue. Increases complexity and cost.
+</div>
+</div>
+
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0 20px 0;">
+  <a href="page3.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    ← Previous Page
+  </a>
+</div>
+
+</div> <!-- Close container -->
+
+<script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const isMultiSelect = q.querySelector('input[type="checkbox"]') !== null;
+  const inputs = q.querySelectorAll(isMultiSelect ? 'input[type="checkbox"]' : 'input[type="radio"]');
+  const labels = q.querySelectorAll("label");
+  const selected = [];
+
+  inputs.forEach((inp, idx) => {
+    if (inp.checked) selected.push(idx);
+  });
+
+  labels.forEach((label, idx) => {
+    label.classList.remove("user-correct", "user-wrong", "correct");
+    if (selected.includes(idx)) {
+      if (correct.includes(idx)) {
+        label.classList.add("user-correct");
+      } else {
+        label.classList.add("user-wrong");
+      }
+    }
+  });
+
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    q.appendChild(resultMsg);
+  }
+
+  const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+  if (isCorrect) {
+    resultMsg.textContent = "✔ Correct!";
+    resultMsg.style.color = "#10b981";
+    resultMsg.style.fontWeight = "600";
+  } else {
+    resultMsg.textContent = "✖ Incorrect. Try again or click 'Show Answer'.";
+    resultMsg.style.color = "#ef4444";
+    resultMsg.style.fontWeight = "600";
+  }
+  resultMsg.style.display = "block";
+}
+
+function showAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const labels = q.querySelectorAll("label");
+  
+  // Clear check answer feedback
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  // Show correct answers
+  correct.forEach(i => labels[i].classList.add("correct"));
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  // Hide result message if exists
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
+}
+</script>
+
+</body>
+</html>

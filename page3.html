@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 3</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page2.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page4.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 3)</h1>
+
+<!-- ================= Q1 ================= -->
+<div class="question">
+<pre>
+21) A company is using an on-premises Active Directory service for user authentication. 
+The company wants to use the same authentication service to sign in to the company's AWS accounts, which are using AWS Organizations. 
+AWS Site-to-Site VPN connectivity already exists between the on-premises environment and all the company's AWS accounts.
+The company's security policy requires conditional access to the accounts based on user groups and roles. User identities must be managed in a single location.
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q1">
+A. Configure AWS IAM Identity Center (AWS Single Sign-On) to connect to Active Directory by using SAML 2.0. Enable automatic provisioning by using the System for Cross-domain Identity Management (SCIM) v2.0 protocol. Grant access to the AWS accounts by using attribute-based access controls (ABACs).
+</label>
+
+<label>
+<input type="radio" name="q1">
+B. Configure AWS IAM Identity Center (AWS Single Sign-On) by using IAM Identity Center as an identity source. Enable automatic provisioning by using the System for Cross-domain Identity Management (SCIM) v2.0 protocol. Grant access to the AWS accounts by using IAM Identity Center permission sets.
+</label>
+
+<label>
+<input type="radio" name="q1">
+C. In one of the company's AWS accounts, configure AWS Identity and Access Management (IAM) to use a SAML 2.0 identity provider. Provision IAM users that are mapped to the federated users. Grant access that corresponds to appropriate groups in Active Directory. Grant access to the required AWS accounts by using cross-account IAM users.
+</label>
+
+<label>
+<input type="radio" name="q1">
+D. In one of the company's AWS accounts, configure AWS Identity and Access Management (IAM) to use an OpenID Connect (OIDC) identity provider. Provision IAM roles that grant access to the AWS account for the federated users that correspond to appropriate groups in Active Directory. Grant access to the required AWS accounts by using cross-account IAM roles.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question is about <b>centralized identity management for AWS Organizations using on-premises Active Directory</b>.
+
+<br><br>
+
+The key requirements are:
+<ul>
+<li>Use existing on-premises Active Directory for authentication</li>
+<li>Single sign-on across multiple AWS accounts in an organization</li>
+<li>Conditional access based on user groups and roles</li>
+<li>Centralized user identity management</li>
+</ul>
+
+<br>
+
+<b>AWS IAM Identity Center (formerly AWS SSO)</b> is the recommended solution for managing access across multiple AWS accounts in AWS Organizations. It provides:
+<ul>
+<li>Integration with external identity providers including Active Directory via SAML 2.0</li>
+<li>Centralized access management for all AWS accounts in the organization</li>
+<li>Support for attribute-based access control (ABAC) to implement conditional access based on user attributes like groups and roles</li>
+<li>Automatic user provisioning via SCIM v2.0, ensuring user identities stay synchronized with Active Directory</li>
+</ul>
+
+<br>
+
+<b>Option A</b> is correct because it:
+<ul>
+<li>Connects IAM Identity Center to on-premises Active Directory using SAML 2.0 federation</li>
+<li>Enables automatic provisioning via SCIM to keep user data synchronized</li>
+<li>Uses ABAC to provide conditional access based on user attributes (groups, roles)</li>
+<li>Manages all AWS accounts from a single centralized location</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Uses IAM Identity Center's own identity source instead of Active Directory, which doesn't meet the requirement to use on-premises AD.<br>
+<b>Option C:</b> Creates IAM users in individual accounts, which is not scalable and doesn't provide centralized management across the organization.<br>
+<b>Option D:</b> Active Directory doesn't natively support OIDC (it supports SAML), and this approach doesn't leverage AWS Organizations' centralized access management.
+</div>
+</div>
+
+
+<!-- ================= Q2 ================= -->
+<div class="question">
+<pre>
+22) A software company has deployed an application that consumes a REST API by using Amazon API Gateway, AWS Lambda functions, and an Amazon DynamoDB table. 
+The application is showing an increase in the number of errors during PUT requests. 
+Most of the PUT calls come from a small number of clients that are authenticated with specific API keys.
+A solutions architect has identified that a large number of the PUT requests originate from one client. The API is noncritical, and clients can tolerate retries of unsuccessful calls. However, the errors are displayed to customers and are causing damage to the API's reputation.
+What should the solutions architect recommend to improve the customer experience?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q2">
+A. Implement retry logic with exponential backoff and irregular variation in the client application. Ensure that the errors are caught and handled with descriptive error messages.
+</label>
+
+<label>
+<input type="radio" name="q2">
+B. Implement API throttling through a usage plan at the API Gateway level. Ensure that the client application handles code 429 replies without error.
+</label>
+
+<label>
+<input type="radio" name="q2">
+C. Turn on API caching to enhance responsiveness for the production stage. Run 10-minute load tests. Verify that the cache capacity is appropriate for the workload.
+</label>
+
+<label>
+<input type="radio" name="q2">
+D. Implement reserved concurrency at the Lambda function level to provide the resources that are needed during sudden increases in traffic.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[1])">Check Answer</button>
+<button onclick="showAnswer(this,[1])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: B</b><br><br>
+
+This question addresses <b>API rate limiting and throttling to protect backend resources and ensure fair usage</b>.
+
+<br><br>
+
+The problem: One client is making excessive PUT requests, causing errors that affect the API's reputation. The key insight is that the problem stems from <b>one specific client</b> identified by their API key.
+
+<br><br>
+
+<b>API Gateway Usage Plans</b> allow you to:
+<ul>
+<li>Define rate limits (requests per second) and burst limits for specific API keys</li>
+<li>Set quotas (total requests per day/week/month) per API key</li>
+<li>Protect backend resources from being overwhelmed</li>
+<li>Ensure fair usage across multiple clients</li>
+</ul>
+
+<br>
+
+When throttling occurs, API Gateway returns <b>HTTP 429 (Too Many Requests)</b>, which:
+<ul>
+<li>Is a standard HTTP status code that clients should handle gracefully</li>
+<li>Doesn't generate backend errors in Lambda or DynamoDB</li>
+<li>Can be handled without displaying errors to end users</li>
+<li>Allows well-behaved clients to continue working normally</li>
+</ul>
+
+<br>
+
+<b>Option B</b> is correct because:
+<ul>
+<li>It addresses the root cause (one client making too many requests)</li>
+<li>Throttling prevents the problematic client from overwhelming the backend</li>
+<li>HTTP 429 responses can be handled gracefully without showing errors to users</li>
+<li>Other clients are not affected by one client's excessive usage</li>
+<li>Usage plans can be applied per API key, allowing fine-grained control</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Retry logic is a client-side solution that doesn't address the root cause (too many requests from one client). It could actually make the problem worse by retrying failed requests.<br>
+<b>Option C:</b> Caching helps with read operations (GET requests), not write operations (PUT requests). It won't solve the PUT request error problem.<br>
+<b>Option D:</b> Reserved concurrency limits how many Lambda instances can run concurrently, but doesn't prevent excessive requests from reaching Lambda in the first place. It doesn't address the rate limiting need.
+</div>
+</div>
+
+
+<!-- ================= Q3 ================= -->
+<div class="question">
+<pre>
+23) A company is running a data-intensive application on AWS. The application runs on a cluster of hundreds of Amazon EC2 instances. 
+A shared file system also runs on several EC2 instances that store 200 TB of data. 
+The application reads and modifies the data on the shared file system and generates a report. The job runs once monthly, reads a subset of the files from the shared file system, and takes about 72 hours to complete. 
+The compute instances scale in an Auto Scaling group, but the instances that host the shared file system run continuously. The compute and storage instances are all in the same AWS Region.
+A solutions architect needs to reduce costs by replacing the shared file system instances. The file system must provide high performance access to the needed data for the duration of the 72-hour run.
+Which solution will provide the LARGEST overall cost reduction while meeting these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q3">
+A. Migrate the data from the existing shared file system to an Amazon S3 bucket that uses the S3 Intelligent-Tiering storage class. Before the job runs each month, use Amazon FSx for Lustre to create a new file system with the data from Amazon S3 by using lazy loading. Use the new file system as the shared storage for the duration of the job. Delete the file system when the job is complete.
+</label>
+
+<label>
+<input type="radio" name="q3">
+B. Migrate the data from the existing shared file system to a large Amazon Elastic Block Store (Amazon EBS) volume with Multi-Attach enabled. Attach the EBS volume to each of the instances by using a user data script in the Auto Scaling group launch template. Use the EBS volume as the shared storage for the duration of the job. Detach the EBS volume when the job is complete.
+</label>
+
+<label>
+<input type="radio" name="q3">
+C. Migrate the data from the existing shared file system to an Amazon S3 bucket that uses the S3 Standard storage class. Before the job runs each month, use Amazon FSx for Lustre to create a new file system with the data from Amazon S3 by using batch loading. Use the new file system as the shared storage for the duration of the job. Delete the file system when the job is complete.
+</label>
+
+<label>
+<input type="radio" name="q3">
+D. Migrate the data from the existing shared file system to an Amazon S3 bucket. Before the job runs each month, use AWS Storage Gateway to create a file gateway with the data from Amazon S3. Use the file gateway as the shared storage for the job. Delete the file gateway when the job is complete.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question focuses on <b>cost optimization for infrequently accessed data with high-performance requirements during processing</b>.
+
+<br><br>
+
+The challenge:
+<ul>
+<li>200 TB of data stored on continuously running EC2 instances (expensive)</li>
+<li>Data only needed once per month for 72 hours</li>
+<li>High-performance access required during processing</li>
+<li>Only a subset of files is accessed during each run</li>
+</ul>
+
+<br>
+
+<b>Cost Analysis:</b><br>
+Currently, EC2 instances run 24/7 to host the file system, costing approximately 720 hours/month, but only 72 hours are productive. That's 90% wasted cost.
+
+<br><br>
+
+<b>The Optimal Solution (Option A):</b>
+
+<br><br>
+
+<b>1. Amazon S3 Intelligent-Tiering for storage:</b>
+<ul>
+<li>Automatically moves data between access tiers based on usage patterns</li>
+<li>Much cheaper than running EC2 instances continuously</li>
+<li>For 200 TB stored for 29 days (idle) and 1 day (active), this is extremely cost-effective</li>
+<li>No retrieval fees for Intelligent-Tiering (unlike Glacier)</li>
+</ul>
+
+<br>
+
+<b>2. Amazon FSx for Lustre with Lazy Loading:</b>
+<ul>
+<li>FSx for Lustre is a high-performance file system optimized for HPC workloads</li>
+<li>Can be linked to S3 buckets for seamless integration</li>
+<li><b>Lazy loading</b> means files are only loaded from S3 when accessed, not all at once</li>
+<li>Since only a subset of files is accessed, lazy loading significantly reduces load time and costs</li>
+<li>Files are cached in FSx for high-performance access once loaded</li>
+<li>Only pay for FSx during the 72-hour job runtime</li>
+</ul>
+
+<br>
+
+<b>3. Create and Delete FSx on Demand:</b>
+<ul>
+<li>FSx file system is only created before the monthly job</li>
+<li>Deleted after job completion</li>
+<li>Pay only for ~72 hours of FSx usage per month instead of 720 hours of EC2</li>
+</ul>
+
+<br>
+
+<b>Cost Savings:</b>
+<ul>
+<li>S3 Intelligent-Tiering: ~$2-4 per TB/month (200 TB = ~$400-800/month)</li>
+<li>FSx for Lustre: Only 72 hours/month instead of continuous EC2 instances</li>
+<li>No data transfer costs between S3 and FSx in the same region</li>
+<li>Lazy loading reduces initial load time and only loads needed files</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> EBS Multi-Attach only supports a limited number of instances (up to 16 in the same AZ) and doesn't support hundreds of instances. Also, EBS volumes are more expensive than S3 for long-term storage.<br>
+<b>Option C:</b> Batch loading would load all 200 TB upfront, even though only a subset is accessed. This wastes time and storage costs. S3 Standard is more expensive than Intelligent-Tiering for infrequently accessed data.<br>
+<b>Option D:</b> Storage Gateway adds latency and is designed for hybrid cloud scenarios, not high-performance computing. It's not optimized for this use case and would be slower than FSx for Lustre.
+</div>
+</div>
+
+
+<!-- ================= Q4 ================= -->
+<div class="question">
+<pre>
+24) A company is developing a new service that will be accessed using TCP on a static port. 
+A solutions architect must ensure that the service is highly available, has redundancy across Availability Zones, and is accessible using the DNS name my.service.com, which is publicly accessible. 
+The service must use fixed address assignments so other companies can add the addresses to their allow lists.
+Assuming that resources are deployed in multiple Availability Zones in a single Region, which solution will meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q4">
+A. Create Amazon EC2 instances with an Elastic IP address for each instance. Create a Network Load Balancer (NLB) and expose the static TCP port. Register EC2 instances with the NLB. Create a new name server record set named my.service.com, and assign the Elastic IP addresses of the EC2 instances to the record set. Provide the Elastic IP addresses of the EC2 instances to the other companies to add to their allow lists.
+</label>
+
+<label>
+<input type="radio" name="q4">
+B. Create an Amazon ECS cluster and a service definition for the application. Create and assign public IP addresses for the ECS cluster. Create a Network Load Balancer (NLB) and expose the TCP port. Create a target group and assign the ECS cluster name to the NL Create a new A record set named my.service.com, and assign the public IP addresses of the ECS cluster to the record set. Provide the public IP addresses of the ECS cluster to the other companies to add to their allow lists.
+</label>
+
+<label>
+<input type="radio" name="q4">
+C. Create Amazon EC2 instances for the service. Create one Elastic IP address for each Availability Zone. Create a Network Load Balancer (NLB) and expose the assigned TCP port. Assign the Elastic IP addresses to the NLB for each Availability Zone. Create a target group and register the EC2 instances with the NLB. Create a new A (alias) record set named my.service.com, and assign the NLB DNS name to the record set.
+</label>
+
+<label>
+<input type="radio" name="q4">
+D. Create an Amazon ECS cluster and a service definition for the application. Create and assign public IP address for each host in the cluster. Create an Application Load Balancer (ALB) and expose the static TCP port. Create a target group and assign the ECS service definition name to the ALB. Create a new CNAME record set and associate the public IP addresses to the record set. Provide the Elastic IP addresses of the Amazon EC2 instances to the other companies to add to their allow lists.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2])">Check Answer</button>
+<button onclick="showAnswer(this,[2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: C</b><br><br>
+
+This question tests understanding of <b>highly available TCP services with static IP addresses using Network Load Balancer</b>.
+
+<br><br>
+
+<b>Key Requirements:</b>
+<ul>
+<li>TCP protocol (not HTTP/HTTPS)</li>
+<li>High availability across multiple Availability Zones</li>
+<li>Static IP addresses for allow-listing</li>
+<li>DNS name: my.service.com</li>
+<li>Publicly accessible</li>
+</ul>
+
+<br>
+
+<b>Network Load Balancer (NLB) Features:</b>
+<ul>
+<li>Operates at Layer 4 (TCP/UDP), perfect for TCP services</li>
+<li>Supports static IP addresses via Elastic IPs</li>
+<li>Can have one Elastic IP per Availability Zone</li>
+<li>Provides high availability and automatic failover</li>
+<li>Extremely high performance and low latency</li>
+</ul>
+
+<br>
+
+<b>Option C is correct because it:</b>
+
+<br><br>
+
+<b>1. Uses Network Load Balancer for TCP:</b>
+<ul>
+<li>NLB is designed for TCP traffic (Layer 4)</li>
+<li>Provides the best performance for non-HTTP protocols</li>
+</ul>
+
+<br>
+
+<b>2. Assigns Elastic IPs to NLB per AZ:</b>
+<ul>
+<li>NLB can have one static Elastic IP per Availability Zone</li>
+<li>These IPs never change, even if backend instances are replaced</li>
+<li>Perfect for allow-listing by other companies</li>
+<li>Provides redundancy - if one AZ fails, others continue serving traffic</li>
+</ul>
+
+<br>
+
+<b>3. Registers EC2 instances in target group:</b>
+<ul>
+<li>Backend instances can scale up/down without affecting the static IPs</li>
+<li>Health checks ensure only healthy instances receive traffic</li>
+<li>Automatic failover if an instance becomes unhealthy</li>
+</ul>
+
+<br>
+
+<b>4. Uses Route 53 A (alias) record:</b>
+<ul>
+<li>Alias record points to the NLB DNS name</li>
+<li>Free queries (no charge for alias queries to AWS resources)</li>
+<li>Automatic updates if NLB configuration changes</li>
+<li>Clients can use my.service.com which resolves to the static Elastic IPs</li>
+</ul>
+
+<br>
+
+<b>5. Provides static IPs for allow-listing:</b>
+<ul>
+<li>Other companies can add the NLB's Elastic IP addresses (one per AZ) to their firewall allow lists</li>
+<li>These IPs remain constant regardless of backend changes</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Assigns Elastic IPs to individual EC2 instances, not to a load balancer. This doesn't provide high availability - if an instance fails, its IP becomes unavailable. Also, the DNS record points to instance IPs instead of the NLB.<br>
+<b>Option B:</b> ECS tasks have dynamic IPs that change when containers restart. You cannot assign static public IPs to an ECS cluster reliably. This doesn't meet the static IP requirement.<br>
+<b>Option D:</b> ALB (Application Load Balancer) operates at Layer 7 (HTTP/HTTPS) and doesn't support static IP addresses. It's not suitable for generic TCP services. Also mentions ECS which has the same dynamic IP issues.
+</div>
+</div>
+
+
+<!-- ================= Q5 ================= -->
+<div class="question">
+<pre>
+25) A company uses an on-premises data analytics platform. The system is highly available in a fully redundant configuration across 12 servers in the company's data center.
+The system runs scheduled jobs, both hourly and daily, in addition to one-time requests from users. Scheduled jobs can take between 20 minutes and 2 hours to finish running and have tight SLAs. The scheduled jobs account for 65% of the system usage. User jobs typically finish running in less than 5 minutes and have no SLA. The user jobs account for 35% of system usage. During system failures, scheduled jobs must continue to meet SLAs. However, user jobs can be delayed.
+A solutions architect needs to move the system to Amazon EC2 instances and adopt a consumption-based model to reduce costs with no long-term commitments. The solution must maintain high availability and must not affect the SLAs.
+Which solution will meet these requirements MOST cost-effectively?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q5">
+A. Split the 12 instances across two Availability Zones in the chosen AWS Region. Run two instances in each Availability Zone as On-Demand Instances with Capacity Reservations. Run four instances in each Availability Zone as Spot Instances.
+</label>
+
+<label>
+<input type="radio" name="q5">
+B. Split the 12 instances across three Availability Zones in the chosen AWS Region. In one of the Availability Zones, run all four instances as On-Demand Instances with Capacity Reservations. Run the remaining instances as Spot Instances.
+</label>
+
+<label>
+<input type="radio" name="q5">
+C. Split the 12 instances across three Availability Zones in the chosen AWS Region. Run two instances in each Availability Zone as On-Demand Instances with a Savings Plan. Run two instances in each Availability Zone as Spot Instances.
+</label>
+
+<label>
+<input type="radio" name="q5">
+D. Split the 12 instances across three Availability Zones in the chosen AWS Region. Run three instances in each Availability Zone as On-Demand Instances with Capacity Reservations. Run one instance in each Availability Zone as a Spot Instance.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[3])">Check Answer</button>
+<button onclick="showAnswer(this,[3])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: D</b><br><br>
+
+This question involves <b>optimizing EC2 instance purchasing options for a mixed workload with different SLA requirements</b>.
+
+<br><br>
+
+<b>Workload Analysis:</b>
+<ul>
+<li><b>Scheduled jobs (65%):</b> Tight SLAs, must always run, 20 minutes to 2 hours duration</li>
+<li><b>User jobs (35%):</b> No SLA, can be delayed, less than 5 minutes duration</li>
+<li><b>High availability required</b> to meet SLAs even during failures</li>
+<li><b>12 servers total</b> with fully redundant configuration</li>
+</ul>
+
+<br>
+
+<b>EC2 Purchasing Options:</b>
+
+<br>
+
+<b>1. On-Demand with Capacity Reservations:</b>
+<ul>
+<li>Guarantees capacity in a specific AZ</li>
+<li>No long-term commitment (can be cancelled anytime)</li>
+<li>Most expensive but ensures availability for critical workloads</li>
+<li>Perfect for jobs with tight SLAs</li>
+</ul>
+
+<br>
+
+<b>2. Spot Instances:</b>
+<ul>
+<li>Up to 90% cheaper than On-Demand</li>
+<li>Can be interrupted with 2-minute warning</li>
+<li>Suitable for fault-tolerant, flexible workloads</li>
+<li>Perfect for jobs without SLAs that can be retried</li>
+</ul>
+
+<br>
+
+<b>3. Savings Plans:</b>
+<ul>
+<li>Require 1-year or 3-year commitment (violates "no long-term commitments" requirement)</li>
+</ul>
+
+<br>
+
+<b>Calculating Required Capacity:</b>
+
+<br>
+
+Scheduled jobs need 65% of 12 servers = ~7.8 servers, round up to 8 servers minimum for safety and redundancy.
+
+<br><br>
+
+For high availability across 3 AZs: 8 servers ÷ 3 AZs = ~2.67, round up to 3 per AZ = 9 total guaranteed capacity.
+
+<br><br>
+
+Remaining capacity: 12 - 9 = 3 instances for user jobs (can tolerate interruption).
+
+<br><br>
+
+<b>Option D is correct:</b>
+
+<br><br>
+
+<b>Configuration: 3 On-Demand with Capacity Reservations per AZ + 1 Spot per AZ</b>
+<ul>
+<li>Total: 9 On-Demand guaranteed + 3 Spot = 12 instances</li>
+<li>Distributed across 3 AZs: High availability</li>
+</ul>
+
+<br>
+
+<b>Why this meets requirements:</b>
+
+<br>
+
+<b>1. SLA Compliance:</b>
+<ul>
+<li>9 guaranteed On-Demand instances provide more than enough capacity for scheduled jobs (need ~8)</li>
+<li>Even if one AZ fails (losing 3 On-Demand + 1 Spot), remaining 6 On-Demand instances can still handle scheduled workload</li>
+<li>Capacity Reservations ensure these instances are always available</li>
+</ul>
+
+<br>
+
+<b>2. Cost Optimization:</b>
+<ul>
+<li>75% On-Demand (9/12) for critical workloads with SLAs</li>
+<li>25% Spot (3/12) for non-critical user jobs saves up to 90% on those instances</li>
+<li>No long-term commitments (no Savings Plans or Reserved Instances)</li>
+</ul>
+
+<br>
+
+<b>3. High Availability:</b>
+<ul>
+<li>3 AZs provide better redundancy than 2 AZs</li>
+<li>Can survive failure of an entire AZ and still meet SLAs</li>
+</ul>
+
+<br>
+
+<b>4. Fault Tolerance for Spot:</b>
+<ul>
+<li>If Spot instances are interrupted, user jobs can be delayed (acceptable per requirements)</li>
+<li>User jobs are short (5 minutes), so they'll likely complete before interruption</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> Only 2 AZs reduces availability. If one AZ fails (losing 6 instances), only 6 instances remain, which might not be enough for scheduled jobs during peak times. Also has 4 On-Demand per AZ = 8 total, which is barely enough.<br>
+<b>Option B:</b> All On-Demand instances in a single AZ creates a single point of failure. If that AZ fails, the system loses all guaranteed capacity for scheduled jobs, violating SLAs.<br>
+<b>Option C:</b> Savings Plans require 1-3 year commitments, violating the "no long-term commitments" requirement. Also, only 6 On-Demand instances might not be enough during failures.
+</div>
+</div>
+
+
+<!-- ================= Q6 ================= -->
+<div class="question">
+<pre>
+26) A security engineer determined that an existing application retrieves credentials to an Amazon RDS for MySQL database from an encrypted file in Amazon S3. For the next version of the application, the security engineer wants to implement the following application design changes to improve security:
+• The database must use strong, randomly generated passwords stored in a secure AWS managed service.
+• The application resources must be deployed through AWS CloudFormation.
+• The application must rotate credentials for the database every 90 days.
+A solutions architect will generate a CloudFormation template to deploy the application.
+Which resources specified in the CloudFormation template will meet the security engineer's requirements with the LEAST amount of operational overhead?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q6">
+A. Generate the database password as a secret resource using AWS Secrets Manager. Create an AWS Lambda function resource to rotate the database password. Specify a Secrets Manager RotationSchedule resource to rotate the database password every 90 days.
+</label>
+
+<label>
+<input type="radio" name="q6">
+B. Generate the database password as a SecureString parameter type using AWS Systems Manager Parameter Store. Create an AWS Lambda function resource to rotate the database password. Specify a Parameter Store RotationSchedule resource to rotate the database password every 90 days.
+</label>
+
+<label>
+<input type="radio" name="q6">
+C. Generate the database password as a secret resource using AWS Secrets Manager. Create an AWS Lambda function resource to rotate the database password. Create an Amazon EventBridge scheduled rule resource to trigger the Lambda function password rotation every 90 days.
+</label>
+
+<label>
+<input type="radio" name="q6">
+D. Generate the database password as a SecureString parameter type using AWS Systems Manager Parameter Store. Specify an AWS AppSync DataSource resource to automatically rotate the database password every 90 days.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question focuses on <b>secure credential management and automatic rotation using AWS managed services</b>.
+
+<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Strong, randomly generated passwords</li>
+<li>Stored in a secure AWS managed service</li>
+<li>Deployed via CloudFormation</li>
+<li>Automatic rotation every 90 days</li>
+<li>Minimal operational overhead</li>
+</ul>
+
+<br>
+
+<b>AWS Secrets Manager vs. Systems Manager Parameter Store:</b>
+
+<br><br>
+
+<b>AWS Secrets Manager:</b>
+<ul>
+<li>Purpose-built for managing secrets (passwords, API keys, tokens)</li>
+<li>Built-in automatic rotation with native Lambda integration</li>
+<li>Automatic password generation</li>
+<li>Native integration with RDS, Redshift, DocumentDB</li>
+<li>Automatic secret rotation templates for supported databases</li>
+<li>Versioning and audit trail</li>
+<li>Higher cost but significantly less operational overhead</li>
+</ul>
+
+<br>
+
+<b>Systems Manager Parameter Store:</b>
+<ul>
+<li>General-purpose configuration storage</li>
+<li>No built-in rotation capability</li>
+<li>Requires manual implementation of rotation logic</li>
+<li>Lower cost but more operational overhead</li>
+<li>Good for configuration data, not ideal for rotating secrets</li>
+</ul>
+
+<br>
+
+<b>Option A is correct because:</b>
+
+<br><br>
+
+<b>1. AWS Secrets Manager Secret Resource:</b>
+<ul>
+<li>Can generate strong random passwords automatically using GenerateSecretString</li>
+<li>Stores passwords encrypted with AWS KMS</li>
+<li>Provides secure retrieval via API or SDK</li>
+<li>Native integration with RDS for MySQL</li>
+</ul>
+
+<br>
+
+<b>2. Lambda Function for Rotation:</b>
+<ul>
+<li>Secrets Manager provides pre-built rotation templates for RDS MySQL</li>
+<li>Lambda function handles the complete rotation process:
+  <ul>
+    <li>Creates a new password</li>
+    <li>Updates RDS with the new password</li>
+    <li>Tests the new credentials</li>
+    <li>Finalizes the rotation</li>
+  </ul>
+</li>
+<li>Can be deployed as part of CloudFormation template</li>
+</ul>
+
+<br>
+
+<b>3. Secrets Manager RotationSchedule Resource:</b>
+<ul>
+<li>Native CloudFormation resource type: AWS::SecretsManager::RotationSchedule</li>
+<li>Declaratively configures automatic rotation (e.g., every 90 days)</li>
+<li>Automatically triggers the Lambda rotation function</li>
+<li>Zero operational overhead after deployment</li>
+<li>Managed entirely by AWS</li>
+</ul>
+
+<br>
+
+<b>4. Complete Infrastructure as Code:</b>
+<ul>
+<li>All resources defined in CloudFormation template</li>
+<li>Secrets Manager secret</li>
+<li>Lambda rotation function</li>
+<li>Rotation schedule</li>
+<li>RDS database with automatic secret association</li>
+</ul>
+
+<br>
+
+<b>5. Least Operational Overhead:</b>
+<ul>
+<li>No manual intervention required after deployment</li>
+<li>AWS manages the entire rotation lifecycle</li>
+<li>Automatic retry logic if rotation fails</li>
+<li>Notifications for rotation success/failure</li>
+</ul>
+
+<br>
+
+<b>Example CloudFormation snippet:</b>
+<pre>
+Resources:
+  DBSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin"}'
+        GenerateStringKey: "password"
+        PasswordLength: 32
+        ExcludeCharacters: '"@/\'
+        
+  SecretRotationSchedule:
+    Type: AWS::SecretsManager::RotationSchedule
+    Properties:
+      SecretId: !Ref DBSecret
+      RotationLambdaARN: !GetAtt RotationLambda.Arn
+      RotationRules:
+        AutomaticallyAfterDays: 90
+</pre>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Parameter Store doesn't have a native "RotationSchedule" resource. You'd have to manually create EventBridge rules and manage rotation logic, increasing operational overhead significantly.<br>
+<b>Option C:</b> While this works, it requires manually managing EventBridge rules in addition to Secrets Manager. Option A's RotationSchedule is simpler and more integrated, requiring less code and configuration.<br>
+<b>Option D:</b> AWS AppSync is for GraphQL APIs, not for password rotation. Parameter Store doesn't support automatic rotation, and AppSync has no built-in rotation capability for database passwords.
+</div>
+</div>
+
+
+<!-- ================= Q7 ================= -->
+<div class="question">
+<pre>
+27) A company is storing data in several Amazon DynamoDB tables. A solutions architect must use a serverless architecture to make the data accessible publicly through a simple API over HTTPS. The solution must scale automatically in response to demand.
+Which solutions meet these requirements? (Choose two.)
+</pre>
+
+<div class="options">
+<label>
+<input type="checkbox">
+A. Create an Amazon API Gateway REST API. Configure this API with direct integrations to DynamoDB by using API Gateway's AWS integration type.
+</label>
+
+<label>
+<input type="checkbox">
+B. Create an Amazon API Gateway HTTP API. Configure this API with direct integrations to Dynamo DB by using API Gateway's AWS integration type.
+</label>
+
+<label>
+<input type="checkbox">
+C. Create an Amazon API Gateway HTTP API. Configure this API with integrations to AWS Lambda functions that return data from the DynamoDB tables.
+</label>
+
+<label>
+<input type="checkbox">
+D. Create an accelerator in AWS Global Accelerator. Configure this accelerator with AWS Lambda@Edge function integrations that return data from the DynamoDB tables.
+</label>
+
+<label>
+<input type="checkbox">
+E. Create a Network Load Balancer. Configure listener rules to forward requests to the appropriate AWS Lambda functions.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0,2])">Check Answer</button>
+<button onclick="showAnswer(this,[0,2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answers: A and C</b><br><br>
+
+This question tests knowledge of <b>serverless API architectures using Amazon API Gateway and DynamoDB</b>.
+
+<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Serverless architecture (no servers to manage)</li>
+<li>Publicly accessible API over HTTPS</li>
+<li>Access data from DynamoDB tables</li>
+<li>Automatic scaling</li>
+</ul>
+
+<br>
+
+<b>API Gateway Integration Types:</b>
+
+<br><br>
+
+<b>1. AWS Integration (Direct Integration):</b>
+<ul>
+<li>API Gateway calls AWS services directly without Lambda</li>
+<li>Requires mapping templates to transform requests/responses</li>
+<li>Lower latency (no Lambda cold starts)</li>
+<li>Lower cost (no Lambda invocation charges)</li>
+<li>Supported for REST API, not HTTP API</li>
+</ul>
+
+<br>
+
+<b>2. Lambda Integration:</b>
+<ul>
+<li>API Gateway invokes Lambda functions</li>
+<li>Lambda functions contain business logic and call DynamoDB</li>
+<li>More flexible for complex operations</li>
+<li>Works with both REST API and HTTP API</li>
+<li>Slight additional latency from Lambda invocation</li>
+</ul>
+
+<br>
+
+<b>Option A is correct:</b>
+
+<br><br>
+
+<b>API Gateway REST API with AWS Integration:</b>
+<ul>
+<li>REST API supports AWS service integrations (including DynamoDB)</li>
+<li>Can directly invoke DynamoDB operations (GetItem, PutItem, Query, Scan)</li>
+<li>Uses VTL (Velocity Template Language) mapping templates to transform:
+  <ul>
+    <li>HTTP requests → DynamoDB API requests</li>
+    <li>DynamoDB responses → HTTP responses</li>
+  </ul>
+</li>
+<li>Fully serverless - no Lambda required</li>
+<li>Automatically scales with incoming requests</li>
+<li>HTTPS endpoint provided by API Gateway</li>
+<li>IAM roles grant API Gateway permission to access DynamoDB</li>
+</ul>
+
+<br>
+
+<b>Example: Direct DynamoDB Integration</b>
+<pre>
+Integration Request:
+  Action: GetItem
+  Table: Users
+  Key: {"userId": {"S": "$input.params('id')"}}
+
+Integration Response:
+  Mapping Template: Transform DynamoDB JSON to simple JSON
+</pre>
+
+<br>
+
+<b>Advantages of Option A:</b>
+<ul>
+<li>Lowest latency (no Lambda cold starts)</li>
+<li>Lowest cost (no Lambda charges)</li>
+<li>Simplest architecture for basic CRUD operations</li>
+</ul>
+
+<br>
+
+<b>Option C is correct:</b>
+
+<br><br>
+
+<b>API Gateway HTTP API with Lambda Integration:</b>
+<ul>
+<li>HTTP API is newer, simpler, and cheaper than REST API</li>
+<li>HTTP API doesn't support direct AWS integrations, so Lambda is required</li>
+<li>Lambda functions provide flexibility for:
+  <ul>
+    <li>Complex business logic</li>
+    <li>Data transformation</li>
+    <li>Aggregating data from multiple DynamoDB tables</li>
+    <li>Error handling and validation</li>
+  </ul>
+</li>
+<li>Automatically scales with incoming requests</li>
+<li>HTTPS endpoint provided by API Gateway</li>
+<li>Lambda automatically scales to handle concurrent requests</li>
+</ul>
+
+<br>
+
+<b>Example Lambda Function:</b>
+<pre>
+exports.handler = async (event) => {
+  const dynamodb = new AWS.DynamoDB.DocumentClient();
+  const result = await dynamodb.get({
+    TableName: 'Users',
+    Key: { userId: event.pathParameters.id }
+  }).promise();
+  
+  return {
+    statusCode: 200,
+    body: JSON.stringify(result.Item)
+  };
+};
+</pre>
+
+<br>
+
+<b>Advantages of Option C:</b>
+<ul>
+<li>HTTP API is up to 70% cheaper than REST API</li>
+<li>More flexible for complex operations</li>
+<li>Easier to implement than VTL mapping templates</li>
+<li>Better for applications requiring business logic</li>
+</ul>
+
+<br>
+
+<b>Both options are fully serverless and scale automatically:</b>
+<ul>
+<li>API Gateway: Scales to millions of requests per second</li>
+<li>Lambda: Scales from 0 to thousands of concurrent executions</li>
+<li>DynamoDB: Scales automatically with on-demand pricing or provisioned capacity</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> HTTP API does NOT support AWS integration type. It only supports Lambda integrations and HTTP proxy integrations. Direct DynamoDB integration is not available for HTTP APIs.<br>
+<b>Option D:</b> AWS Global Accelerator is for improving global network performance, not for creating APIs. Lambda@Edge runs at CloudFront edge locations and is designed for CDN customization, not for building REST APIs. Also, this doesn't provide a "simple API" interface.<br>
+<b>Option E:</b> Network Load Balancer is not serverless - it requires target resources. NLBs work at Layer 4 (TCP/UDP) and are designed for high-performance networking, not for HTTP APIs. This doesn't meet the "serverless" requirement.
+</div>
+</div>
+
+
+<!-- ================= Q8 ================= -->
+<div class="question">
+<pre>
+28) A company has registered 10 new domain names. The company uses the domains for online marketing. The company needs a solution that will redirect online visitors to a specific URL for each domain. All domains and target URLs are defined in a JSON document. All DNS records are managed by Amazon Route 53.
+A solutions architect must implement a redirect service that accepts HTTP and HTTPS requests.
+Which combination of steps should the solutions architect take to meet these requirements with the LEAST amount of operational effort? (Choose three.)
+</pre>
+
+<div class="options">
+<label>
+<input type="checkbox">
+A. Create a dynamic webpage that runs on an Amazon EC2 instance. Configure the webpage to use the JSON document in combination with the event message to look up and respond with a redirect URL.
+</label>
+
+<label>
+<input type="checkbox">
+B. Create an Application Load Balancer that includes HTTP and HTTPS listeners.
+</label>
+
+<label>
+<input type="checkbox">
+C. Create an AWS Lambda function that uses the JSON document in combination with the event message to look up and respond with a redirect URL.
+</label>
+
+<label>
+<input type="checkbox">
+D. Use an Amazon API Gateway API with a custom domain to publish an AWS Lambda function.
+</label>
+
+<label>
+<input type="checkbox">
+E. Create an Amazon CloudFront distribution. Deploy a Lambda@Edge function.
+</label>
+
+<label>
+<input type="checkbox">
+F. Create an SSL certificate by using AWS Certificate Manager (ACM). Include the domains as Subject Alternative Names.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[2,4,5])">Check Answer</button>
+<button onclick="showAnswer(this,[2,4,5])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answers: C, E, and F</b><br><br>
+
+This question is about implementing <b>a low-maintenance, serverless URL redirection service for multiple domains</b>.
+
+<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Redirect visitors from 10 different domains to specific URLs</li>
+<li>Support both HTTP and HTTPS</li>
+<li>Mapping defined in a JSON document</li>
+<li>DNS managed by Route 53</li>
+<li>Least operational effort (minimal management)</li>
+</ul>
+
+<br>
+
+<b>The Optimal Solution: CloudFront + Lambda@Edge + ACM</b>
+
+<br><br>
+
+<b>Option C - Lambda Function for Redirect Logic:</b>
+
+<br><br>
+
+<b>Why Lambda is ideal:</b>
+<ul>
+<li>Serverless - no servers to manage</li>
+<li>Can read and parse JSON document</li>
+<li>Examines incoming request (domain name)</li>
+<li>Looks up target URL in JSON</li>
+<li>Returns HTTP 301/302 redirect response</li>
+<li>Automatically scales to handle traffic</li>
+</ul>
+
+<br>
+
+<b>Example Lambda@Edge Function:</b>
+<pre>
+const redirects = {
+  "domain1.com": "https://target1.com",
+  "domain2.com": "https://target2.com",
+  // ... more domains
+};
+
+exports.handler = async (event) => {
+  const request = event.Records[0].cf.request;
+  const host = request.headers.host[0].value;
+  const targetUrl = redirects[host];
+  
+  if (targetUrl) {
+    return {
+      status: '301',
+      statusDescription: 'Moved Permanently',
+      headers: {
+        location: [{ value: targetUrl }]
+      }
+    };
+  }
+  
+  return request; // Fallback
+};
+</pre>
+
+<br>
+
+<b>Option E - CloudFront Distribution with Lambda@Edge:</b>
+
+<br><br>
+
+<b>Why CloudFront + Lambda@Edge:</b>
+<ul>
+<li><b>Global distribution:</b> Low-latency redirects from edge locations worldwide</li>
+<li><b>Multiple domains:</b> CloudFront supports alternate domain names (CNAMEs) for all 10 domains</li>
+<li><b>Lambda@Edge integration:</b> Runs Lambda function at edge locations before serving content</li>
+<li><b>Viewer Request trigger:</b> Function executes immediately when request arrives</li>
+<li><b>HTTP + HTTPS support:</b> CloudFront natively handles both protocols</li>
+<li><b>Serverless:</b> No infrastructure to manage</li>
+<li><b>Cost-effective:</b> Pay only for requests and function execution</li>
+</ul>
+
+<br>
+
+<b>Lambda@Edge Triggers:</b>
+<ul>
+<li><b>Viewer Request</b> (best for redirects): Executes before CloudFront checks cache</li>
+<li>Viewer Response: After CloudFront responds</li>
+<li>Origin Request: Before forwarding to origin</li>
+<li>Origin Response: After receiving from origin</li>
+</ul>
+
+<br>
+
+<b>Option F - ACM Certificate with Subject Alternative Names (SANs):</b>
+
+<br><br>
+
+<b>Why ACM is essential:</b>
+<ul>
+<li><b>HTTPS requirement:</b> Must support HTTPS for all 10 domains</li>
+<li><b>Single certificate:</b> ACM allows multiple domains in one certificate via SANs</li>
+<li><b>Subject Alternative Names:</b> Include all 10 domains (domain1.com, domain2.com, etc.)</li>
+<li><b>Free:</b> ACM certificates are free when used with CloudFront</li>
+<li><b>Auto-renewal:</b> ACM automatically renews certificates</li>
+<li><b>Easy integration:</b> Attach to CloudFront distribution with one click</li>
+</ul>
+
+<br>
+
+<b>Example ACM Certificate:</b>
+<pre>
+Subject Alternative Names:
+  - domain1.com
+  - domain2.com
+  - domain3.com
+  ... (all 10 domains)
+</pre>
+
+<br>
+
+<b>Complete Architecture Flow:</b>
+
+<br>
+
+<ol>
+<li>User visits domain1.com or domain2.com (any of the 10 domains)</li>
+<li>Route 53 resolves domain to CloudFront distribution</li>
+<li>CloudFront receives HTTP/HTTPS request</li>
+<li>ACM certificate validates HTTPS connection</li>
+<li>Lambda@Edge function executes at edge location (Viewer Request trigger)</li>
+<li>Function reads request host header (domain1.com)</li>
+<li>Function looks up target URL in JSON document</li>
+<li>Function returns HTTP 301 redirect to target URL</li>
+<li>User's browser redirects to target URL</li>
+</ol>
+
+<br>
+
+<b>Route 53 Configuration:</b>
+<ul>
+<li>Create A or ALIAS records for each domain pointing to CloudFront distribution</li>
+<li>All 10 domains point to the same CloudFront distribution</li>
+</ul>
+
+<br>
+
+<b>Why this solution has the LEAST operational effort:</b>
+<ul>
+<li>Fully serverless - no EC2 instances or load balancers to manage</li>
+<li>Auto-scaling built into CloudFront and Lambda@Edge</li>
+<li>ACM handles certificate renewal automatically</li>
+<li>Global distribution for low latency without manual setup</li>
+<li>JSON document can be updated easily (stored in function code or S3)</li>
+<li>No patching, no capacity planning, no high availability configuration needed</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option A:</b> EC2 instances require significant operational overhead: OS patching, scaling configuration, high availability setup, monitoring, security group management. Not serverless, doesn't meet "least effort" requirement.<br>
+<b>Option B:</b> ALB requires managing target groups, health checks, and isn't necessary when using CloudFront + Lambda@Edge. ALB doesn't support multiple domains as efficiently as CloudFront with CNAMEs. Adds cost and complexity.<br>
+<b>Option D:</b> API Gateway with custom domains would require separate custom domain configurations for each of the 10 domains, which is more complex. Also, API Gateway is designed for APIs, not simple redirects. CloudFront + Lambda@Edge is more appropriate and efficient for this use case.
+</div>
+</div>
+
+
+<!-- ================= Q9 ================= -->
+<div class="question">
+<pre>
+29) A company that has multiple AWS accounts is using AWS Organizations. The company's AWS accounts host VPCs, Amazon EC2 instances, and containers.
+The company's compliance team has deployed a security tool in each VPC where the company has deployments. The security tools run on EC2 instances and send information to the AWS account that is dedicated for the compliance team. The company has tagged all the compliance-related resources with a key of "costCenter" and a value or "compliance".
+The company wants to identify the cost of the security tools that are running on the EC2 instances so that the company can charge the compliance team's AWS account. The cost calculation must be as accurate as possible.
+What should a solutions architect do to meet these requirements?
+</pre>
+
+<div class="options">
+<label>
+<input type="radio" name="q9">
+A. In the management account of the organization, activate the costCenter user-defined tag. Configure monthly AWS Cost and Usage Reports to save to an Amazon S3 bucket in the management account. Use the tag breakdown in the report to obtain the total cost for the costCenter tagged resources.
+</label>
+
+<label>
+<input type="radio" name="q9">
+B. In the member accounts of the organization, activate the costCenter user-defined tag. Configure monthly AWS Cost and Usage Reports to save to an Amazon S3 bucket in the management account. Schedule a monthly AWS Lambda function to retrieve the reports and calculate the total cost for the costCenter tagged resources.
+</label>
+
+<label>
+<input type="radio" name="q9">
+C. In the member accounts of the organization activate the costCenter user-defined tag. From the management account, schedule a monthly AWS Cost and Usage Report. Use the tag breakdown in the report to calculate the total cost for the costCenter tagged resources.
+</label>
+
+<label>
+<input type="radio" name="q9">
+D. Create a custom report in the organization view in AWS Trusted Advisor. Configure the report to generate a monthly billing summary for the costCenter tagged resources in the compliance team's AWS account.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0])">Check Answer</button>
+<button onclick="showAnswer(this,[0])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answer: A</b><br><br>
+
+This question tests understanding of <b>cost allocation tags and cost reporting in AWS Organizations</b>.
+
+<br><br>
+
+<b>Key Concepts:</b>
+
+<br><br>
+
+<b>1. Cost Allocation Tags:</b>
+<ul>
+<li>User-defined tags applied to AWS resources</li>
+<li>Must be activated in the billing console to appear in cost reports</li>
+<li>Enable tracking costs by custom dimensions (team, project, cost center, etc.)</li>
+<li>After activation, tags appear in Cost and Usage Reports within 24 hours</li>
+</ul>
+
+<br>
+
+<b>2. AWS Organizations and Consolidated Billing:</b>
+<ul>
+<li>Management account receives consolidated bill for all member accounts</li>
+<li>Cost allocation tags must be activated in the management account</li>
+<li>Tags from member accounts automatically roll up to consolidated reports</li>
+</ul>
+
+<br>
+
+<b>3. AWS Cost and Usage Reports (CUR):</b>
+<ul>
+<li>Most comprehensive cost and usage data available</li>
+<li>Includes detailed line items for all AWS services</li>
+<li>Supports tag-based filtering and grouping</li>
+<li>Delivered to S3 bucket in CSV or Parquet format</li>
+<li>Can be configured from management account for entire organization</li>
+</ul>
+
+<br>
+
+<b>Option A is correct:</b>
+
+<br><br>
+
+<b>Step 1: Activate costCenter tag in management account</b>
+<ul>
+<li>In AWS Organizations, cost allocation tags are activated in the <b>management account</b></li>
+<li>Once activated in management account, the tag becomes available for cost tracking across all member accounts</li>
+<li>This is a one-time configuration</li>
+<li>Navigation: Billing Console → Cost Allocation Tags → User-defined tags → Activate "costCenter"</li>
+</ul>
+
+<br>
+
+<b>Step 2: Configure AWS Cost and Usage Reports</b>
+<ul>
+<li>Set up from management account (covers entire organization)</li>
+<li>Schedule: Monthly (or daily/hourly for more granularity)</li>
+<li>Destination: S3 bucket in management account</li>
+<li>Include: Resource IDs and user-defined tags</li>
+<li>Format: CSV with Gzip or Parquet (for large datasets)</li>
+</ul>
+
+<br>
+
+<b>Step 3: Use tag breakdown to calculate costs</b>
+<ul>
+<li>CUR includes a column for each activated tag (e.g., "user:costCenter")</li>
+<li>Filter rows where costCenter = "compliance"</li>
+<li>Sum the costs for these resources</li>
+<li>Can use tools like Amazon Athena, QuickSight, or Excel to analyze</li>
+</ul>
+
+<br>
+
+<b>Example CUR Analysis with Amazon Athena:</b>
+<pre>
+SELECT 
+  line_item_usage_account_id,
+  SUM(line_item_unblended_cost) as total_cost
+FROM 
+  cur_table
+WHERE 
+  resource_tags_user_cost_center = 'compliance'
+  AND month = '2026-01'
+GROUP BY 
+  line_item_usage_account_id;
+</pre>
+
+<br>
+
+<b>Why this provides the most accurate costs:</b>
+<ul>
+<li>Cost and Usage Reports include ALL costs associated with tagged resources:
+  <ul>
+    <li>EC2 instance hours</li>
+    <li>EBS volumes attached to instances</li>
+    <li>Data transfer</li>
+    <li>Elastic IPs</li>
+    <li>CloudWatch metrics and logs</li>
+    <li>Any other services used by tagged resources</li>
+  </ul>
+</li>
+<li>Hourly granularity available (vs. daily billing)</li>
+<li>Includes all pricing dimensions (on-demand, reserved, savings plans, spot)</li>
+<li>Accounts for discounts and credits</li>
+</ul>
+
+<br>
+
+<b>Centralized Management Benefits:</b>
+<ul>
+<li>Single source of truth for all organizational costs</li>
+<li>No need to configure reports in each member account</li>
+<li>Automated consolidation across accounts</li>
+<li>Easier to implement chargebacks to compliance team</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Cost allocation tags must be activated in the <b>management account</b>, not member accounts. Activating in member accounts won't make tags appear in consolidated billing reports. Additionally, CUR already includes tag breakdown - no Lambda function is needed to "calculate" totals; you can query the reports directly.<br>
+<b>Option C:</b> Same issue as Option B - tags must be activated in management account. Also, the wording is confusing - Cost and Usage Reports are always configured from the management account, but tags must be activated there too.<br>
+<b>Option D:</b> AWS Trusted Advisor does not support custom cost reporting based on tags. Trusted Advisor provides best practice recommendations, not detailed cost analysis by tags. This feature doesn't exist.
+</div>
+</div>
+
+
+<!-- ================= Q10 ================= -->
+<div class="question">
+<pre>
+30) A company has 50 AWS accounts that are members of an organization in AWS Organizations. Each account contains multiple VPCs. The company wants to use AWS Transit Gateway to establish connectivity between the VPCs in each member account. Each time a new member account is created, the company wants to automate the process of creating a new VPC and a transit gateway attachment.
+Which combination of steps will meet these requirements? (Choose two.)
+</pre>
+
+<div class="options">
+<label>
+<input type="checkbox">
+A. From the management account, share the transit gateway with member accounts by using AWS Resource Access Manager.
+</label>
+
+<label>
+<input type="checkbox">
+B. From the management account, share the transit gateway with member accounts by using an AWS Organizations SCP.
+</label>
+
+<label>
+<input type="checkbox">
+C. Launch an AWS CloudFormation stack set from the management account that automatically creates a new VPC and a VPC transit gateway attachment in a member account. Associate the attachment with the transit gateway in the management account by using the transit gateway ID.
+</label>
+
+<label>
+<input type="checkbox">
+D. Launch an AWS CloudFormation stack set from the management account that automatically creates a new VPC and a peering transit gateway attachment in a member account. Share the attachment with the transit gateway in the management account by using a transit gateway service-linked role.
+</label>
+
+<label>
+<input type="checkbox">
+E. From the management account, share the transit gateway with member accounts by using AWS Service Catalog.
+</label>
+</div>
+
+<button onclick="checkAnswer(this,[0,2])">Check Answer</button>
+<button onclick="showAnswer(this,[0,2])">Show Answer</button>
+
+<div class="explanation">
+<button class="close-explanation" onclick="closeExplanation(this)">✕ Close</button>
+<b>Correct Answers: A and C</b><br><br>
+
+This question addresses <b>automated multi-account networking with AWS Transit Gateway and infrastructure as code</b>.
+
+<br><br>
+
+<b>Requirements:</b>
+<ul>
+<li>Connect VPCs across 50 AWS accounts using Transit Gateway</li>
+<li>Automate VPC and attachment creation for new accounts</li>
+<li>All accounts are in AWS Organizations</li>
+</ul>
+
+<br>
+
+<b>AWS Transit Gateway Multi-Account Strategy:</b>
+
+<br><br>
+
+The typical pattern is:
+<ol>
+<li>Create one central Transit Gateway in a networking/management account</li>
+<li>Share the Transit Gateway with member accounts</li>
+<li>Member accounts create attachments to the shared Transit Gateway</li>
+<li>Central account accepts/manages attachments and routing</li>
+</ol>
+
+<br>
+
+<b>Option A - Share Transit Gateway via AWS Resource Access Manager (RAM):</b>
+
+<br><br>
+
+<b>Why RAM is essential:</b>
+<ul>
+<li>AWS Transit Gateway supports resource sharing across accounts via RAM</li>
+<li>Allows central ownership of Transit Gateway with distributed usage</li>
+<li>Member accounts can create attachments to shared Transit Gateway without owning it</li>
+<li>Maintains centralized control of routing and network policies</li>
+</ul>
+
+<br>
+
+<b>How RAM sharing works with Transit Gateway:</b>
+<ol>
+<li><b>Create resource share in management account:</b>
+  <ul>
+    <li>Select the Transit Gateway</li>
+    <li>Share with AWS Organization or specific OUs</li>
+    <li>Grants permission to create attachments</li>
+  </ul>
+</li>
+<li><b>Member accounts gain access:</b>
+  <ul>
+    <li>Can see the shared Transit Gateway</li>
+    <li>Can create VPC attachments to it</li>
+    <li>Cannot modify Transit Gateway settings or routing</li>
+  </ul>
+</li>
+<li><b>Centralized management:</b>
+  <ul>
+    <li>Management account controls route tables</li>
+    <li>Management account approves/manages attachments</li>
+    <li>Consistent network policies enforced centrally</li>
+  </ul>
+</li>
+</ol>
+
+<br>
+
+<b>Example RAM Configuration:</b>
+<pre>
+Resource Share Name: TGW-Org-Share
+Shared Resource: tgw-12345678
+Principals: AWS Organization (ou-xxxx-xxxxxxxx)
+Permissions: AWSRAMDefaultPermissionTransitGateway
+</pre>
+
+<br>
+
+<b>Benefits of RAM for Transit Gateway:</b>
+<ul>
+<li>Automatic access for new accounts added to organization</li>
+<li>No manual credentials or permissions configuration</li>
+<li>Integrated with AWS Organizations for easy management</li>
+<li>Secure sharing without exposing Transit Gateway to external accounts</li>
+</ul>
+
+<br>
+
+<b>Option C - CloudFormation StackSets for Automation:</b>
+
+<br><br>
+
+<b>Why StackSets are ideal:</b>
+<ul>
+<li>Deploy identical infrastructure across multiple AWS accounts</li>
+<li>Single template defines VPC and Transit Gateway attachment</li>
+<li>Automatically deploys to new accounts added to organization</li>
+<li>Centralized management from one account</li>
+<li>Ensures consistency across all accounts</li>
+</ul>
+
+<br>
+
+<b>How StackSets work:</b>
+<ol>
+<li><b>Create StackSet in management account:</b>
+  <ul>
+    <li>Template defines: VPC, subnets, route tables, Transit Gateway attachment</li>
+    <li>Parameters: CIDR blocks, Transit Gateway ID</li>
+  </ul>
+</li>
+<li><b>Deploy to target accounts:</b>
+  <ul>
+    <li>Specify AWS Organizations OUs or individual accounts</li>
+    <li>StackSet automatically creates stack instances in each account</li>
+  </ul>
+</li>
+<li><b>Automatic deployment for new accounts:</b>
+  <ul>
+    <li>Enable automatic deployment for specified OUs</li>
+    <li>When new account joins OU, stack is automatically created</li>
+    <li>No manual intervention required</li>
+  </ul>
+</li>
+</ol>
+
+<br>
+
+<b>Example CloudFormation StackSet Template:</b>
+<pre>
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: !Ref VPCCidr
+      
+  PrivateSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: !Ref SubnetCidr
+      
+  TransitGatewayAttachment:
+    Type: AWS::EC2::TransitGatewayAttachment
+    Properties:
+      TransitGatewayId: !Ref SharedTransitGatewayId  # Shared via RAM
+      VpcId: !Ref VPC
+      SubnetIds:
+        - !Ref PrivateSubnet
+      Tags:
+        - Key: Name
+          Value: !Sub '${AWS::AccountId}-tgw-attachment'
+</pre>
+
+<br>
+
+<b>Parameters passed to StackSet:</b>
+<ul>
+<li>SharedTransitGatewayId: ID of Transit Gateway shared via RAM</li>
+<li>VPCCidr: Unique CIDR block for each account (e.g., 10.X.0.0/16)</li>
+<li>SubnetCidr: Subnet CIDR within VPC</li>
+</ul>
+
+<br>
+
+<b>Complete Automation Flow:</b>
+
+<br>
+
+<ol>
+<li>Management account creates Transit Gateway</li>
+<li>Management account shares Transit Gateway with organization via RAM (Option A)</li>
+<li>Management account creates CloudFormation StackSet (Option C)</li>
+<li>StackSet deploys to all existing member accounts:
+  <ul>
+    <li>Creates VPC with specified CIDR</li>
+    <li>Creates subnets</li>
+    <li>Creates Transit Gateway attachment using shared TGW ID</li>
+  </ul>
+</li>
+<li>When new account is added:
+  <ul>
+    <li>RAM automatically shares Transit Gateway access</li>
+    <li>StackSet automatically deploys stack to new account</li>
+    <li>VPC and attachment created without manual steps</li>
+  </ul>
+</li>
+<li>Management account accepts/manages attachments and configures routing</li>
+</ol>
+
+<br>
+
+<b>Why this combination provides full automation:</b>
+<ul>
+<li>RAM enables sharing without manual permission configuration</li>
+<li>StackSets enable infrastructure deployment without manual template execution</li>
+<li>Both support automatic provisioning for new accounts</li>
+<li>Centralized management reduces operational overhead</li>
+<li>Consistent network architecture across all accounts</li>
+</ul>
+
+<br>
+
+<b>Why other options are incorrect:</b><br>
+<b>Option B:</b> Service Control Policies (SCPs) are for permission boundaries and access control, not for sharing resources. SCPs cannot share a Transit Gateway - that's what RAM is for. Completely wrong tool for this requirement.<br>
+<b>Option D:</b> There is no such thing as a "peering transit gateway attachment." Transit Gateway uses standard VPC attachments, not peering attachments. Also, "transit gateway service-linked role" is not used for sharing attachments - that's what RAM does. This option uses incorrect/non-existent terminology.<br>
+<b>Option E:</b> AWS Service Catalog is for sharing approved product portfolios and self-service provisioning, not for sharing specific AWS resources like Transit Gateways. Service Catalog could provision the resources, but it doesn't handle the sharing of the Transit Gateway itself - that requires RAM.
+</div>
+</div>
+
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0 20px 0;">
+  <a href="page2.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page4.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div> <!-- Close container -->
+
+<script>
+function checkAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const isMultiSelect = q.querySelector('input[type="checkbox"]') !== null;
+  const inputs = q.querySelectorAll(isMultiSelect ? 'input[type="checkbox"]' : 'input[type="radio"]');
+  const labels = q.querySelectorAll("label");
+  const selected = [];
+
+  inputs.forEach((inp, idx) => {
+    if (inp.checked) selected.push(idx);
+  });
+
+  labels.forEach((label, idx) => {
+    label.classList.remove("user-correct", "user-wrong", "correct");
+    if (selected.includes(idx)) {
+      if (correct.includes(idx)) {
+        label.classList.add("user-correct");
+      } else {
+        label.classList.add("user-wrong");
+      }
+    }
+  });
+
+  let resultMsg = q.querySelector(".result-message");
+  if (!resultMsg) {
+    resultMsg = document.createElement("div");
+    resultMsg.className = "result-message";
+    q.appendChild(resultMsg);
+  }
+
+  const isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(correct.sort());
+  if (isCorrect) {
+    resultMsg.textContent = "✔ Correct!";
+    resultMsg.style.color = "#10b981";
+    resultMsg.style.fontWeight = "600";
+  } else {
+    resultMsg.textContent = "✖ Incorrect. Try again or click 'Show Answer'.";
+    resultMsg.style.color = "#ef4444";
+    resultMsg.style.fontWeight = "600";
+  }
+  resultMsg.style.display = "block";
+}
+
+function showAnswer(btn, correct) {
+  const q = btn.parentElement;
+  const labels = q.querySelectorAll("label");
+  
+  // Clear check answer feedback
+  labels.forEach(label => {
+    label.classList.remove("user-correct", "user-wrong");
+  });
+  
+  // Show correct answers
+  correct.forEach(i => labels[i].classList.add("correct"));
+  const explanation = q.querySelector(".explanation");
+  explanation.style.display = "block";
+  
+  // Hide result message if exists
+  const resultMsg = q.querySelector(".result-message");
+  if (resultMsg) {
+    resultMsg.style.display = "none";
+  }
+}
+
+function closeExplanation(btn) {
+  const explanation = btn.parentElement;
+  explanation.style.display = "none";
+}
+</script>
+
+</body>
+</html>
