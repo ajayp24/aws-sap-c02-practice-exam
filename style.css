@@ -83,11 +83,24 @@ button:hover {
 
 .explanation {
     display: none;
-    margin-top: 18px;
-    padding: 16px 18px;
+    margin-top: 20px;
+    padding: 24px 26px;
     background: #f0f7ff;
     border-left: 4px solid #2563eb;
     border-radius: 8px;
-    font-size: 14px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.9;      /* more vertical spacing */
+    color: #1e3a8a;
 }
+
+.explanation b {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+.explanation br {
+    content: "";
+    display: block;
+    margin-bottom: 10px;  /* extra spacing between paragraphs */
+}
+
