@@ -29,6 +29,7 @@ h1 {
     margin-bottom: 28px;
     border: 1px solid #e5e7eb;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+    text-align: left;
 }
 
 pre {
@@ -37,6 +38,7 @@ pre {
     line-height: 1.6;
     margin-bottom: 18px;
     color: #111827;
+    text-align: left;
 }
 
 .options label {
@@ -108,6 +110,7 @@ button:hover {
     font-size: 15px;
     line-height: 1.9;      /* more vertical spacing */
     color: #1e3a8a;
+    text-align: left;
 }
 
 .explanation b {
