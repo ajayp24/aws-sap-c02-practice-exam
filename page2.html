@@ -22,40 +22,60 @@ Which combination of actions should the solutions architect perform to meet thes
 </pre>
 
 <div class="options">
-<label><input type="checkbox">A. Create a transit gateway in the infrastructure account.</label>
-<label><input type="checkbox">B. Enable resource sharing from the AWS Organizations management account. Most Voted</label>
-<label><input type="checkbox">C. Create VPCs in each AWS account and peer them.</label>
-<label><input type="checkbox">D. Create a resource share in AWS Resource Access Manager in the infrastructure account and share subnets. Most Voted</label>
-<label><input type="checkbox">E. Create a resource share in AWS Resource Access Manager and share prefix lists.</label>
+<label>
+<input type="checkbox">
+A. Create a transit gateway in the infrastructure account.
+</label>
+
+<label>
+<input type="checkbox">
+B. Enable resource sharing from the AWS Organizations management account. Most Voted
+</label>
+
+<label>
+<input type="checkbox">
+C. Create VPCs in each AWS account within the organization in AWS Organizations. Configure the VPCs to share the same CIDR range and subnets as the VPC in the infrastructure account. Peer the VPCs in each individual account with the VPC in the infrastructure account.
+</label>
+
+<label>
+<input type="checkbox">
+D. Create a resource share in AWS Resource Access Manager in the infrastructure account. Select the specific AWS Organizations OU that will use the shared network. Select each subnet to associate with the resource share. Most Voted
+</label>
+
+<label>
+<input type="checkbox">
+E. Create a resource share in AWS Resource Access Manager in the infrastructure account. Select the specific AWS Organizations OU that will use the shared network. Select each prefix list to associate with the resource share.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[1,3])">Show Answer</button>
 
 <div class="explanation">
-<b>Correct Answers: B, D</b><br><br>
+<b>Correct Answers: B and D</b><br><br>
 
-This question is about <b>centrally managed networking across multiple AWS accounts</b>.
-
-The infrastructure team owns the VPC and must retain control over networking, while application accounts should only deploy resources inside subnets.
+This question is about <b>centralized network ownership with decentralized resource creation</b> in a multi-account AWS Organization.
 
 <br><br>
 
-<b>AWS Resource Access Manager (RAM)</b> allows sharing AWS resources, such as subnets, across accounts in an AWS Organization.
+The infrastructure team owns the VPC and must retain full control over networking components such as CIDR ranges, route tables, and gateways. Application teams in other accounts should not be able to modify the network, but they still need to launch resources (EC2, RDS, Lambda ENIs) inside shared subnets.
 
 <br><br>
 
-<b>Enabling resource sharing from the AWS Organizations management account</b> is required so that subnets can be shared with member accounts.
+<b>AWS Resource Access Manager (RAM)</b> allows AWS resources to be shared across accounts in the same AWS Organization. However, RAM sharing only works if resource sharing is explicitly enabled from the AWS Organizations management account.
 
 <br><br>
 
-<b>Sharing subnets through AWS RAM</b> allows application accounts to launch resources into those subnets without being able to modify the VPC itself.
+<b>Option B</b> enables resource sharing at the organization level, which is required before any shared resources can be used.
 
 <br><br>
 
-This design enforces centralized network control while enabling decentralized application deployment, which is an AWS best practice.
+<b>Option D</b> shares specific subnets from the infrastructure account’s VPC with selected AWS Organization OUs. This allows member accounts to deploy resources into those subnets while preventing them from changing the VPC configuration.
+
+<br><br>
+
+This approach enforces centralized network governance while allowing application teams to operate independently, which is an AWS best practice.
 </div>
 </div>
-
 
 
 <!-- ================= Q2 ================= -->
@@ -71,10 +91,25 @@ Which solution meets these requirements?
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q12">A. Create an AWS PrivateLink interface VPC endpoint.</label>
-<label><input type="radio" name="q12">B. Create an AWS Site-to-Site VPN connection.</label>
-<label><input type="radio" name="q12">C. Create a VPC peering connection.</label>
-<label><input type="radio" name="q12">D. Create an AWS PrivateLink endpoint service.</label>
+<label>
+<input type="radio" name="q12">
+A. Create an AWS PrivateLink interface VPC endpoint. Connect this endpoint to the endpoint service that the third-party SaaS application provides. Create a security group to limit the access to the endpoint. Associate the security group with the endpoint
+</label>
+
+<label>
+<input type="radio" name="q12">
+B. Create an AWS Site-to-Site VPN connection between the third-party SaaS application and the company VPC. Configure network ACLs to limit access across the VPN tunnels.
+</label>
+
+<label>
+<input type="radio" name="q12">
+C. Create a VPC peering connection between the third-party SaaS application and the company VPUpdate route tables by adding the needed routes for the peering connection.
+</label>
+
+<label>
+<input type="radio" name="q12">
+D. Create an AWS PrivateLink endpoint service. Ask the third-party SaaS provider to create an interface VPC endpoint for this endpoint service. Grant permissions for the endpoint service to the specific account of the third-party SaaS provider.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[0])">Show Answer</button>
@@ -82,25 +117,44 @@ Which solution meets these requirements?
 <div class="explanation">
 <b>Correct Answer: A</b><br><br>
 
-This question tests understanding of <b>private service consumption</b>.
+This question is testing <b>secure, private consumption of a third-party SaaS application</b> while strictly following the <b>principle of least privilege</b>.
 
 <br><br>
 
-<b>AWS PrivateLink</b> allows private connectivity to services hosted in another VPC without exposing traffic to the public internet.
+The company requires that traffic:
+- Does <b>not traverse the public internet</b>
+- Does <b>not allow inbound access</b> into the company VPC
+- Is <b>restricted only to the specific SaaS service</b>, not an entire network
 
 <br><br>
 
-An <b>interface VPC endpoint</b> creates elastic network interfaces inside the company VPC, allowing access to the SaaS service privately.
+<b>AWS PrivateLink</b> is specifically designed for this use case.
 
 <br><br>
 
-Traffic stays entirely within the AWS network, satisfies least privilege, and does not allow inbound access from outside the company VPC.
+With an <b>interface VPC endpoint</b>, AWS creates elastic network interfaces inside the company’s VPC. These ENIs provide private connectivity to the SaaS provider’s endpoint service entirely within the AWS network.
 
 <br><br>
 
-VPC peering and VPNs expose broader network access and violate least-privilege principles.
+Traffic flow:
+Company VPC → Interface VPC Endpoint → AWS PrivateLink → SaaS provider VPC
+
+<br><br>
+
+Because the connection is service-level (not network-level), the SaaS provider cannot access any other resources inside the company VPC. This satisfies the <b>least privilege</b> requirement.
+
+<br><br>
+
+Other options are not correct:
+- A Site-to-Site VPN or VPC peering exposes broad network access.
+- Creating an endpoint service is something the <b>SaaS provider</b> does, not the customer.
+
+<br><br>
+
+Therefore, using an AWS PrivateLink interface VPC endpoint is the correct and most secure solution.
 </div>
 </div>
+
 
 
 <!-- ================= Q3 ================= -->
@@ -112,10 +166,21 @@ Which set of actions should a solutions architect take to meet these requirement
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q13">A. Use AWS Systems Manager to manage patches and generate reports.</label>
-<label><input type="radio" name="q13">B. Use AWS OpsWorks and Amazon QuickSight.</label>
-<label><input type="radio" name="q13">C. Use Amazon EventBridge and Amazon Inspector.</label>
-<label><input type="radio" name="q13">D. Use AWS OpsWorks and AWS X-Ray.</label>
+<label><input type="radio" name="q13">
+A. Use AWS Systems Manager to manage patches on the on-premises servers and EC2 instances. Use Systems Manager to generate patch compliance reports.
+</label>
+
+<label><input type="radio" name="q13">
+B. Use AWS OpsWorks to manage patches on the on-premises servers and EC2 instances. Use Amazon QuickSight integration with OpsWorks to generate patch compliance reports.
+</label>
+
+<label><input type="radio" name="q13">
+C. Use an Amazon EventBridge rule to apply patches by scheduling an AWS Systems Manager patch remediation job. Use Amazon Inspector to generate patch compliance reports.
+</label>
+
+<label><input type="radio" name="q13">
+D. Use AWS OpsWorks to manage patches on the on-premises servers and EC2 instances. Use AWS X-Ray to post the patch status to AWS Systems Manager OpsCenter to generate patch compliance reports.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[0])">Show Answer</button>
@@ -123,21 +188,22 @@ Which set of actions should a solutions architect take to meet these requirement
 <div class="explanation">
 <b>Correct Answer: A</b><br><br>
 
-<b>AWS Systems Manager</b> provides a unified way to manage patching across both on-premises servers and EC2 instances.
+AWS Systems Manager is designed to provide a <b>single unified management plane</b> for both Amazon EC2 instances and on-premises servers.
 
 <br><br>
 
-Systems Manager Patch Manager can enforce patch baselines and automatically track patch compliance.
+Systems Manager Patch Manager allows organizations to define patch baselines, apply patches automatically, and track compliance status.
 
 <br><br>
 
-Compliance data is centrally collected and reported, providing a single authoritative view of patch status across the entire environment.
+Patch compliance data is centrally collected and can be reported across all managed instances, regardless of location.
 
 <br><br>
 
-This eliminates the need for multiple tools and satisfies management reporting requirements.
+This meets the requirement for a <b>single consolidated patch status report</b> with minimal operational complexity.
 </div>
 </div>
+
 
 <!-- ================= Q4 ================= -->
 <div class="question">
@@ -149,10 +215,21 @@ Which set of actions will ensure that log files are copied to the central S3 buc
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q14">A. Use ABANDON lifecycle hook.</label>
-<label><input type="radio" name="q14">B. Use Systems Manager document with lifecycle hook. Most Voted</label>
-<label><input type="radio" name="q14">C. Use user data scripts.</label>
-<label><input type="radio" name="q14">D. Use SNS with ABANDON.</label>
+<label><input type="radio" name="q14">
+A. Create a script to copy log files to Amazon S3, and store the script in a file on the EC2 instance. Create an Auto Scaling lifecycle hook and an Amazon EventBridge rule to detect lifecycle events from the Auto Scaling group. Invoke an AWS Lambda function on the autoscaling:EC2_INSTANCE_TERMINATING transition to send ABANDON to the Auto Scaling group to prevent termination, run the script to copy the log files, and terminate the instance using the AWS SDK.
+</label>
+
+<label><input type="radio" name="q14">
+B. Create an AWS Systems Manager document with a script to copy log files to Amazon S3. Create an Auto Scaling lifecycle hook and an Amazon EventBridge rule to detect lifecycle events from the Auto Scaling group. Invoke an AWS Lambda function on the autoscaling:EC2_INSTANCE_TERMINATING transition to call the AWS Systems Manager API SendCommand operation to run the document to copy the log files and send CONTINUE to the Auto Scaling group to terminate the instance. Most Voted
+</label>
+
+<label><input type="radio" name="q14">
+C. Change the log delivery rate to every 5 minutes. Create a script to copy log files to Amazon S3, and add the script to EC2 instance user data. Create an Amazon EventBridge rule to detect EC2 instance termination. Invoke an AWS Lambda function from the EventBridge rule that uses the AWS CLI to run the user-data script to copy the log files and terminate the instance.
+</label>
+
+<label><input type="radio" name="q14">
+D. Create an AWS Systems Manager document with a script to copy log files to Amazon S3. Create an Auto Scaling lifecycle hook that publishes a message to an Amazon Simple Notification Service (Amazon SNS) topic. From the SNS notification, call the AWS Systems Manager API SendCommand operation to run the document to copy the log files and send ABANDON to the Auto Scaling group to terminate the instance.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[1])">Show Answer</button>
@@ -160,36 +237,52 @@ Which set of actions will ensure that log files are copied to the central S3 buc
 <div class="explanation">
 <b>Correct Answer: B</b><br><br>
 
-Auto Scaling lifecycle hooks allow actions to run before an EC2 instance is terminated.
+Auto Scaling lifecycle hooks allow an EC2 instance to pause during termination.
 
 <br><br>
 
-By using an <b>AWS Systems Manager document</b>, log-copy scripts can be executed reliably on the instance during the termination phase.
+Using AWS Systems Manager ensures the log-copy operation runs reliably on the instance itself.
 
 <br><br>
 
-The lifecycle hook pauses termination until the log copy completes, ensuring no logs are lost.
+The lifecycle hook prevents termination until the log copy completes, after which the CONTINUE signal allows termination.
 
 <br><br>
 
-This approach is reliable, automated, and fully managed.
+This guarantees that no logs are lost when instances scale in.
 </div>
 </div>
+
 
 <!-- ================= Q5 ================= -->
 <div class="question">
 <pre>
 15) A company is using multiple AWS accounts. The DNS records are stored in a private hosted zone for Amazon Route 53 in Account A. The company’s applications and databases are running in Account B.
-During deployment, the application failed to start because db.example.com was not resolvable.
+A solutions architect will deploy a two-tier application in a new VPC. To simplify the configuration, the db.example.com CNAME record set for the Amazon RDS endpoint was created in a private hosted zone for Amazon Route 53.
+During deployment, the application failed to start. Troubleshooting revealed that db.example.com is not resolvable on the Amazon EC2 instance. The solutions architect confirmed that the record set was created correctly in Route 53.
 Which combination of steps should the solutions architect take to resolve this issue? (Choose two.)
 </pre>
 
 <div class="options">
-<label><input type="checkbox">A. Deploy database on EC2.</label>
-<label><input type="checkbox">B. Modify /etc/resolv.conf.</label>
-<label><input type="checkbox">C. Create an authorization to associate the hosted zone with the VPC.</label>
-<label><input type="checkbox">D. Create a new hosted zone.</label>
-<label><input type="checkbox">E. Associate the VPC with the hosted zone.</label>
+<label><input type="checkbox">
+A. Deploy the database on a separate EC2 instance in the new VPC. Create a record set for the instance’s private IP in the private hosted zone.
+</label>
+
+<label><input type="checkbox">
+B. Use SSH to connect to the application tier EC2 instance. Add an RDS endpoint IP address to the /etc/resolv.conf file.
+</label>
+
+<label><input type="checkbox">
+C. Create an authorization to associate the private hosted zone in Account A with the new VPC in Account B.
+</label>
+
+<label><input type="checkbox">
+D. Create a private hosted zone for the example com domain in Account B. Configure Route 53 replication between AWS accounts.
+</label>
+
+<label><input type="checkbox">
+E. Associate a new VPC in Account B with a hosted zone in Account A. Delete the association authorization in Account A.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[2,4])">Show Answer</button>
@@ -197,21 +290,22 @@ Which combination of steps should the solutions architect take to resolve this i
 <div class="explanation">
 <b>Correct Answers: C, E</b><br><br>
 
-Private hosted zones can only resolve DNS for associated VPCs.
+Private hosted zones only resolve DNS names for VPCs that are explicitly associated.
 
 <br><br>
 
-When the hosted zone is in a different account, an <b>association authorization</b> must be created first.
+When the hosted zone and VPC are in different accounts, an association authorization must be created first.
 
 <br><br>
 
-Once authorized, the VPC in Account B can be associated with the hosted zone in Account A, allowing DNS resolution to work correctly.
+After authorization, the VPC can be associated with the hosted zone, enabling DNS resolution.
 
 <br><br>
 
-This is the correct cross-account DNS configuration pattern.
+This is the correct cross-account Route 53 configuration.
 </div>
 </div>
+
 
 <!-- ================= Q6 ================= -->
 <div class="question">
@@ -223,10 +317,21 @@ Which is the MOST cost-efficient and scalable deployment that will resolve the i
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q16">A. Reconfigure Amazon EFS to enable maximum I/O.</label>
-<label><input type="radio" name="q16">B. Update the blog site to use instance store volumes for storage. Copy the site contents to the volumes at launch and to Amazon S3 at shutdown.</label>
-<label><input type="radio" name="q16">C. Configure an Amazon CloudFront distribution. Point the distribution to an S3 bucket, and migrate the videos from EFS to Amazon S3.</label>
-<label><input type="radio" name="q16">D. Set up an Amazon CloudFront distribution for all site contents, and point the distribution at the ALB.</label>
+<label><input type="radio" name="q16">
+A. Reconfigure Amazon EFS to enable maximum I/O.
+</label>
+
+<label><input type="radio" name="q16">
+B. Update the blog site to use instance store volumes for storage. Copy the site contents to the volumes at launch and to Amazon S3 at shutdown.
+</label>
+
+<label><input type="radio" name="q16">
+C. Configure an Amazon CloudFront distribution. Point the distribution to an S3 bucket, and migrate the videos from EFS to Amazon S3.
+</label>
+
+<label><input type="radio" name="q16">
+D. Set up an Amazon CloudFront distribution for all site contents, and point the distribution at the ALB.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[2])">Show Answer</button>
@@ -234,25 +339,24 @@ Which is the MOST cost-efficient and scalable deployment that will resolve the i
 <div class="explanation">
 <b>Correct Answer: C</b><br><br>
 
-This problem is about handling a sudden increase in traffic for <b>large static objects (videos)</b> in a cost-efficient way.
+The performance issue is caused by a sudden increase in demand for large video files.
 
 <br><br>
 
-Amazon EFS is designed for shared file systems, but it is not optimized for large-scale public content delivery. Increasing EFS performance would significantly increase cost and still would not scale globally.
+Amazon EFS is designed for shared file systems, not for large-scale public content delivery. Increasing EFS performance would significantly increase cost and still would not scale globally.
 
 <br><br>
 
-Amazon S3 is designed for durable, massively scalable object storage and is ideal for storing video files.
+Amazon S3 is highly durable and massively scalable object storage, making it ideal for storing video files.
 
 <br><br>
 
-Amazon CloudFront caches video content at edge locations, reducing load on the backend and eliminating buffering caused by repeated requests to the origin.
+Amazon CloudFront caches video content at edge locations close to users, reducing latency, eliminating buffering, and removing load from the backend infrastructure.
 
 <br><br>
 
-Migrating videos to S3 and serving them through CloudFront provides the best combination of scalability, performance, and cost efficiency.
-</div>
-</div>
+Migrating videos to S3 and delivering them through CloudFront provi
+
 
 
 <!-- ================= Q7 ================= -->
@@ -267,10 +371,21 @@ Which solution meets these requirements?
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q17">A. Provision a Direct Connect gateway. Delete the existing private virtual interface from the existing connection. Create the second Direct Connect connection. Create a new private virtual interface on each connection, and connect both private virtual interfaces to the Direct Connect gateway. Connect the Direct Connect gateway to the single VPC.</label>
-<label><input type="radio" name="q17">B. Keep the existing private virtual interface. Create the second Direct Connect connection. Create a new private virtual interface on the new connection, and connect the new private virtual interface to the single VPC.</label>
-<label><input type="radio" name="q17">C. Keep the existing private virtual interface. Create the second Direct Connect connection. Create a new public virtual interface on the new connection, and connect the new public virtual interface to the single VPC.</label>
-<label><input type="radio" name="q17">D. Provision a transit gateway. Delete the existing private virtual interface from the existing connection. Create the second Direct Connect connection. Create a new private virtual interface on each connection, and connect both private virtual interfaces to the transit gateway. Associate the transit gateway with the single VPC.</label>
+<label><input type="radio" name="q17">
+A. Provision a Direct Connect gateway. Delete the existing private virtual interface from the existing connection. Create the second Direct Connect connection. Create a new private virtual interface on each connection, and connect both private virtual interfaces to the Direct Connect gateway. Connect the Direct Connect gateway to the single VPC.
+</label>
+
+<label><input type="radio" name="q17">
+B. Keep the existing private virtual interface. Create the second Direct Connect connection. Create a new private virtual interface on the new connection, and connect the new private virtual interface to the single VPC.
+</label>
+
+<label><input type="radio" name="q17">
+C. Keep the existing private virtual interface. Create the second Direct Connect connection. Create a new public virtual interface on the new connection, and connect the new public virtual interface to the single VPC.
+</label>
+
+<label><input type="radio" name="q17">
+D. Provision a transit gateway. Delete the existing private virtual interface from the existing connection. Create the second Direct Connect connection. Create a new private virtual interface on each connection, and connect both private virtual interfaces to the transit gateway. Associate the transit gateway with the single VPC.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[0])">Show Answer</button>
@@ -278,25 +393,26 @@ Which solution meets these requirements?
 <div class="explanation">
 <b>Correct Answer: A</b><br><br>
 
-This question tests <b>Direct Connect scalability and multi-Region connectivity</b>.
+This question tests knowledge of Direct Connect scalability and redundancy.
 
 <br><br>
 
-A <b>Direct Connect gateway</b> allows a single Direct Connect connection to be used with multiple VPCs across multiple AWS Regions.
+A Direct Connect gateway allows multiple Direct Connect connections to provide connectivity to multiple VPCs across multiple Regions.
 
 <br><br>
 
-By creating two Direct Connect connections and attaching private virtual interfaces from both connections to the Direct Connect gateway, the company achieves redundancy in the same Region.
+By attaching private virtual interfaces from two separate Direct Connect connections to the Direct Connect gateway, the company achieves redundancy in the same Region.
 
 <br><br>
 
-As the company expands into additional Regions, the same Direct Connect gateway can be associated with VPCs in other Regions without creating new Direct Connect connections.
+As the company expands to additional Regions, the same Direct Connect gateway can be associated with new VPCs without creating additional Direct Connect connections.
 
 <br><br>
 
-This design provides redundancy, scalability, and long-term flexibility.
+This design provides redundancy, regional scalability, and long-term flexibility.
 </div>
 </div>
+
 
 
 
@@ -311,10 +427,21 @@ Which solution meets these requirements?
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q18">A. Use Amazon ECS containers for the web application and Spot instances for the Auto Scaling group that processes the SQS queue. Replace the custom software with Amazon Rekognition to categorize the videos.</label>
-<label><input type="radio" name="q18">B. Store the uploaded videos in Amazon EFS and mount the file system to the EC2 instances for the web application. Process the SQS queue with an AWS Lambda function that calls the Amazon Rekognition API to categorize the videos.</label>
-<label><input type="radio" name="q18">C. Host the web application in Amazon S3. Store the uploaded videos in Amazon S3. Use S3 event notification to publish events to the SQS queue. Process the SQS queue with an AWS Lambda function that calls the Amazon Rekognition API to categorize the videos.</label>
-<label><input type="radio" name="q18">D. Use AWS Elastic Beanstalk to launch EC2 instances in an Auto Scaling group for the web application and launch a worker environment to process the SQS queue. Replace the custom software with Amazon Rekognition to categorize the videos.</label>
+<label><input type="radio" name="q18">
+A. Use Amazon ECS containers for the web application and Spot instances for the Auto Scaling group that processes the SQS queue. Replace the custom software with Amazon Rekognition to categorize the videos.
+</label>
+
+<label><input type="radio" name="q18">
+B. Store the uploaded videos in Amazon EFS and mount the file system to the EC2 instances for the web application. Process the SQS queue with an AWS Lambda function that calls the Amazon Rekognition API to categorize the videos.
+</label>
+
+<label><input type="radio" name="q18">
+C. Host the web application in Amazon S3. Store the uploaded videos in Amazon S3. Use S3 event notification to publish events to the SQS queue. Process the SQS queue with an AWS Lambda function that calls the Amazon Rekognition API to categorize the videos.
+</label>
+
+<label><input type="radio" name="q18">
+D. Use AWS Elastic Beanstalk to launch EC2 instances in an Auto Scaling group for the web application and launch a worker environment to process the SQS queue. Replace the custom software with Amazon Rekognition to categorize the videos.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[2])">Show Answer</button>
@@ -322,25 +449,26 @@ Which solution meets these requirements?
 <div class="explanation">
 <b>Correct Answer: C</b><br><br>
 
-This question focuses on <b>removing operational overhead</b> by using managed and serverless services.
+The goal is to remove operational overhead and eliminate EC2-based processing.
 
 <br><br>
 
-Amazon S3 is ideal for both hosting static web content and storing uploaded video files. It scales automatically and requires no server management.
+Amazon S3 is ideal for hosting static web content and storing uploaded videos because it scales automatically and requires no server management.
 
 <br><br>
 
-S3 event notifications can trigger events when videos are uploaded, removing the need for EC2-based queue pollers.
+S3 event notifications can publish messages to Amazon SQS whenever new videos are uploaded, removing the need for EC2 polling.
 
 <br><br>
 
-AWS Lambda can process SQS messages and invoke Amazon Rekognition, eliminating the need for EC2 instances and custom recognition software.
+AWS Lambda can process SQS messages and invoke Amazon Rekognition, replacing custom recognition software and EC2 workers.
 
 <br><br>
 
-This architecture replaces EC2-based components with fully managed services, achieving the lowest operational overhead.
+This architecture uses fully managed services end-to-end, achieving the lowest operational overhead.
 </div>
 </div>
+
 
 <!-- ================= Q9 ================= -->
 <div class="question">
@@ -353,10 +481,21 @@ How can this be accomplished?
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q19">A. Create and deploy nested AWS CloudFormation stacks.</label>
-<label><input type="radio" name="q19">B. Use AWS SAM and built-in AWS CodeDeploy to deploy the new Lambda version.</label>
-<label><input type="radio" name="q19">C. Refactor the AWS CLI scripts into a single script.</label>
-<label><input type="radio" name="q19">D. Create a new API Gateway endpoint for each version.</label>
+<label><input type="radio" name="q19">
+A. Create and deploy nested AWS CloudFormation stacks with the parent stack consisting of the AWS CloudFront distribution and API Gateway, and the child stack containing the Lambda function. For changes to Lambda, create an AWS CloudFormation change set and deploy; if errors are triggered, revert the AWS CloudFormation change set to the previous version.
+</label>
+
+<label><input type="radio" name="q19">
+B. Use AWS SAM and built-in AWS CodeDeploy to deploy the new Lambda version, gradually shift traffic to the new version, and use pre-traffic and post-traffic test functions to verify code. Rollback if Amazon CloudWatch alarms are triggered.
+</label>
+
+<label><input type="radio" name="q19">
+C. Refactor the AWS CLI scripts into a single script that deploys the new Lambda version. When deployment is completed, the script tests execute. If errors are detected, revert to the previous Lambda version.
+</label>
+
+<label><input type="radio" name="q19">
+D. Create and deploy an AWS CloudFormation stack that consists of a new API Gateway endpoint that references the new Lambda version. Change the CloudFront origin to the new API Gateway endpoint, monitor errors and if detected, change the AWS CloudFront origin to the previous API Gateway endpoint.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[1])">Show Answer</button>
@@ -364,21 +503,22 @@ How can this be accomplished?
 <div class="explanation">
 <b>Correct Answer: B</b><br><br>
 
-AWS SAM integrates directly with <b>AWS CodeDeploy</b> to support safe, automated Lambda deployments.
+AWS SAM integrates directly with AWS CodeDeploy to support safe and automated Lambda deployments.
 
 <br><br>
 
-Traffic can be shifted gradually to the new version using canary or linear deployments.
+Traffic can be shifted gradually using canary or linear deployment strategies.
 
 <br><br>
 
-Pre-traffic and post-traffic hooks allow automated testing, and CloudWatch alarms can trigger automatic rollback.
+Pre-traffic and post-traffic hooks allow automated validation, while CloudWatch alarms can trigger automatic rollback if errors are detected.
 
 <br><br>
 
-This significantly reduces deployment time and minimizes the impact of faulty releases.
+This approach significantly reduces deployment time and minimizes customer impact.
 </div>
 </div>
+
 
 <!-- ================= Q10 ================= -->
 <div class="question">
@@ -392,10 +532,21 @@ Which solution will meet these requirements at the LOWEST cost?
 </pre>
 
 <div class="options">
-<label><input type="radio" name="q20">A. Create an Amazon S3 bucket. Configure the S3 bucket to use the S3 One Zone-Infrequent Access (S3 One Zone-IA) storage class as default. Configure the S3 bucket for website hosting. Create an S3 interface endpoint. Configure the S3 bucket to allow access only through that endpoint.</label>
-<label><input type="radio" name="q20">B. Launch an Amazon EC2 instance with EFS One Zone-IA.</label>
-<label><input type="radio" name="q20">C. Launch an Amazon EC2 instance with Cold HDD EBS.</label>
-<label><input type="radio" name="q20">D. Create an Amazon S3 bucket with Glacier Deep Archive.</label>
+<label><input type="radio" name="q20">
+A. Create an Amazon S3 bucket. Configure the S3 bucket to use the S3 One Zone-Infrequent Access (S3 One Zone-IA) storage class as default. Configure the S3 bucket for website hosting. Create an S3 interface endpoint. Configure the S3 bucket to allow access only through that endpoint.
+</label>
+
+<label><input type="radio" name="q20">
+B. Launch an Amazon EC2 instance that runs a web server. Attach an Amazon Elastic File System (Amazon EFS) file system to store the archived data in the EFS One Zone-Infrequent Access (EFS One Zone-IA) storage class Configure the instance security groups to allow access only from private networks.
+</label>
+
+<label><input type="radio" name="q20">
+C. Launch an Amazon EC2 instance that runs a web server Attach an Amazon Elastic Block Store (Amazon EBS) volume to store the archived data. Use the Cold HDD (sc1) volume type. Configure the instance security groups to allow access only from private networks.
+</label>
+
+<label><input type="radio" name="q20">
+D. Create an Amazon S3 bucket. Configure the S3 bucket to use the S3 Glacier Deep Archive storage class as default. Configure the S3 bucket for website hosting. Create an S3 interface endpoint. Configure the S3 bucket to allow access only through that endpoint.
+</label>
 </div>
 
 <button onclick="showAnswer(this,[0])">Show Answer</button>
@@ -403,19 +554,19 @@ Which solution will meet these requirements at the LOWEST cost?
 <div class="explanation">
 <b>Correct Answer: A</b><br><br>
 
-The primary requirement is <b>lowest cost</b> with private access.
+The primary requirement is lowest cost with private access.
 
 <br><br>
 
-Amazon S3 One Zone-IA is significantly cheaper than standard storage and is suitable because durability already exists elsewhere.
+S3 One Zone-IA provides significantly lower storage cost compared to standard storage and is acceptable because durability already exists elsewhere.
 
 <br><br>
 
-Using an <b>S3 interface endpoint</b> ensures that access remains private and does not traverse the public internet.
+Using an S3 interface endpoint ensures access remains private and does not traverse the public internet.
 
 <br><br>
 
-Website hosting enables simple access through the intranet without additional infrastructure.
+This solution meets security requirements while minimizing cost.
 </div>
 </div>
 
