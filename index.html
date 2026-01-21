@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Solutions Architect Exam Practice</title>
+    <title>AWS Exam Practice - Page 1</title>
     <style>
         * {
             margin: 0;
@@ -19,12 +19,13 @@
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
+            margin-bottom: 30px;
         }
 
         .header {
@@ -32,6 +33,9 @@
             color: white;
             padding: 30px;
             text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header h1 {
@@ -39,9 +43,10 @@
             margin-bottom: 10px;
         }
 
-        .header p {
+        .page-info {
+            font-size: 16px;
             opacity: 0.9;
-            font-size: 14px;
+            margin-top: 5px;
         }
 
         .content {
@@ -50,36 +55,37 @@
 
         .question-card {
             background: #f8f9fa;
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
             border-left: 5px solid #667eea;
-            transition: transform 0.2s;
+            transition: all 0.3s;
         }
 
         .question-card:hover {
-            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .question-header {
             display: flex;
-            align-items: start;
+            align-items: center;
             margin-bottom: 20px;
+            gap: 15px;
         }
 
         .question-number {
             background: #667eea;
             color: white;
-            padding: 8px 15px;
+            padding: 8px 16px;
             border-radius: 50px;
             font-weight: bold;
-            margin-right: 15px;
+            font-size: 16px;
             flex-shrink: 0;
         }
 
         .question-text {
             font-size: 16px;
-            line-height: 1.6;
+            line-height: 1.7;
             color: #2d3748;
             font-weight: 500;
         }
@@ -93,7 +99,7 @@
             border: 2px solid #e2e8f0;
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
@@ -112,18 +118,48 @@
             width: 18px;
             height: 18px;
             flex-shrink: 0;
+            accent-color: #667eea;
         }
 
         .option-text {
             flex: 1;
-            line-height: 1.5;
+            line-height: 1.6;
             color: #4a5568;
+            font-size: 15px;
+        }
+
+        .option-label {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 6px;
+        }
+
+        .show-answer-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .show-answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .show-answer-btn.active {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
         }
 
         .answer-section {
-            background: #fff5f5;
-            border: 2px solid #feb2b2;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid #10b981;
+            border-radius: 10px;
             padding: 20px;
             margin-top: 15px;
             display: none;
@@ -131,51 +167,90 @@
 
         .answer-section.show {
             display: block;
-            animation: fadeIn 0.3s;
+            animation: slideDown 0.3s ease-out;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .correct-answer {
             font-weight: bold;
-            color: #22543d;
+            color: #065f46;
             margin-bottom: 15px;
-            padding: 10px;
-            background: #c6f6d5;
-            border-radius: 5px;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 16px;
+            border-left: 4px solid #10b981;
+        }
+
+        .explanation-title {
+            font-weight: bold;
+            color: #065f46;
+            margin-bottom: 10px;
+            font-size: 15px;
         }
 
         .explanation {
-            color: #2d3748;
+            color: #1f2937;
             line-height: 1.7;
             white-space: pre-line;
+            font-size: 14px;
         }
 
-        .show-answers-btn {
+        .navigation {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 40px 30px;
+            background: #f9fafb;
+            border-top: 2px solid #e5e7eb;
+        }
+
+        .nav-btn {
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-btn.prev {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .nav-btn.next {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            display: block;
-            margin: 30px auto;
-            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
         }
 
-        .show-answers-btn:hover {
+        .nav-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.5);
         }
 
-        .show-answers-btn:active {
-            transform: translateY(0);
+        .nav-btn.next:hover {
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none !important;
         }
 
         @media (max-width: 768px) {
@@ -184,6 +259,10 @@
             }
 
             .content {
+                padding: 20px;
+            }
+
+            .header {
                 padding: 20px;
             }
 
@@ -197,10 +276,16 @@
 
             .question-header {
                 flex-direction: column;
+                align-items: flex-start;
             }
 
-            .question-number {
-                margin-bottom: 10px;
+            .navigation {
+                flex-direction: column;
+            }
+
+            .nav-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -209,12 +294,19 @@
     <div class="container">
         <div class="header">
             <h1>AWS Solutions Architect Practice Exam</h1>
-            <p>Select your answers and click "Show Answers" to see results</p>
+            <div class="page-info">Page 1 | Questions 211-220</div>
         </div>
 
         <div class="content" id="questionsContainer"></div>
 
-        <button class="show-answers-btn" onclick="showAllAnswers()">Show Answers & Explanations</button>
+        <div class="navigation">
+            <button class="nav-btn prev" disabled>
+                ← Previous Page
+            </button>
+            <button class="nav-btn next" onclick="nextPage()">
+                Next Page (Questions 221-230) →
+            </button>
+        </div>
     </div>
 
     <script>
@@ -229,7 +321,7 @@
                     "Use AWS Systems Manager to install CloudWatch agent on all VMs. Send performance metrics to CloudWatch. Build a server utilization dashboard in QuickSight and manually identify idle servers."
                 ],
                 correct: "C",
-                explanation: "Migration Evaluator (formerly TSO Logic) provides: Agentless data collection from the ESXi hypervisor, Automatic performance & utilization analysis, Right-sizing recommendations, Cost modeling for migration, Import directly into AWS Migration Hub, Zero need to touch each VM individually."
+                explanation: "Migration Evaluator (formerly TSO Logic) provides:\n• Agentless data collection from the ESXi hypervisor\n• Automatic performance & utilization analysis\n• Right-sizing recommendations\n• Cost modeling for migration\n• Import directly into AWS Migration Hub\n• Zero need to touch each VM individually"
             },
             {
                 number: 212,
@@ -241,7 +333,7 @@
                     "Write the data to an Amazon SNS topic. Invoke the Lambda function to write to the database when the topic receives messages. Configure provisioned concurrency for the Lambda to match the database's supported connections."
                 ],
                 correct: "A",
-                explanation: "Option A uses Amazon SQS as a buffer and Lambda reserved concurrency to throttle write operations. SQS stores incoming write requests and smooths traffic spikes. Reserved Concurrency on Lambda limits concurrent executions to a safe number (e.g., if DB supports 5 connections, set concurrency = 5). This ensures the DB never receives more writes than it can handle, with no database migration needed."
+                explanation: "Option A uses Amazon SQS as a buffer and Lambda reserved concurrency to throttle write operations.\n\nHow it solves the problem:\n• SQS Queue stores incoming write requests and smooths traffic spikes\n• Reserved Concurrency on Lambda limits concurrent executions to a safe number (e.g., if DB supports 5 connections, set concurrency = 5)\n• Ensures the DB never receives more writes than it can handle\n• No database migration needed - continues using the existing on-prem SQL database"
             },
             {
                 number: 213,
@@ -253,7 +345,7 @@
                     "Configure AWS Backup to back up the EC2 instance hourly. Restore the EC2 from the newest snapshot in another Availability Zone when required."
                 ],
                 correct: "B",
-                explanation: "Managed Grafana = No servers to maintain (Fully managed by AWS, Automatic scaling and high availability, No patching, no EC2, no ALB, no Auto Scaling groups). Dashboards can be imported - Existing Grafana JSON dashboards can be exported from EC2 Grafana and imported directly into Managed Grafana. Downtime < 10 min - Cutover can happen quickly. Meets all requirements: Highly available, Preserves dashboards, Minimal maintenance, No infrastructure to maintain, AWS-native integrations."
+                explanation: "Managed Grafana provides:\n• No servers to maintain - Fully managed by AWS\n• Automatic scaling and high availability\n• No patching, no EC2, no ALB, no Auto Scaling groups\n• Dashboards can be imported - Existing Grafana JSON dashboards can be exported and imported directly\n• Downtime < 10 min - Quick cutover\n• Meets all requirements: HA, preserves dashboards, minimal maintenance, AWS-native integrations"
             },
             {
                 number: 214,
@@ -265,7 +357,7 @@
                     "Migrate the database to Amazon Neptune using AWS SCT. Configure CloudWatch to invoke a Lambda function for yearly password rotation."
                 ],
                 correct: "B",
-                explanation: "Amazon RDS for Oracle with AWS Secrets Manager provides fully automated password rotation with minimal operational overhead. Secrets Manager has built-in automatic rotation capabilities and integrates seamlessly with RDS for Oracle."
+                explanation: "Amazon RDS for Oracle with AWS Secrets Manager provides:\n• Fully automated password rotation with minimal operational overhead\n• Secrets Manager has built-in automatic rotation capabilities\n• Seamless integration with RDS for Oracle\n• No custom Lambda functions needed\n• Simple yearly rotation schedule configuration"
             },
             {
                 number: 215,
@@ -278,7 +370,7 @@
                     "Use AWS Direct Connect for connectivity to the on-premises network."
                 ],
                 correct: "B, D",
-                explanation: "B: Create a VPC in a shared services account and share subnets via AWS RAM - Instead of creating a separate VPC for each team, create a single VPC in a shared services account and share needed subnets to other accounts using Resource Access Manager. Benefits: Centralized VPC → easier management, Less NAT Gateways, fewer VPNs → much cheaper.\n\nD: Use AWS Site-to-Site VPN for on-premises connectivity - Traffic < 50 Mbps → VPN is the cheapest option. No need for expensive Direct Connect or Transit Gateway. Simple and cost-effective, works well for low-throughput workloads."
+                explanation: "B: Create a VPC in a shared services account and share subnets via AWS RAM\n• Create a single VPC in a shared services account\n• Share needed subnets to other accounts using Resource Access Manager\n• Benefits: Centralized VPC → easier management, Less NAT Gateways, fewer VPNs → much cheaper\n\nD: Use AWS Site-to-Site VPN for on-premises connectivity\n• Traffic < 50 Mbps → VPN is the cheapest option\n• No need for expensive Direct Connect or Transit Gateway\n• Simple and cost-effective for low-throughput workloads"
             },
             {
                 number: 216,
@@ -290,7 +382,7 @@
                     "In each AWS account, create an Auto Scaling group of network-optimized Amazon EC2 instances that run an open-source internet proxy for rule-based filtering. Modify all default routes to point to the proxy's Auto Scaling group."
                 ],
                 correct: "B",
-                explanation: "AWS Network Firewall is designed for centralized, scalable, managed rule-based filtering. It's fully managed, handles tens of Gbps per AZ (meets the 25 Gbps requirement), and supports deep packet inspection, FQDN filtering, access control, and intrusion prevention. Centralized filtering is supported by deploying everything in a shared egress VPC. This provides the simplest multi-account governance model using Transit Gateway, Network Firewall endpoints, and NAT Gateway with centralized routing. No EC2 management required (No patches, No Auto Scaling, No failover logic, No maintenance of proxy instances)."
+                explanation: "AWS Network Firewall is designed for centralized, scalable, managed rule-based filtering:\n• Fully managed service\n• Handles tens of Gbps per AZ (meets the 25 Gbps requirement)\n• Supports deep packet inspection, FQDN filtering, access control, intrusion prevention\n• Centralized filtering in a shared egress VPC\n• Simplest multi-account governance using Transit Gateway + Network Firewall endpoints\n• No EC2 management (No patches, No Auto Scaling, No failover logic)"
             },
             {
                 number: 217,
@@ -302,7 +394,7 @@
                     "Configure a Multi-AZ Auto Scaling group using the application's AMI. Create an Application Load Balancer (ALB) and select the previously created Auto Scaling group as the target. Create an Amazon Kinesis Data Firehose with a destination of the third-party auditing application. Create a web ACL in WAF. Create an AWS WAF using the web ACL and ALB, then enable logging by selecting the Kinesis Data Firehose as the destination. Subscribe to AWS Managed Rules in AWS Marketplace, choosing the WAF as the subscriber."
                 ],
                 correct: "D",
-                explanation: "Option D meets all requirements:\n✓ Multi-AZ Auto Scaling group → High Availability\n✓ ALB → Load balancing and WAF integration\n✓ AWS WAF with Web ACL + Managed Rules → Protection from common attacks\n✓ Kinesis Data Firehose → Direct integration with 3rd-party audit system\n✓ WAF logging to Firehose → WAF rejected requests sent to auditing app\n\nFirehose is the only service that can forward logs to an external third-party directly, without custom code."
+                explanation: "Option D meets all requirements:\n✓ Multi-AZ Auto Scaling group → High Availability\n✓ ALB → Load balancing and WAF integration\n✓ AWS WAF with Web ACL + Managed Rules → Protection from common attacks\n✓ Kinesis Data Firehose → Direct integration with 3rd-party audit system (no custom code needed)\n✓ WAF logging to Firehose → Rejected requests sent to auditing app automatically"
             },
             {
                 number: 218,
@@ -314,7 +406,7 @@
                     "Create an accelerator in AWS Global Accelerator, and connect the accelerator to the API Gateway. Update the route table for all VPC subnets with a route to the Global Accelerator endpoint IP address. Add an API key for each service to use for authentication."
                 ],
                 correct: "B",
-                explanation: "Solution steps:\n1. Create an Interface VPC Endpoint for API Gateway (PrivateLink) - Ensures traffic stays inside AWS network, provides a private IP inside your VPC for API Gateway, avoids the public internet entirely\n2. Restrict API access with endpoint policy - Only allow this specific API to be reachable, enforces least privilege\n3. Add API Gateway resource policy - Ensures API can only be invoked from the VPC endpoint, blocks ALL public internet access\n4. Change API Gateway endpoint type to Private - Makes the API reachable only through VPC endpoints, no public endpoint is created"
+                explanation: "Solution steps:\n1. Create an Interface VPC Endpoint for API Gateway (PrivateLink)\n   • Traffic stays inside AWS network\n   • Provides private IP inside your VPC\n   • Avoids public internet entirely\n\n2. Restrict API access with endpoint policy\n   • Only allow this specific API to be reachable\n   • Enforces least privilege\n\n3. Add API Gateway resource policy\n   • API can only be invoked from the VPC endpoint\n   • Blocks ALL public internet access\n\n4. Change API Gateway endpoint type to Private\n   • Reachable only through VPC endpoints"
             },
             {
                 number: 219,
@@ -326,7 +418,7 @@
                     "Enable AWS Config on the EC2 security groups to track any noncompliant changes. Send the changes as alerts through an Amazon SNS topic."
                 ],
                 correct: "D",
-                explanation: "Enable AWS Config + SNS Alerts. AWS Config provides: Out-of-the-box rules for security groups, Automatic configuration change tracking, Built-in compliance evaluation, Direct integration with SNS for alerts. This is the fastest solution as it requires minimal setup and provides immediate tracking and alerting capabilities."
+                explanation: "Enable AWS Config + SNS Alerts provides:\n• Out-of-the-box rules for security groups\n• Automatic configuration change tracking\n• Built-in compliance evaluation\n• Direct integration with SNS for alerts\n• Fastest solution with minimal setup\n• Immediate tracking and alerting capabilities\n\nThis is the quickest way to implement tracking and alerting for security group compliance."
             },
             {
                 number: 220,
@@ -340,7 +432,7 @@
                     "Configure the stream to use dynamic partitioning."
                 ],
                 correct: "A, C, E",
-                explanation: "A - Increase the number of shards (Resharding Up): Increasing shards increases total read throughput, increases total parallelism, reduces consumer throttling, and allows more applications to read data simultaneously.\n\nC - Use Enhanced Fan-Out Consumers: Enhanced fan-out gives 2 MB/s dedicated throughput per consumer per shard, avoids shared throughput limits, eliminates consumers blocking each other, and removes most ReadProvisionedThroughputExceeded errors.\n\nE - Add retry + exponential backoff: Even with improved throughput, AWS recommends retries for throttled reads and backoff to ease contention. This prevents consumers from hammering the shard and increasing throttles."
+                explanation: "A - Increase the number of shards (Resharding Up):\n• Increases total read throughput\n• Increases total parallelism\n• Reduces consumer throttling\n• Allows more applications to read data simultaneously\n\nC - Use Enhanced Fan-Out Consumers:\n• Gives 2 MB/s dedicated throughput per consumer per shard\n• Avoids shared throughput limits\n• Eliminates consumers blocking each other\n• Removes most ReadProvisionedThroughputExceeded errors\n\nE - Add retry + exponential backoff:\n• AWS recommends retries for throttled reads\n• Backoff eases contention\n• Prevents consumers from hammering the shard"
             }
         ];
 
@@ -358,7 +450,10 @@
                     optionsHTML += `
                         <label class="option">
                             <input type="checkbox" name="q${index}" value="${optionLetter}">
-                            <span class="option-text"><strong>${optionLetter}.</strong> ${option}</span>
+                            <span class="option-text">
+                                <span class="option-label">${optionLetter}.</span>
+                                ${option}
+                            </span>
                         </label>
                     `;
                 });
@@ -371,8 +466,12 @@
                     <div class="options">
                         ${optionsHTML}
                     </div>
+                    <button class="show-answer-btn" onclick="toggleAnswer(${index})">
+                        Show Answer & Explanation
+                    </button>
                     <div class="answer-section" id="answer-${index}">
                         <div class="correct-answer">✓ Correct Answer: ${q.correct}</div>
+                        <div class="explanation-title">📝 Explanation:</div>
                         <div class="explanation">${q.explanation}</div>
                     </div>
                 `;
@@ -381,13 +480,25 @@
             });
         }
 
-        function showAllAnswers() {
-            questions.forEach((q, index) => {
-                const answerSection = document.getElementById(`answer-${index}`);
-                answerSection.classList.add('show');
-            });
+        function toggleAnswer(index) {
+            const answerSection = document.getElementById(`answer-${index}`);
+            const button = document.querySelectorAll('.show-answer-btn')[index];
             
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (answerSection.classList.contains('show')) {
+                answerSection.classList.remove('show');
+                button.textContent = 'Show Answer & Explanation';
+                button.classList.remove('active');
+            } else {
+                answerSection.classList.add('show');
+                button.textContent = 'Hide Answer';
+                button.classList.add('active');
+                answerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+
+        function nextPage() {
+            alert('Please provide the next 10 questions (221-230), and I will create Page 2 for you!');
+            // In actual implementation: window.location.href = 'page-2.html';
         }
 
         renderQuestions();
