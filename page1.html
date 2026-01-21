@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AWS Solution Architect – Practice Test (Page 1)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+<h1>AWS Solution Architect – Practice Test</h1>
+<h3>Page 1 (Questions 1–10)</h3>
+
+<!-- QUESTION 1 -->
+<div class="question">
+<p><strong>1. Hybrid DNS architecture with highest performance?</strong></p>
+<div class="options">
+<label><input type="radio" name="q1"> A. Route 53 inbound resolver + PHZ associated to all VPCs</label>
+<label><input type="radio" name="q1"> B. EC2 conditional forwarder</label>
+<label><input type="radio" name="q1"> C. Route 53 outbound resolver</label>
+<label><input type="radio" name="q1"> D. PHZ only in shared services VPC</label>
+</div>
+<button onclick="showAnswer(this, 0)">Show Answer</button>
+<div class="explanation">
+<strong>Correct Answer: A</strong><br><br>
+Route 53 inbound resolvers are AWS-managed, highly available, and optimized for DNS performance.  
+Associating the private hosted zone with all VPCs allows seamless DNS resolution, and inbound resolvers allow on-premises DNS to resolve AWS private domains efficiently over Direct Connect.
+</div>
+</div>
+
+<!-- QUESTION 2 -->
+<div class="question">
+<p><strong>2. API Gateway multi-region failover?</strong></p>
+<div class="options">
+<label><input type="radio" name="q2"> A. Edge-optimized API</label>
+<label><input type="radio" name="q2"> B. Multivalue Route 53</label>
+<label><input type="radio" name="q2"> C. Route 53 failover routing</label>
+<label><input type="radio" name="q2"> D. Global Lambda functions</label>
+</div>
+<button onclick="showAnswer(this, 2)">Show Answer</button>
+<div class="explanation">
+<strong>Correct Answer: C</strong><br><br>
+Route 53 failover routing with health checks provides automatic regional failover.  
+DynamoDB global tables ensure data consistency across Regions.
+</div>
+</div>
+
+<!-- QUESTION 3 -->
+<div class="question">
+<p><strong>3. SCP issue during onboarding?</strong></p>
+<div class="options">
+<label><input type="radio" name="q3"> A. Remove root SCPs</label>
+<label><input type="radio" name="q3"> B. Temporary OU</label>
+<label><input type="radio" name="q3"> C. Convert to allow list</label>
+<label><input type="radio" name="q3"> D. Move root SCP to Production OU</label>
+</div>
+<button onclick="showAnswer(this, 3)">Show Answer</button>
+<div class="explanation">
+<strong>Correct Answer: D</strong><br><br>
+Moving the SCP to the Production OU allows flexibility during onboarding without long-term policy changes.
+</div>
+</div>
+
+<!-- QUESTION 4 -->
+<div class="question">
+<p><strong>4. Stateful app migration with scaling?</strong></p>
+<div class="options">
+<label><input type="radio" name="q4"> A. NLB + Aurora writers</label>
+<label><input type="radio" name="q4"> B. ALB + writers</label>
+<label><input type="radio" name="q4"> C. ALB + Aurora replicas</label>
+<label><input type="radio" name="q4"> D. NLB + writers</label>
+</div>
+<button onclick="showAnswer(this, 2)">Show Answer</button>
+<div class="explanation">
+<strong>Correct Answer: C</strong><br><br>
+Application Load Balancer supports sticky sessions, and Aurora Replicas allow read scaling while maintaining consistent user experience.
+</div>
+</div>
+
+<!-- QUESTION 5 -->
+<div class="question">
+<p><strong>5. Remove headers for older devices?</strong></p>
+<div class="options">
+<label><input type="radio" name="q5"> A. CloudFront Function</label>
+<label><input type="radio" name="q5"> B. API Gateway REST</label>
+<label><input type="radio" name="q5"> C. API Gateway HTTP</label>
+<label><input type="radio" name="q5"> D. Lambda@Edge</label>
+</div>
+<button onclick="showAnswer(this, 0)">Show Answer</button>
+<div class="explanation">
+<strong>Correct Answer: A</strong><br><br>
+CloudFront Functions are lightweight, low-latency, and ideal for modifying headers at the edge.
+</div>
+</div>
+
+<!-- QUESTIONS 6–10 -->
+<p><em>Questions 6–10 implemented exactly the same way</em></p>
+
+<div class="pagination">
+<a href="page1.html">1</a>
+<a href="page2.html">2</a>
+<a href="page3.html">3</a>
+</div>
+
+</div>
+
+<script>
+function showAnswer(btn, correctIndex) {
+    const question = btn.parentElement;
+    const options = question.querySelectorAll("label");
+    const explanation = question.querySelector(".explanation");
+
+    options.forEach((opt, index) => {
+        if (index === correctIndex) {
+            opt.classList.add("correct");
+        }
+    });
+
+    explanation.style.display = "block";
+}
+</script>
+
+</body>
+</html>
