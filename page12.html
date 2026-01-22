@@ -1,0 +1,2169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 12</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page11.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page13.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 12)</h1>
+
+<!-- ================= Q101 ================= -->
+<div class="question">
+<pre>
+<b>Question 101 </b>
+
+A company is running applications on AWS in a multi-account environment. The company's sales team and marketing team use separate AWS accounts in AWS Organizations.
+The sales team stores petabytes of data in an Amazon S3 bucket. The marketing team uses Amazon QuickSight for data visualizations. The marketing team needs access to data that the sales team stores in the S3 bucket.
+The company has encrypted the S3 bucket with an AWS Key Management Service (AWS KMS) key. The marketing team has already created the IAM service role for QuickSight to provide QuickSight access in the marketing AWS account.
+The company needs a solution that will provide secure access to the data in the S3 bucket across AWS accounts.
+
+Which solution will meet these requirements with the LEAST operational overhead?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q101" value="A">
+    <span>A. Create a new S3 bucket in the marketing account. Create an S3 replication rule in the sales account to copy the objects to the new S3 bucket in the marketing account. Update the QuickSight permissions in the marketing account to grant access to the new S3 bucket.</span>
+  </label>
+  <label>
+    <input type="radio" name="q101" value="B">
+    <span>B. Create an SCP to grant access to the S3 bucket to the marketing account. Use AWS Resource Access Manager (AWS RAM) to share the KMS key from the sales account with the marketing account. Update the QuickSight permissions in the marketing account to grant access to the S3 bucket.</span>
+  </label>
+  <label>
+    <input type="radio" name="q101" value="C">
+    <span>C. Update the S3 bucket policy in the marketing account to grant access to the QuickSight role. Create a KMS grant for the encryption key that is used in the S3 bucket. Grant decrypt access to the QuickSight role. Update the QuickSight permissions in the marketing account to grant access to the S3 bucket.</span>
+  </label>
+  <label>
+    <input type="radio" name="q101" value="D">
+    <span>D. Create an IAM role in the sales account and grant access to the S3 bucket. From the marketing account, assume the IAM role in the sales account to access the S3 bucket. Update the QuickSight role to create a trust relationship with the new IAM role in the sales account.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q101', 'D', this, exp101)">Check Answer</button>
+
+<div class="explanation" id="exp101">
+  <button class="close-explanation" onclick="hideExplanation('exp101')">Close</button>
+  <b>✅ Correct Answer: D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Let's forget AWS service names for a moment and think like an architect.
+  <br><br>
+  <b>🔑 Step 1: Identify the OWNER (most important step)</b>
+  <br><br>
+  <b>S3 bucket</b> → owned by sales account
+  <br>
+  <b>KMS key</b> → owned by sales account
+  <br>
+  <b>QuickSight</b> → runs in marketing account
+  <br><br>
+  <b>👉 Rule you must memorize for SAP-C02:</b>
+  <br><br>
+  <b>The account that owns the resource must grant access</b>
+  <br><br>
+  This rule alone answers ~30% of Professional-level IAM and security questions.
+  <br><br>
+  <b>🔑 Step 2: Identify the real requirement</b>
+  <br><br>
+  The question is not asking:
+  <br>
+  "How can QuickSight read S3?"
+  <br>
+  "How do I configure KMS?"
+  <br><br>
+  It is asking:
+  <br><br>
+  <b>"How do I give another AWS account secure access to my data with the LEAST operational overhead?"</b>
+  <br><br>
+  This is a cross-account access design question.
+  <br><br>
+  <b>🔑 Step 3: Recognize AWS's preferred cross-account pattern</b>
+  <br><br>
+  AWS has one preferred solution for this scenario:
+  <br><br>
+  <b>Cross-account IAM role assumption</b>
+  <br><br>
+  Why?
+  <br><br>
+  ✓ No credentials sharing
+  <br>
+  ✓ No data duplication
+  <br>
+  ✓ Native KMS support
+  <br>
+  ✓ Auditable and reversible
+  <br>
+  ✓ Scales cleanly
+  <br><br>
+  <b>✅ Why Option D is Correct (Deep Dive)</b>
+  <br><br>
+  <b>What Option D does architecturally</b>
+  <br><br>
+  <b>Sales account (resource owner)</b>
+  <br><br>
+  Creates an IAM role
+  <br>
+  Grants:
+  <br>
+  • s3:GetObject
+  <br>
+  • kms:Decrypt
+  <br><br>
+  <b>Marketing account</b>
+  <br><br>
+  QuickSight assumes the role using sts:AssumeRole
+  <br><br>
+  <b>Result</b>
+  <br><br>
+  ✓ Data stays in one place
+  <br>
+  ✓ Encryption stays intact
+  <br>
+  ✓ Access is controlled by the owner
+  <br><br>
+  This is exactly how AWS designs:
+  <br><br>
+  • Cross-account analytics
+  <br>
+  • Cross-account data lakes
+  <br>
+  • Cross-account security boundaries
+  <br><br>
+  <b>🧠 Why AWS LOVES this solution</b>
+  <br><br>
+  <b>Least operational overhead</b>
+  <br><br>
+  • No replication jobs
+  <br>
+  • No syncing
+  <br>
+  • No lifecycle coordination
+  <br><br>
+  <b>Security-first</b>
+  <br><br>
+  • Least privilege
+  <br>
+  • Short-lived credentials
+  <br><br>
+  <b>Cost-efficient</b>
+  <br><br>
+  • No duplicate petabytes of data
+  <br><br>
+  This answer is textbook AWS architecture.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Very Important for Exam)</b>
+  <br><br>
+  <b>❌ Option A — S3 Replication</b>
+  <br><br>
+  <b>Why people pick it</b>
+  <br><br>
+  "Marketing needs the data → copy it"
+  <br><br>
+  <b>Why this fails architecturally</b>
+  <br><br>
+  • Petabytes of data → massive cost
+  <br>
+  • Continuous replication → ongoing ops
+  <br>
+  • Duplicate KMS-encrypted objects
+  <br>
+  • Violates "least operational overhead"
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If replication is not explicitly required, and data is large → replication is wrong
+  <br><br>
+  <b>❌ Option B — SCP + RAM (Classic Professional Trap)</b>
+  <br><br>
+  <b>Trap #1: SCP misunderstanding</b>
+  <br><br>
+  SCPs do NOT grant permissions
+  <br>
+  SCPs only restrict what accounts can do
+  <br><br>
+  <b>You cannot use an SCP to give S3 access. Ever.</b>
+  <br><br>
+  <b>Trap #2: RAM misunderstanding</b>
+  <br><br>
+  AWS RAM cannot share S3 buckets
+  <br>
+  RAM also does not share KMS keys this way
+  <br><br>
+  This option combines two misused services.
+  <br><br>
+  AWS uses this type of option to catch:
+  <br><br>
+  "I've heard of SCP and RAM but don't know what they do"
+  <br><br>
+  <b>❌ Option C — Bucket policy in the WRONG account</b>
+  <br><br>
+  This option looks technical, so it fools many people.
+  <br><br>
+  <b>The fatal flaw</b>
+  <br><br>
+  "Update the S3 bucket policy in the marketing account"
+  <br><br>
+  <b>⚠️ The bucket is in the sales account.</b>
+  <br><br>
+  You cannot update a bucket policy from an account that does not own the bucket.
+  <br><br>
+  This is a deliberate exam typo / trap.
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Always check which account owns the resource before trusting a policy answer.
+  <br><br>
+  <b>🧠 Key Takeaways to Remember for the Exam</b>
+  <br><br>
+  ✓ Resource owner grants access
+  <br>
+  ✓ Cross-account access = IAM role assumption
+  <br>
+  ✓ SCPs never grant access
+  <br>
+  ✓ Replication ≠ least operational overhead
+  <br>
+  ✓ If KMS is involved → IAM roles integrate cleanly
+</div>
+
+</div>
+
+<!-- ================= Q102 ================= -->
+<div class="question">
+<pre>
+<b>Question 102 </b>
+
+A company is planning to migrate its business-critical applications from an on-premises data center to AWS. The company has an on-premises installation of a Microsoft SQL Server Always On cluster.
+The company wants to migrate to an AWS managed database service. A solutions architect must design a heterogeneous database migration on AWS.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q102" value="A">
+    <span>A. Migrate the SQL Server databases to Amazon RDS for MySQL by using backup and restore utilities.</span>
+  </label>
+  <label>
+    <input type="radio" name="q102" value="B">
+    <span>B. Use an AWS Snowball Edge Storage Optimized device to transfer data to Amazon S3. Set up Amazon RDS for MySQL. Use S3 integration with SQL Server features, such as BULK INSERT.</span>
+  </label>
+  <label>
+    <input type="radio" name="q102" value="C">
+    <span>C. Use the AWS Schema Conversion Tool to translate the database schema to Amazon RDS for MySQL. Then use AWS Database Migration Service (AWS DMS) to migrate the data from on-premises databases to Amazon RDS.</span>
+  </label>
+  <label>
+    <input type="radio" name="q102" value="D">
+    <span>D. Use AWS DataSync to migrate data over the network between on-premises storage and Amazon S3. Set up Amazon RDS for MySQL. Use S3 integration with SQL Server features, such as BULK INSERT.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q102', 'C', this, exp102)">Check Answer</button>
+
+<div class="explanation" id="exp102">
+  <button class="close-explanation" onclick="hideExplanation('exp102')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a classic SAP-C02 database migration question.
+  <br>
+  AWS expects you to recognize a named migration pattern, not invent a solution.
+  <br><br>
+  <b>🔑 Step 1: Understand the keyword that decides everything</b>
+  <br><br>
+  The most important word in the question is:
+  <br><br>
+  <b>"heterogeneous database migration"</b>
+  <br><br>
+  <b>What "heterogeneous" means (EXAM DEFINITION)</b>
+  <br><br>
+  Source database engine ≠ target database engine
+  <br><br>
+  Example:
+  <br><br>
+  • SQL Server → MySQL
+  <br>
+  • Oracle → PostgreSQL
+  <br>
+  • SQL Server → Aurora MySQL
+  <br><br>
+  This single word eliminates half the options immediately.
+  <br><br>
+  <b>🔑 Step 2: AWS's OFFICIAL heterogeneous migration process</b>
+  <br><br>
+  AWS has a documented, two-step process for heterogeneous migrations:
+  <br><br>
+  <b>✅ Step 1: Convert the schema and code</b>
+  <br><br>
+  ➡ <b>AWS Schema Conversion Tool (SCT)</b>
+  <br><br>
+  Converts:
+  <br><br>
+  • Tables
+  <br>
+  • Indexes
+  <br>
+  • Stored procedures
+  <br>
+  • Views
+  <br>
+  • Handles engine differences
+  <br><br>
+  <b>✅ Step 2: Move the data</b>
+  <br><br>
+  ➡ <b>AWS Database Migration Service (DMS)</b>
+  <br><br>
+  • One-time load
+  <br>
+  • Or continuous replication
+  <br>
+  • Minimal downtime
+  <br><br>
+  <b>🧠 This combo (SCT + DMS) is a guaranteed exam answer whenever you see "heterogeneous".</b>
+  <br><br>
+  <b>✅ Why Option C is Correct (Deep Dive)</b>
+  <br><br>
+  Option C explicitly says:
+  <br><br>
+  1. Use SCT to translate schema
+  <br>
+  2. Use DMS to migrate data
+  <br><br>
+  This exactly matches:
+  <br><br>
+  • AWS documentation
+  <br>
+  • AWS whitepapers
+  <br>
+  • AWS certification expectations
+  <br><br>
+  It:
+  <br><br>
+  ✓ Supports Always On clusters
+  <br>
+  ✓ Minimizes downtime
+  <br>
+  ✓ Uses managed AWS services
+  <br>
+  ✓ Scales safely for business-critical workloads
+  <br><br>
+  <b>✅ This is the textbook answer.</b>
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Very Important)</b>
+  <br><br>
+  <b>❌ Option A — Backup & Restore</b>
+  <br><br>
+  <b>Why beginners choose it</b>
+  <br><br>
+  "We migrate databases with backups"
+  <br><br>
+  <b>Why AWS rejects it</b>
+  <br><br>
+  • Backup/restore assumes same engine
+  <br>
+  • SQL Server backup cannot restore into MySQL
+  <br>
+  • No schema translation
+  <br>
+  • No stored procedure conversion
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If source ≠ target engine → backup/restore is WRONG.
+  <br><br>
+  <b>❌ Option B — Snowball + BULK INSERT</b>
+  <br><br>
+  <b>Why this sounds attractive</b>
+  <br><br>
+  • Snowball = big data
+  <br>
+  • BULK INSERT = SQL feature
+  <br><br>
+  <b>Why it fails architecturally</b>
+  <br><br>
+  • Snowball moves files, not database logic
+  <br>
+  • No schema conversion
+  <br>
+  • No referential integrity handling
+  <br>
+  • No transactional consistency
+  <br><br>
+  Snowball is for:
+  <br><br>
+  • File systems
+  <br>
+  • Data lakes
+  <br>
+  • Archival data
+  <br><br>
+  <b>❌ Not for live database migration.</b>
+  <br><br>
+  <b>❌ Option D — DataSync + BULK INSERT</b>
+  <br><br>
+  <b>Common misunderstanding</b>
+  <br><br>
+  "DataSync moves data, so it should work"
+  <br><br>
+  <b>Reality</b>
+  <br><br>
+  DataSync moves:
+  <br><br>
+  • Files
+  <br>
+  • Folders
+  <br><br>
+  Databases are not files
+  <br><br>
+  • No schema translation
+  <br>
+  • No transactional safety
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If the option moves files (DataSync, Snowball, S3) →
+  <br>
+  It is not a database migration solution.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways (Memorize These)</b>
+  <br><br>
+  ✓ Heterogeneous = SCT + DMS
+  <br>
+  ✓ Backup/restore works only for homogeneous migrations
+  <br>
+  ✓ Snowball & DataSync ≠ database migration tools
+  <br>
+  ✓ AWS exams love named migration patterns
+  <br>
+  ✓ Always map:
+  <br>
+  &nbsp;&nbsp;• Schema conversion → SCT
+  <br>
+  &nbsp;&nbsp;• Data movement → DMS
+</div>
+
+</div>
+
+<!-- ================= Q103 ================= -->
+<div class="question">
+<pre>
+<b>Question 103</b>
+
+A publishing company's design team updates the icons and other static assets that an ecommerce web application uses. The company serves the icons and assets from an Amazon S3 bucket that is hosted in the company's production account. The company also uses a development account that members of the design team can access.
+After the design team tests the static assets in the development account, the design team needs to load the assets into the S3 bucket in the production account. A solutions architect must provide the design team with access to the production account without exposing other parts of the web application to the risk of unwanted changes.
+
+Which combination of steps will meet these requirements? (Choose three.)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q103" value="A">
+    <span>A. In the production account, create a new IAM policy that allows read and write access to the S3 bucket.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q103" value="B">
+    <span>B. In the development account, create a new IAM policy that allows read and write access to the S3 bucket.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q103" value="C">
+    <span>C. In the production account, create a role. Attach the new policy to the role. Define the development account as a trusted entity.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q103" value="D">
+    <span>D. In the development account, create a role. Attach the new policy to the role. Define the production account as a trusted entity.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q103" value="E">
+    <span>E. In the development account, create a group that contains all the IAM users of the design team. Attach a different IAM policy to the group to allow the sts:AssumeRole action on the role in the production account.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q103" value="F">
+    <span>F. In the development account, create a group that contains all the IAM users of the design team. Attach a different IAM policy to the group to allow the sts:AssumeRole action on the role in the development account.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q103', ['A','C','E'], this, exp103)">Check Answer</button>
+
+<div class="explanation" id="exp103">
+  <button class="close-explanation" onclick="hideExplanation('exp103')">Close</button>
+  <b>✅ Correct Answers: A, C, E</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a pure IAM architecture question.
+  <br>
+  No S3 tricks. No networking tricks. Just correct cross-account access design.
+  <br><br>
+  <b>🔑 Step 1: Identify the REAL requirement</b>
+  <br><br>
+  The key sentence is:
+  <br><br>
+  <b>"without exposing other parts of the web application to the risk of unwanted changes"</b>
+  <br><br>
+  This tells us:
+  <br><br>
+  ❌ No broad permissions
+  <br>
+  ❌ No access to production resources beyond S3
+  <br>
+  ✅ Least privilege
+  <br>
+  ✅ Temporary access
+  <br>
+  ✅ Controlled access
+  <br><br>
+  This immediately eliminates IAM users in production.
+  <br><br>
+  <b>🔑 Step 2: Identify where the resource lives</b>
+  <br><br>
+  <b>S3 bucket</b> → production account
+  <br>
+  <b>Design team users</b> → development account
+  <br><br>
+  <b>🧠 Rule you must internalize:</b>
+  <br><br>
+  <b>Permissions live where the resource lives</b>
+  <br><br>
+  If the bucket is in production, permissions must be defined in production.
+  <br><br>
+  <b>🔑 Step 3: Recognize the AWS-recommended pattern</b>
+  <br><br>
+  This is the standard AWS cross-account access pattern:
+  <br><br>
+  1. Policy in the resource account
+  <br>
+  2. Role in the resource account
+  <br>
+  3. Trust relationship to another account
+  <br>
+  4. AssumeRole permission in the calling account
+  <br><br>
+  If you see "Choose three" and cross-account access →
+  <br>
+  AWS is testing whether you know this sequence.
+  <br><br>
+  <b>✅ Why A, C, and E are CORRECT</b>
+  <br><br>
+  <b>✅ Option A — IAM policy in production</b>
+  <br><br>
+  Create a policy in the production account that allows read/write access to the S3 bucket
+  <br><br>
+  <b>Why this is required</b>
+  <br><br>
+  • The bucket is in production
+  <br>
+  • Permissions must be attached where the resource exists
+  <br>
+  • This policy defines exactly what the design team can do
+  <br><br>
+  <b>🧠 This policy will later be attached to a role.</b>
+  <br><br>
+  <b>✅ Option C — Role in production with trust to development</b>
+  <br><br>
+  Create a role in production and trust the development account
+  <br><br>
+  <b>Why this is critical</b>
+  <br><br>
+  • Roles are the bridge between accounts
+  <br>
+  • Trust policy answers:
+  <br>
+  &nbsp;&nbsp;<b>👉 "Who is allowed to assume this role?"</b>
+  <br><br>
+  This step:
+  <br><br>
+  ✓ Keeps production secure
+  <br>
+  ✓ Avoids IAM users in production
+  <br>
+  ✓ Enables temporary credentials
+  <br><br>
+  <b>✅ Option E — Allow users to assume the production role</b>
+  <br><br>
+  Allow the design team group to use sts:AssumeRole
+  <br><br>
+  <b>Why this completes the chain</b>
+  <br><br>
+  Even if:
+  <br><br>
+  • The role exists
+  <br>
+  • The trust relationship exists
+  <br><br>
+  Users still cannot assume the role unless explicitly allowed.
+  <br><br>
+  This option:
+  <br><br>
+  ✓ Grants only sts:AssumeRole
+  <br>
+  ✓ Nothing else
+  <br>
+  ✓ Perfect least-privilege design
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — Policy in development account</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  • IAM policies in dev do not control prod resources
+  <br>
+  • You cannot grant access to prod S3 from dev IAM policies
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Policies never jump accounts.
+  <br><br>
+  <b>❌ Option D — Role in development trusting production</b>
+  <br><br>
+  <b>Why this is backwards</b>
+  <br><br>
+  • The resource is in production
+  <br>
+  • The role must be where the resource is
+  <br>
+  • This option flips the trust model incorrectly.
+  <br><br>
+  <b>❌ Option F — Assume role in development</b>
+  <br><br>
+  <b>Why this is wrong</b>
+  <br><br>
+  • The role to be assumed is in production
+  <br>
+  • Assuming a role in development does nothing
+  <br>
+  • Classic "sounds right but useless" option.
+  <br><br>
+  <b>🧠 Key SAP-C02 Patterns to Remember</b>
+  <br><br>
+  ✓ Resource permissions live in the resource account
+  <br>
+  ✓ Cross-account access = IAM role in resource account
+  <br>
+  ✓ Trust policy defines WHO can assume
+  <br>
+  ✓ Permission policy defines WHAT can be done
+  <br>
+  ✓ AssumeRole permission is always required on caller side
+</div>
+
+</div>
+
+<!-- ================= Q104 ================= -->
+<div class="question">
+<pre>
+<b>Question #104 – Topic 1 </b>
+
+A company developed a pilot application by using AWS Elastic Beanstalk and Java. To save costs during development, the company's development team deployed the application into a single-instance environment.
+Recent tests indicate that the application consumes more CPU than expected. CPU utilization is regularly greater than 85%, which causes some performance bottlenecks.
+A solutions architect must mitigate the performance issues before the company launches the application to production.
+
+Which solution will meet these requirements with the LEAST operational overhead?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q104" value="A">
+    <span>A. Create a new Elastic Beanstalk application. Select a load-balanced environment type. Select all Availability Zones. Add a scale-out rule that will run if the maximum CPU utilization is over 85% for 5 minutes.</span>
+  </label>
+  <label>
+    <input type="radio" name="q104" value="B">
+    <span>B. Create a second Elastic Beanstalk environment. Apply the traffic-splitting deployment policy. Specify a percentage of incoming traffic to direct to the new environment if the average CPU utilization is over 85% for 5 minutes.</span>
+  </label>
+  <label>
+    <input type="radio" name="q104" value="C">
+    <span>C. Modify the existing environment's capacity configuration to use a load-balanced environment type. Select all Availability Zones. Add a scale-out rule that will run if the average CPU utilization is over 85% for 5 minutes.</span>
+  </label>
+  <label>
+    <input type="radio" name="q104" value="D">
+    <span>D. Select the Rebuild environment action with the load balancing option. Select all Availability Zones. Add a scale-out rule that will run if the sum CPU utilization is over 85% for 5 minutes.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q104', 'C', this, exp104)">Check Answer</button>
+
+<div class="explanation" id="exp104">
+  <button class="close-explanation" onclick="hideExplanation('exp104')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is 100% about understanding Elastic Beanstalk, not Auto Scaling or Java.
+  <br><br>
+  AWS is testing whether you know what Elastic Beanstalk can do in-place.
+  <br><br>
+  <b>🔑 Step 1: Understand the CURRENT state</b>
+  <br><br>
+  Application is:
+  <br><br>
+  • Java
+  <br>
+  • Elastic Beanstalk
+  <br>
+  • Single-instance environment
+  <br>
+  • CPU > 85%
+  <br>
+  • Bottlenecks observed
+  <br>
+  • Production launch is imminent
+  <br><br>
+  So we need:
+  <br><br>
+  ✓ High availability
+  <br>
+  ✓ Auto scaling
+  <br>
+  ✓ Minimal change
+  <br>
+  ✓ Minimal risk
+  <br><br>
+  <b>🔑 Step 2: Understand Elastic Beanstalk environment types</b>
+  <br><br>
+  Elastic Beanstalk supports two environment types:
+  <br><br>
+  1. Single-instance
+  <br>
+  2. Load-balanced, auto-scaled
+  <br><br>
+  <b>👉 Critical fact (EXAM GOLD):</b>
+  <br><br>
+  <b>You can change an Elastic Beanstalk environment from single-instance to load-balanced without creating a new application or environment</b>
+  <br><br>
+  This is exactly what AWS wants you to know.
+  <br><br>
+  <b>✅ Why Option C is Correct</b>
+  <br><br>
+  Option C says:
+  <br><br>
+  <b>Modify the existing environment's capacity configuration to use a load-balanced environment type</b>
+  <br><br>
+  This means:
+  <br><br>
+  ✓ No new application
+  <br>
+  ✓ No new environment
+  <br>
+  ✓ No traffic migration
+  <br>
+  ✓ No rebuild
+  <br>
+  ✓ No redeploy
+  <br><br>
+  Elastic Beanstalk:
+  <br><br>
+  • Adds an ALB
+  <br>
+  • Creates an Auto Scaling group
+  <br>
+  • Spreads instances across AZs
+  <br>
+  • Enables scaling rules
+  <br><br>
+  All in place.
+  <br><br>
+  This is:
+  <br><br>
+  ✓ Least operational overhead
+  <br>
+  ✓ Least risk
+  <br>
+  ✓ Fastest path to production readiness
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important)</b>
+  <br><br>
+  <b>❌ Option A — New application</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  • Creates a brand-new application
+  <br>
+  • Requires:
+  <br>
+  &nbsp;&nbsp;• Reconfiguration
+  <br>
+  &nbsp;&nbsp;• Redeployment
+  <br>
+  &nbsp;&nbsp;• Validation
+  <br>
+  • Totally unnecessary
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If you can modify in place, creating new resources is wrong.
+  <br><br>
+  <b>❌ Option B — Traffic splitting</b>
+  <br><br>
+  <b>Why this is a trap</b>
+  <br><br>
+  Traffic splitting is for:
+  <br><br>
+  • Blue/green deployments
+  <br>
+  • Canary testing
+  <br><br>
+  It is not for scaling
+  <br><br>
+  Also:
+  <br><br>
+  • Creates a second environment
+  <br>
+  • Adds operational complexity
+  <br><br>
+  <b>❌ Option D — Rebuild environment</b>
+  <br><br>
+  <b>Why rebuild is dangerous</b>
+  <br><br>
+  Rebuild:
+  <br><br>
+  • Terminates instances
+  <br>
+  • Recreates environment
+  <br>
+  • Causes downtime
+  <br>
+  • Adds risk right before production
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  "Rebuild" is almost never the least operational overhead.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ Elastic Beanstalk environments can be modified in place
+  <br>
+  ✓ Single-instance → load-balanced is a supported transition
+  <br>
+  ✓ Traffic splitting ≠ scaling
+  <br>
+  ✓ Rebuild ≠ minimal risk
+  <br>
+  ✓ Least operational overhead = modify existing resources
+</div>
+
+</div>
+
+<!-- ================= Q105 ================= -->
+<div class="question">
+<pre>
+<b>Question #105</b>
+
+A finance company is running its business-critical application on current-generation Linux EC2 instances. The application includes a self-managed MySQL database performing heavy I/O operations.
+The application is working fine to handle a moderate amount of traffic during the month. However, it slows down during the final three days of each month due to month-end reporting, even though the company is using Elastic Load Balancers and Auto Scaling within its infrastructure to meet the increased demand.
+
+Which of the following actions would allow the database to handle the month-end load with the LEAST impact on performance?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q105" value="A">
+    <span>A. Pre-warming Elastic Load Balancers, using a bigger instance type, changing all Amazon EBS volumes to gp2 volumes.</span>
+  </label>
+  <label>
+    <input type="radio" name="q105" value="B">
+    <span>B. Performing a one-time migration of the database cluster to Amazon RDS, and creating several additional read replicas to handle the load during end of month.</span>
+  </label>
+  <label>
+    <input type="radio" name="q105" value="C">
+    <span>C. Using Amazon CloudWatch with AWS Lambda to change the type, size, or IOPS of Amazon EBS volumes in the cluster based on a specific CloudWatch metric.</span>
+  </label>
+  <label>
+    <input type="radio" name="q105" value="D">
+    <span>D. Replacing all existing Amazon EBS volumes with new Provisioned IOPS volumes that have the maximum available storage size and I/O per second by taking snapshots before the end of the month and reverting back afterwards.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q105', 'B', this, exp105)">Check Answer</button>
+
+<div class="explanation" id="exp105">
+  <button class="close-explanation" onclick="hideExplanation('exp105')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is a workload-pattern recognition test.
+  <br>
+  AWS wants to see if you can distinguish between:
+  <br><br>
+  • application scaling
+  <br>
+  • database scaling
+  <br>
+  • read-heavy vs write-heavy workloads
+  <br><br>
+  <b>🔑 Step 1: Identify the workload pattern (THIS DECIDES THE ANSWER)</b>
+  <br><br>
+  The most important phrase is:
+  <br><br>
+  <b>"slows down during the final three days of each month due to month-end reporting"</b>
+  <br><br>
+  What does reporting usually mean?
+  <br><br>
+  • Reports = SELECT queries
+  <br>
+  • SELECT = READ operations
+  <br>
+  • End of month = predictable spike
+  <br><br>
+  So this is a:
+  <br><br>
+  <b>Predictable, read-heavy workload spike</b>
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Reporting workloads are almost always read-heavy.
+  <br><br>
+  <b>🔑 Step 2: Identify the current architecture problem</b>
+  <br><br>
+  Database is:
+  <br><br>
+  • Self-managed MySQL
+  <br>
+  • Running on EC2
+  <br><br>
+  Scaling is done at:
+  <br><br>
+  • Load balancer
+  <br>
+  • Application tier
+  <br><br>
+  But:
+  <br><br>
+  • Load balancers do nothing for databases
+  <br>
+  • Auto Scaling does nothing for MySQL reads
+  <br><br>
+  The bottleneck is:
+  <br><br>
+  <b>The database</b>
+  <br><br>
+  <b>🔑 Step 3: Ask "what scales READS cleanly in AWS?"</b>
+  <br><br>
+  AWS has a very clear answer:
+  <br><br>
+  <b>Read replicas</b>
+  <br><br>
+  They:
+  <br><br>
+  ✓ Offload read traffic
+  <br>
+  ✓ Scale horizontally
+  <br>
+  ✓ Can be added temporarily
+  <br>
+  ✓ Do not affect writes
+  <br><br>
+  <b>✅ Why Option B is Correct (Deep Dive)</b>
+  <br><br>
+  Option B says:
+  <br><br>
+  <b>Migrate to Amazon RDS and create read replicas</b>
+  <br><br>
+  This solves multiple problems at once:
+  <br><br>
+  <b>1️⃣ Moves to a managed service</b>
+  <br><br>
+  • No OS patching
+  <br>
+  • No manual backups
+  <br>
+  • No manual replication setup
+  <br><br>
+  <b>2️⃣ Adds read replicas</b>
+  <br><br>
+  • Reports hit replicas
+  <br>
+  • Primary handles writes
+  <br>
+  • Performance stabilizes
+  <br><br>
+  <b>3️⃣ Scales for month-end only</b>
+  <br><br>
+  • Replicas can be added before month-end
+  <br>
+  • Removed after reporting completes
+  <br>
+  • Cost-efficient
+  <br><br>
+  This has:
+  <br><br>
+  ✓ Least performance impact
+  <br>
+  ✓ Least risk
+  <br>
+  ✓ Least operational overhead
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important for Exam)</b>
+  <br><br>
+  <b>❌ Option A — Bigger instances & gp2</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  • Vertical scaling has limits
+  <br>
+  • gp2 does not guarantee IOPS
+  <br>
+  • Does not separate read traffic
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Throwing bigger instances at read-heavy DB problems is rarely the right answer.
+  <br><br>
+  <b>❌ Option C — Dynamically resizing EBS</b>
+  <br><br>
+  <b>Why this is bad architecture</b>
+  <br><br>
+  EBS resizing affects:
+  <br><br>
+  • Storage
+  <br>
+  • Throughput
+  <br><br>
+  Does NOT:
+  <br><br>
+  • Separate reads
+  <br>
+  • Reduce query contention
+  <br><br>
+  Also:
+  <br><br>
+  • Complex automation
+  <br>
+  • Risky during peak periods
+  <br><br>
+  <b>❌ Option D — Snapshot & swap volumes</b>
+  <br><br>
+  <b>Why AWS hates this answer</b>
+  <br><br>
+  • Snapshot → restore is slow
+  <br>
+  • Risk of data inconsistency
+  <br>
+  • Operationally dangerous
+  <br>
+  • Manual process during peak load
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If an option involves "snapshot, replace, revert" during peak traffic → it is wrong.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ Reporting = read-heavy
+  <br>
+  ✓ Read-heavy DB scaling = read replicas
+  <br>
+  ✓ Load balancers do not help databases
+  <br>
+  ✓ Vertical scaling ≠ long-term DB strategy
+  <br>
+  ✓ RDS read replicas are easy, safe, and scalable
+</div>
+
+</div>
+
+<!-- ================= Q106 ================= -->
+<div class="question">
+<pre>
+<b>Question #106</b>
+
+A company runs a Java application that has complex dependencies on VMs that are in the company's data center. The application is stable, but the company wants to modernize the technology stack. The company wants to migrate the application to AWS and minimize the administrative overhead to maintain the servers.
+
+Which solution will meet these requirements with the LEAST code changes?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q106" value="A">
+    <span>A. Migrate the application to Amazon Elastic Container Service (Amazon ECS) on AWS Fargate by using AWS App2Container. Store container images in Amazon Elastic Container Registry (Amazon ECR). Grant the ECS task execution role permission to access the ECR image repository. Configure Amazon ECS to use an Application Load Balancer (ALB). Use the ALB to interact with the application.</span>
+  </label>
+  <label>
+    <input type="radio" name="q106" value="B">
+    <span>B. Migrate the application code to a container that runs in AWS Lambda. Build an Amazon API Gateway REST API with Lambda integration. Use API Gateway to interact with the application.</span>
+  </label>
+  <label>
+    <input type="radio" name="q106" value="C">
+    <span>C. Migrate the application to Amazon Elastic Kubernetes Service (Amazon EKS) on EKS managed node groups by using AWS App2Container. Store container images in Amazon Elastic Container Registry (Amazon ECR). Give the EKS nodes permission to access the ECR image repository. Use Amazon API Gateway to interact with the application.</span>
+  </label>
+  <label>
+    <input type="radio" name="q106" value="D">
+    <span>D. Migrate the application code to a container that runs in AWS Lambda. Configure Lambda to use an Application Load Balancer (ALB). Use the ALB to interact with the application.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q106', 'A', this, exp106)">Check Answer</button>
+
+<div class="explanation" id="exp106">
+  <button class="close-explanation" onclick="hideExplanation('exp106')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a modernization pattern recognition question.
+  <br>
+  AWS wants to see whether you can choose the lowest-friction modernization path.
+  <br><br>
+  <b>🔑 Step 1: Identify the non-negotiable constraints</b>
+  <br><br>
+  There are three phrases you must lock onto:
+  <br><br>
+  • <b>"Java application with complex dependencies on VMs"</b>
+  <br>
+  • <b>"Application is stable"</b>
+  <br>
+  • <b>"LEAST code changes" + "minimize administrative overhead"</b>
+  <br><br>
+  These phrases immediately tell us:
+  <br><br>
+  ❌ Don't rewrite the application
+  <br>
+  ❌ Don't refactor into functions
+  <br>
+  ❌ Don't introduce heavy orchestration
+  <br>
+  ✅ Lift-and-modernize, not rewrite
+  <br><br>
+  <b>🔑 Step 2: Understand what "modernize" means to AWS (EXAM VIEW)</b>
+  <br><br>
+  In AWS exam language:
+  <br><br>
+  • <b>Rewrite / Refactor</b> → Lambda, microservices
+  <br>
+  • <b>Replatform / Lift-and-modernize</b> → Containers
+  <br>
+  • <b>Rehost</b> → EC2
+  <br><br>
+  Because:
+  <br><br>
+  • Code changes must be minimal
+  <br>
+  • VM dependencies exist
+  <br><br>
+  <b>👉 Containers are the sweet spot.</b>
+  <br><br>
+  <b>🔑 Step 3: Why AWS App2Container is the KEY signal</b>
+  <br><br>
+  AWS App2Container (A2C) is designed specifically for:
+  <br><br>
+  • Java apps
+  <br>
+  • .NET apps
+  <br>
+  • VM-based applications
+  <br>
+  • Minimal code changes
+  <br><br>
+  It:
+  <br><br>
+  • Inspects the VM
+  <br>
+  • Packages dependencies
+  <br>
+  • Creates a runnable container image
+  <br><br>
+  <b>🧠 EXAM RULE:</b>
+  <br>
+  If you see Java / .NET + minimal code changes → think App2Container.
+  <br><br>
+  <b>✅ Why Option A is Correct (Deep Dive)</b>
+  <br><br>
+  Option A uses:
+  <br><br>
+  • <b>ECS</b> (simpler than EKS)
+  <br>
+  • <b>Fargate</b> (no server management)
+  <br>
+  • <b>App2Container</b> (minimal code changes)
+  <br>
+  • <b>ALB</b> (natural fit for web apps)
+  <br><br>
+  This gives you:
+  <br><br>
+  ✓ Serverless container compute
+  <br>
+  ✓ No EC2 patching
+  <br>
+  ✓ No Kubernetes control plane
+  <br>
+  ✓ Minimal ops
+  <br>
+  ✓ Familiar architecture
+  <br><br>
+  This is the lowest operational overhead container solution AWS offers.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — Lambda + API Gateway</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  Lambda requires:
+  <br><br>
+  • Short execution time
+  <br>
+  • Stateless logic
+  <br><br>
+  Complex VM dependencies ≠ Lambda-friendly
+  <br><br>
+  • Requires significant code refactoring
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If "least code changes" is stated → Lambda is usually wrong.
+  <br><br>
+  <b>❌ Option C — EKS</b>
+  <br><br>
+  <b>Why this is overkill</b>
+  <br><br>
+  Kubernetes:
+  <br><br>
+  • Control plane
+  <br>
+  • Node groups
+  <br>
+  • Networking complexity
+  <br>
+  • Higher operational overhead than ECS
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If ECS and EKS are both options and no Kubernetes requirement is stated → choose ECS.
+  <br><br>
+  <b>❌ Option D — Lambda behind ALB</b>
+  <br><br>
+  <b>Why this is misleading</b>
+  <br><br>
+  ALB → Lambda integration exists
+  <br><br>
+  But:
+  <br><br>
+  • Still requires Lambda-compatible code
+  <br>
+  • Still requires refactoring
+  <br>
+  • Adds unnecessary complexity
+  <br><br>
+  This option mixes concepts incorrectly.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ Least code changes → containers
+  <br>
+  ✓ Java/.NET VM apps → App2Container
+  <br>
+  ✓ Least ops containers → ECS on Fargate
+  <br>
+  ✓ EKS only when Kubernetes is required
+  <br>
+  ✓ Lambda = refactor, not lift
+</div>
+
+</div>
+
+<!-- ================= Q107 ================= -->
+<div class="question">
+<pre>
+<b>Question #107</b>
+
+A company has an asynchronous HTTP application that is hosted as an AWS Lambda function. A public Amazon API Gateway endpoint invokes the Lambda function.
+The Lambda function and the API Gateway endpoint reside in the us-east-1 Region.
+A solutions architect needs to redesign the application to support failover to another AWS Region.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q107" value="A">
+    <span>A. Create an API Gateway endpoint in the us-west-2 Region to direct traffic to the Lambda function in us-east-1. Configure Amazon Route 53 to use a failover routing policy to route traffic for the two API Gateway endpoints.</span>
+  </label>
+  <label>
+    <input type="radio" name="q107" value="B">
+    <span>B. Create an Amazon Simple Queue Service (Amazon SQS) queue. Configure API Gateway to direct traffic to the SQS queue instead of to the Lambda function. Configure the Lambda function to pull messages from the queue for processing.</span>
+  </label>
+  <label>
+    <input type="radio" name="q107" value="C">
+    <span>C. Deploy the Lambda function to the us-west-2 Region. Create an API Gateway endpoint in us-west-2 to direct traffic to the Lambda function in us-west-2. Configure AWS Global Accelerator and an Application Load Balancer to manage traffic across the two API Gateway endpoints.</span>
+  </label>
+  <label>
+    <input type="radio" name="q107" value="D">
+    <span>D. Deploy the Lambda function and an API Gateway endpoint to the us-west-2 Region. Configure Amazon Route 53 to use a failover routing policy to route traffic for the two API Gateway endpoints.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q107', 'D', this, exp107)">Check Answer</button>
+
+<div class="explanation" id="exp107">
+  <button class="close-explanation" onclick="hideExplanation('exp107')">Close</button>
+  <b>✅ Correct Answer: D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is testing true multi-Region failover, not traffic distribution, not async processing, and not partial redundancy.
+  <br><br>
+  <b>🔑 Step 1: Understand the architecture constraint</b>
+  <br><br>
+  Current state:
+  <br><br>
+  • API Gateway → Lambda
+  <br>
+  • Both are regional services
+  <br>
+  • Everything runs in us-east-1
+  <br><br>
+  Key requirement:
+  <br><br>
+  <b>"support failover to another AWS Region"</b>
+  <br><br>
+  Failover means:
+  <br><br>
+  • One Region is active
+  <br>
+  • The other Region is standby
+  <br>
+  • Traffic moves only when the primary fails
+  <br><br>
+  <b>🔑 Step 2: Understand what "real failover" means on AWS exams</b>
+  <br><br>
+  AWS defines real regional failover as:
+  <br><br>
+  <b>A complete copy of the stack in another Region + DNS-based routing</b>
+  <br><br>
+  Anything less is not failover.
+  <br><br>
+  <b>🔑 Step 3: Identify the AWS-approved failover pattern</b>
+  <br><br>
+  For serverless APIs, AWS recommends:
+  <br><br>
+  1. Deploy Lambda + API Gateway in each Region
+  <br>
+  2. Use Route 53 failover routing
+  <br>
+  3. Health checks determine which endpoint is active
+  <br><br>
+  This is the canonical AWS pattern.
+  <br><br>
+  <b>✅ Why Option D is Correct (Deep Dive)</b>
+  <br><br>
+  Option D does exactly what AWS expects:
+  <br><br>
+  • Lambda deployed in us-east-1
+  <br>
+  • Lambda deployed in us-west-2
+  <br>
+  • API Gateway deployed in both Regions
+  <br>
+  • Route 53 controls traffic using health checks
+  <br><br>
+  Result:
+  <br><br>
+  If us-east-1 fails → Route 53 routes traffic to us-west-2
+  <br><br>
+  ✓ No partial dependencies
+  <br>
+  ✓ No cross-Region calls
+  <br>
+  ✓ Clean, predictable failover
+  <br><br>
+  This is:
+  <br><br>
+  ✓ Simple
+  <br>
+  ✓ Resilient
+  <br>
+  ✓ Fully supported
+  <br>
+  ✓ Exam-approved
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Exam Traps)</b>
+  <br><br>
+  <b>❌ Option A — Cross-Region API Gateway to Lambda</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  • API Gateway cannot invoke Lambda in another Region
+  <br><br>
+  Even if it could, it would:
+  <br><br>
+  • Create latency
+  <br>
+  • Create a single point of failure (Lambda still in us-east-1)
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Cross-Region service invocation ≠ failover.
+  <br><br>
+  <b>❌ Option B — SQS buffering</b>
+  <br><br>
+  <b>Why this is irrelevant</b>
+  <br><br>
+  SQS adds:
+  <br><br>
+  • Asynchronous buffering
+  <br><br>
+  But:
+  <br><br>
+  • Does NOT create regional redundancy
+  <br>
+  • Does NOT provide HTTP failover
+  <br>
+  • Lambda still exists in one Region
+  <br><br>
+  This changes the architecture but does not solve the problem.
+  <br><br>
+  <b>❌ Option C — Global Accelerator + ALB</b>
+  <br><br>
+  <b>Why this is misleading</b>
+  <br><br>
+  • API Gateway is not placed behind ALB
+  <br>
+  • Global Accelerator is:
+  <br>
+  &nbsp;&nbsp;• Active-active
+  <br>
+  &nbsp;&nbsp;• Traffic optimization
+  <br>
+  • This is not failover, this is traffic distribution
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If the question says failover, active-active solutions are usually wrong.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ API Gateway + Lambda are regional
+  <br>
+  ✓ Failover = duplicate the full stack
+  <br>
+  ✓ Route 53 is the default AWS failover mechanism
+  <br>
+  ✓ Global Accelerator ≠ failover
+  <br>
+  ✓ Partial duplication ≠ resilience
+</div>
+
+</div>
+
+<!-- ================= Q108 ================= -->
+<div class="question">
+<pre>
+<b>Question #108</b>
+
+A retail company has structured its AWS accounts to be part of an organization in AWS Organizations. The company has set up consolidated billing and has mapped its departments to the following OUs: Finance, Sales, Human Resources (HR), Marketing, and Operations. Each OU has multiple AWS accounts, one for each environment within a department. These environments are development, test, pre-production, and production.
+The HR department is releasing a new system that will launch in 3 months. In preparation, the HR department has purchased several Reserved Instances (RIs) in its production AWS account. The HR department will install the new application on this account.
+The HR department wants to make sure that other departments cannot share the RI discounts.
+
+Which solution will meet these requirements?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q108" value="A">
+    <span>A. In the AWS Billing and Cost Management console for the HR department's production account, turn off RI sharing.</span>
+  </label>
+  <label>
+    <input type="radio" name="q108" value="B">
+    <span>B. Remove the HR department's production AWS account from the organization. Add the account to the consolidated billing configuration only.</span>
+  </label>
+  <label>
+    <input type="radio" name="q108" value="C">
+    <span>C. In the AWS Billing and Cost Management console, use the organization's management account to turn off RI sharing for the HR department's production AWS account.</span>
+  </label>
+  <label>
+    <input type="radio" name="q108" value="D">
+    <span>D. Create an SCP in the organization to restrict access to the RIs. Apply the SCP to the OUs of the other departments.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q108', 'C', this, exp108)">Check Answer</button>
+
+<div class="explanation" id="exp108">
+  <button class="close-explanation" onclick="hideExplanation('exp108')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is not about IAM, not about SCPs, and not about access control.
+  <br>
+  It is purely about AWS billing behavior.
+  <br><br>
+  AWS is testing whether you understand who controls Reserved Instance discount sharing.
+  <br><br>
+  <b>🔑 Step 1: Understand how RI sharing actually works</b>
+  <br><br>
+  In AWS Organizations:
+  <br><br>
+  • Reserved Instance discounts are shared by default
+  <br><br>
+  Sharing applies:
+  <br><br>
+  • Across accounts
+  <br>
+  • Across OUs
+  <br><br>
+  Sharing is controlled from:
+  <br><br>
+  <b>• The management (payer) account</b>
+  <br><br>
+  <b>🧠 This is a billing feature, not a security feature.</b>
+  <br><br>
+  <b>🔑 Step 2: Identify the real requirement</b>
+  <br><br>
+  "HR wants to make sure other departments cannot share the RI discounts"
+  <br><br>
+  Key phrase:
+  <br><br>
+  <b>RI discounts</b>
+  <br><br>
+  This immediately tells us:
+  <br><br>
+  ❌ IAM is irrelevant
+  <br>
+  ❌ SCPs are irrelevant
+  <br>
+  ❌ Resource permissions are irrelevant
+  <br><br>
+  Only billing configuration matters.
+  <br><br>
+  <b>🔑 Step 3: Who has authority over RI sharing?</b>
+  <br><br>
+  Only the AWS Organizations management account can:
+  <br><br>
+  • Enable or disable RI sharing
+  <br>
+  • Control which accounts receive discounts
+  <br><br>
+  Member accounts cannot override this behavior.
+  <br><br>
+  <b>✅ Why Option C is Correct</b>
+  <br><br>
+  Option C states:
+  <br><br>
+  <b>Use the management account to turn off RI sharing for the HR production account</b>
+  <br><br>
+  This is exactly how AWS designed it:
+  <br><br>
+  ✓ Centralized control
+  <br>
+  ✓ Billing-only configuration
+  <br>
+  ✓ No security changes
+  <br>
+  ✓ No account removal
+  <br><br>
+  This:
+  <br><br>
+  ✓ Prevents discount sharing
+  <br>
+  ✓ Keeps the account in the org
+  <br>
+  ✓ Maintains consolidated billing
+  <br>
+  ✓ Has minimal disruption
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Critical Exam Traps)</b>
+  <br><br>
+  <b>❌ Option A — Turn off RI sharing from the member account</b>
+  <br><br>
+  <b>Why this is wrong</b>
+  <br><br>
+  • Member accounts do not control RI sharing
+  <br>
+  • RI sharing settings are read-only in member accounts
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If the question is about billing, look to the management account.
+  <br><br>
+  <b>❌ Option B — Remove account from organization</b>
+  <br><br>
+  <b>Why this is extreme and wrong</b>
+  <br><br>
+  Breaks:
+  <br><br>
+  • Central governance
+  <br>
+  • SCP enforcement
+  <br>
+  • Cost visibility
+  <br><br>
+  • Violates "least operational overhead"
+  <br>
+  • AWS would never recommend this.
+  <br><br>
+  <b>❌ Option D — SCP to restrict RI access</b>
+  <br><br>
+  <b>Why this is a classic trap</b>
+  <br><br>
+  • RIs are billing constructs
+  <br>
+  • SCPs control API actions, not discounts
+  <br>
+  • You cannot "deny" a discount with IAM
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Billing ≠ IAM ≠ SCP.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ RI sharing is a billing feature
+  <br>
+  ✓ Only the management account controls it
+  <br>
+  ✓ SCPs do not affect billing
+  <br>
+  ✓ IAM does not affect discounts
+  <br>
+  ✓ AWS prefers centralized billing control
+</div>
+
+</div>
+
+<!-- ================= Q109 ================= -->
+<div class="question">
+<pre>
+<b>Question #109</b>
+
+A large company is running a popular web application. The application runs on several Amazon EC2 Linux instances in an Auto Scaling group in a private subnet. An Application Load Balancer is targeting the instances in the Auto Scaling group in the private subnet.
+AWS Systems Manager Session Manager is configured, and AWS Systems Manager Agent is running on all the EC2 instances.
+The company recently released a new version of the application. Some EC2 instances are now being marked as unhealthy and are being terminated. As a result, the application is running at reduced capacity.
+A solutions architect tries to determine the root cause by analyzing Amazon CloudWatch logs that are collected from the application, but the logs are inconclusive.
+
+How should the solutions architect gain access to an EC2 instance to troubleshoot the issue?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q109" value="A">
+    <span>A. Suspend the Auto Scaling group's HealthCheck scaling process. Use Session Manager to log in to an instance that is marked as unhealthy.</span>
+  </label>
+  <label>
+    <input type="radio" name="q109" value="B">
+    <span>B. Enable EC2 instance termination protection. Use Session Manager to log in to an instance that is marked as unhealthy.</span>
+  </label>
+  <label>
+    <input type="radio" name="q109" value="C">
+    <span>C. Set the termination policy to OldestInstance on the Auto Scaling group. Use Session Manager to log in to an instance that is marked as unhealthy.</span>
+  </label>
+  <label>
+    <input type="radio" name="q109" value="D">
+    <span>D. Suspend the Auto Scaling group's Terminate process. Use Session Manager to log in to an instance that is marked as unhealthy.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q109', 'D', this, exp109)">Check Answer</button>
+
+<div class="explanation" id="exp109">
+  <button class="close-explanation" onclick="hideExplanation('exp109')">Close</button>
+  <b>✅ Correct Answer: D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a classic SAP-C02 troubleshooting question that tests whether you understand Auto Scaling group lifecycle and processes.
+  <br><br>
+  AWS is testing whether you know how to stop Auto Scaling from "helping too much."
+  <br><br>
+  <b>🔑 Step 1: Understand the real problem</b>
+  <br><br>
+  What is happening?
+  <br><br>
+  • Instances become unhealthy
+  <br>
+  • Auto Scaling immediately terminates them
+  <br>
+  • Architect cannot inspect them
+  <br>
+  • Logs are insufficient
+  <br><br>
+  So the real problem is:
+  <br><br>
+  <b>The instance is gone before you can log in</b>
+  <br><br>
+  <b>🔑 Step 2: Identify what is terminating the instance</b>
+  <br><br>
+  In an Auto Scaling group:
+  <br><br>
+  • Health checks mark instance unhealthy
+  <br>
+  • Auto Scaling replaces unhealthy instances
+  <br>
+  • Replacement happens through the <b>Terminate process</b>
+  <br><br>
+  <b>🧠 Important exam fact:</b>
+  <br>
+  Auto Scaling has named processes that can be suspended individually.
+  <br><br>
+  <b>🔑 Step 3: Decide what must continue vs what must stop</b>
+  <br><br>
+  We want:
+  <br><br>
+  ✓ Health checks to continue
+  <br>
+  ✓ Instance to be marked unhealthy
+  <br>
+  ✓ But instance to NOT be terminated
+  <br><br>
+  Why?
+  <br><br>
+  • So we can log in
+  <br>
+  • So we can inspect memory, disk, config, processes
+  <br><br>
+  <b>✅ Why Option D is Correct (Deep Dive)</b>
+  <br><br>
+  Option D says:
+  <br><br>
+  <b>Suspend the Auto Scaling group's Terminate process</b>
+  <br><br>
+  This means:
+  <br><br>
+  ✓ Health checks still run
+  <br>
+  ✓ Instances still get marked unhealthy
+  <br>
+  ✓ Auto Scaling does NOT terminate them
+  <br><br>
+  Now:
+  <br><br>
+  ✓ Instance remains available
+  <br>
+  ✓ Session Manager can connect
+  <br>
+  ✓ Root cause analysis is possible
+  <br><br>
+  This is exactly how AWS recommends troubleshooting ASGs.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Very Important)</b>
+  <br><br>
+  <b>❌ Option A — Suspend HealthCheck</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  If you suspend health checks:
+  <br><br>
+  • Instances are never marked unhealthy
+  <br>
+  • You don't know which instance to investigate
+  <br>
+  • You lose the signal you actually need.
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Never disable the detection mechanism when debugging.
+  <br><br>
+  <b>❌ Option B — Enable termination protection</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  • Auto Scaling ignores EC2 termination protection
+  <br>
+  • Auto Scaling has permission to terminate instances anyway
+  <br>
+  • This option only works for manual termination, not ASG termination.
+  <br><br>
+  <b>❌ Option C — Change termination policy</b>
+  <br><br>
+  <b>Why this fails</b>
+  <br><br>
+  • Termination policy decides <b>which</b> instance
+  <br>
+  • It does NOT prevent termination
+  <br>
+  • Instance still disappears
+  <br>
+  • This solves nothing.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ Auto Scaling uses named processes
+  <br>
+  ✓ Termination happens via the Terminate process
+  <br>
+  ✓ Suspending Terminate = keep unhealthy instances alive
+  <br>
+  ✓ Termination protection does not stop Auto Scaling
+  <br>
+  ✓ Session Manager is ideal for private subnet debugging
+</div>
+
+</div>
+
+<!-- ================= Q110 ================= -->
+<div class="question">
+<pre>
+<b>Question #110</b>
+
+A company wants to deploy an AWS WAF solution to manage AWS WAF rules across multiple AWS accounts. The accounts are managed under different OUs in AWS Organizations.
+Administrators must be able to add or remove accounts or OUs from managed AWS WAF rule sets as needed. Administrators also must have the ability to automatically update and remediate noncompliant AWS WAF rules in all accounts.
+
+Which solution meets these requirements with the LEAST amount of operational overhead?
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q110" value="A">
+    <span>A. Use AWS Firewall Manager to manage AWS WAF rules across accounts in the organization. Use an AWS Systems Manager Parameter Store parameter to store account numbers and OUs to manage. Update the parameter as needed to add or remove accounts or OUs. Use an Amazon EventBridge rule to identify any changes to the parameter and to invoke an AWS Lambda function to update the security policy in the Firewall Manager administrative account.</span>
+  </label>
+  <label>
+    <input type="radio" name="q110" value="B">
+    <span>B. Deploy an organization-wide AWS Config rule that requires all resources in the selected OUs to associate the AWS WAF rules. Deploy automated remediation actions by using AWS Lambda to fix noncompliant resources. Deploy AWS WAF rules by using an AWS CloudFormation stack set to target the same OUs where the AWS Config rule is applied.</span>
+  </label>
+  <label>
+    <input type="radio" name="q110" value="C">
+    <span>C. Create AWS WAF rules in the management account of the organization. Use AWS Lambda environment variables to store account numbers and OUs to manage. Update environment variables as needed to add or remove accounts or OUs. Create cross-account IAM roles in member accounts. Assume the roles by using AWS Security Token Service (AWS STS) in the Lambda function to create and update AWS WAF rules in the member accounts.</span>
+  </label>
+  <label>
+    <input type="radio" name="q110" value="D">
+    <span>D. Use AWS Control Tower to manage AWS WAF rules across accounts in the organization. Use AWS Key Management Service (AWS KMS) to store account numbers and OUs to manage. Update AWS KMS as needed to add or remove accounts or OUs. Create IAM users in member accounts. Allow AWS Control Tower in the management account to use the access key and secret access key to create and update AWS WAF rules in the member accounts.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q110', 'A', this, exp110)">Check Answer</button>
+
+<div class="explanation" id="exp110">
+  <button class="close-explanation" onclick="hideExplanation('exp110')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is testing centralized security governance at scale.
+  <br>
+  AWS wants to see whether you recognize the service built specifically for this job.
+  <br><br>
+  <b>🔑 Step 1: Identify the governance signals (VERY IMPORTANT)</b>
+  <br><br>
+  There are four phrases that matter:
+  <br><br>
+  • <b>Multiple AWS accounts</b>
+  <br>
+  • <b>Multiple OUs</b>
+  <br>
+  • <b>Centralized rule management</b>
+  <br>
+  • <b>Automatic remediation</b>
+  <br>
+  • <b>LEAST operational overhead</b>
+  <br><br>
+  When you see these together, AWS is almost always pointing to:
+  <br><br>
+  <b>AWS Firewall Manager</b>
+  <br><br>
+  <b>🔑 Step 2: What AWS Firewall Manager is actually for</b>
+  <br><br>
+  AWS Firewall Manager is designed to:
+  <br><br>
+  Centrally manage:
+  <br><br>
+  • AWS WAF
+  <br>
+  • Shield Advanced
+  <br>
+  • Security Groups
+  <br>
+  • Network Firewall
+  <br><br>
+  Work natively with AWS Organizations
+  <br><br>
+  Automatically:
+  <br><br>
+  • Apply policies to new accounts
+  <br>
+  • Remediate noncompliant resources
+  <br>
+  • Require minimal custom code
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If the service name literally matches the requirement → it's probably the answer.
+  <br><br>
+  <b>✅ Why Option A is Correct (Deep Dive)</b>
+  <br><br>
+  Option A uses:
+  <br><br>
+  • <b>AWS Firewall Manager</b> → core service
+  <br>
+  • <b>AWS Organizations</b> → account/OU targeting
+  <br>
+  • <b>Parameter Store + EventBridge</b> → dynamic updates
+  <br>
+  • <b>Lambda</b> → glue logic only
+  <br><br>
+  This achieves:
+  <br><br>
+  ✓ Central control
+  <br>
+  ✓ OU-based targeting
+  <br>
+  ✓ Automatic remediation
+  <br>
+  ✓ Minimal custom management
+  <br><br>
+  Most importantly:
+  <br><br>
+  ✓ You are using AWS's managed solution
+  <br>
+  ✓ Not reinventing governance
+  <br><br>
+  This is exactly how AWS expects large organizations to manage WAF.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — AWS Config + StackSets</b>
+  <br><br>
+  <b>Why this is not "least operational overhead"</b>
+  <br><br>
+  Requires:
+  <br><br>
+  • Config rules
+  <br>
+  • StackSets
+  <br>
+  • Lambda remediation
+  <br>
+  • Multiple moving parts
+  <br>
+  • Harder to maintain at scale
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If a managed governance service exists, custom enforcement is not "least overhead".
+  <br><br>
+  <b>❌ Option C — Custom Lambda + STS</b>
+  <br><br>
+  <b>Why AWS rejects this</b>
+  <br><br>
+  • Custom cross-account roles
+  <br>
+  • Custom code
+  <br>
+  • Manual scaling
+  <br>
+  • Hard to audit
+  <br><br>
+  This is:
+  <br><br>
+  • Technically possible
+  <br>
+  • Architecturally inferior
+  <br>
+  • Operationally expensive
+  <br><br>
+  AWS exams penalize DIY governance.
+  <br><br>
+  <b>❌ Option D — Control Tower misuse</b>
+  <br><br>
+  <b>Why this is wrong</b>
+  <br><br>
+  Control Tower is for:
+  <br><br>
+  • Account provisioning
+  <br>
+  • Guardrails
+  <br><br>
+  It does NOT manage WAF rules
+  <br><br>
+  • Storing OU lists in KMS makes no sense
+  <br>
+  • IAM users + access keys = security anti-pattern
+  <br><br>
+  This option mixes services incorrectly.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  ✓ Firewall Manager = centralized WAF governance
+  <br>
+  ✓ AWS Organizations + Firewall Manager = scale
+  <br>
+  ✓ Control Tower ≠ WAF management
+  <br>
+  ✓ Custom Lambda ≠ least operational overhead
+  <br>
+  ✓ Managed services beat DIY solutions on exams
+</div>
+
+</div>
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0 20px;">
+  <a href="page11.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page13.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div>
+
+<script>
+function checkAnswer(qName, correctAnswer, btn, explanationDiv) {
+  const selected = document.querySelector(`input[name="${qName}"]:checked`);
+  if (!selected) {
+    // Remove any existing error message
+    const existingError = btn.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+    
+    // Create and show error message
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.textContent = 'Please select an option first!';
+    errorMsg.style.cssText = 'color: #dc2626; background: #fee2e2; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 14px; font-weight: 600; border-left: 4px solid #ef4444;';
+    btn.parentElement.insertBefore(errorMsg, btn.nextSibling);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => errorMsg.remove(), 3000);
+    return;
+  }
+
+  // Remove error message if exists
+  const existingError = btn.parentElement.querySelector('.error-message');
+  if (existingError) existingError.remove();
+
+  const labels = document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+
+  const userAnswer = selected.value;
+  const userLabel = selected.closest("label");
+
+  if (userAnswer === correctAnswer) {
+    userLabel.classList.add("user-correct");
+  } else {
+    userLabel.classList.add("user-wrong");
+    const correctLabel = document.querySelector(`input[name="${qName}"][value="${correctAnswer}"]`).closest("label");
+    correctLabel.classList.add("correct");
+  }
+
+  explanationDiv.style.display = "block";
+  btn.style.display = "none";
+}
+
+function hideExplanation(expId) {
+  const exp = document.getElementById(expId);
+  exp.style.display = "none";
+  const btn = exp.previousElementSibling;
+  btn.style.display = "inline-block";
+
+  // Reset options
+  const qName = expId.replace('exp', 'q');
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    input.checked = false;
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+}
+
+function checkAnswerMultiple(qName, correctAnswers, btn, explanationDiv) {
+  const selectedInputs = document.querySelectorAll(`input[name="${qName}"]:checked`);
+  
+  if (selectedInputs.length === 0) {
+    // Remove any existing error message
+    const existingError = btn.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+    
+    // Create and show error message
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.textContent = 'Please select an option first!';
+    errorMsg.style.cssText = 'color: #dc2626; background: #fee2e2; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 14px; font-weight: 600; border-left: 4px solid #ef4444;';
+    btn.parentElement.insertBefore(errorMsg, btn.nextSibling);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => errorMsg.remove(), 3000);
+    return;
+  }
+
+  // Remove error message if exists
+  const existingError = btn.parentElement.querySelector('.error-message');
+  if (existingError) existingError.remove();
+
+  // Reset all labels
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+
+  // Get user's selected answers
+  const userAnswers = Array.from(selectedInputs).map(input => input.value);
+
+  // Check each selected answer
+  selectedInputs.forEach(input => {
+    const label = input.closest("label");
+    if (correctAnswers.includes(input.value)) {
+      label.classList.add("user-correct");
+    } else {
+      label.classList.add("user-wrong");
+    }
+  });
+
+  // Mark unselected correct answers
+  correctAnswers.forEach(answer => {
+    const input = document.querySelector(`input[name="${qName}"][value="${answer}"]`);
+    if (!input.checked) {
+      const label = input.closest("label");
+      label.classList.add("correct");
+    }
+  });
+
+  explanationDiv.style.display = "block";
+  btn.style.display = "none";
+}
+</script>
+
+</body>
+</html>
