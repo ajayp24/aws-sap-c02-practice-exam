@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 14</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page13.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page15.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 14)</h1>
+
+<!-- ================= Q121 ================= -->
+<div class="question">
+<pre>
+<b>Question 121 – Topic 1 (Verbatim)</b>
+
+Question:
+A financial company is planning to migrate its web application from on premises to AWS. The company uses a third-party security tool to monitor the inbound traffic to the application. The company has used the security tool for the last 15 years, and the tool has no cloud solutions available from its vendor.
+The company plans to deploy the application on Amazon EC2 instances that run in an Auto Scaling group in a dedicated VPC.
+The company needs to use the security tool to inspect all packets that come in and out of the VPC. This inspection must occur in real time and must not affect the application’s performance.
+A solutions architect must design a target architecture on AWS that is highly available within an AWS Region.
+
+Which combination of steps should the solutions architect take to meet these requirements? (Choose two.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q121" value="A">
+    <span>A. Deploy the security tool on EC2 instances in a new Auto Scaling group in the existing VPC.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q121" value="B">
+    <span>B. Deploy the web application behind a Network Load Balancer.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q121" value="C">
+    <span>C. Deploy an Application Load Balancer in front of the security tool instances.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q121" value="D">
+    <span>D. Provision a Gateway Load Balancer for each Availability Zone to redirect the traffic to the security tool.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q121" value="E">
+    <span>E. Provision a transit gateway to facilitate communication between VPCs.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q121', ['A','D'], this, exp121)">Check Answer</button>
+
+<div class="explanation" id="exp121">
+  <button class="close-explanation" onclick="hideExplanation('exp121')">Close</button>
+  <b>✅ Correct Answers: A and D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a classic “third-party network appliance” question.
+  AWS is testing whether you recognize the one AWS service built specifically for inline packet inspection.
+  <br><br>
+  🔑 Step 1: Identify the non-negotiable requirements
+  <br><br>
+  Third-party security tool
+  <br>
+  No cloud-native version
+  <br>
+  Inspect all packets (L3/L4)
+  <br>
+  Must not affect application performance
+  <br><br>
+  🔑 Step 2: Recognize the Gateway Load Balancer (EXAM GOLD)
+  <br><br>
+  Gateway Load Balancer (GWLB) is designed for firewalls/IDS/IPS and third-party security appliances. It preserves IPs, offers near-zero latency, and scales appliances.
+  <br><br>
+  ✅ Option A: Deploy the security tool on EC2 instances in ASG — required because vendor provides EC2 appliance
+  <br>
+  ✅ Option D: Provision a GWLB per AZ — required to transparently steer traffic to appliances with high availability and performance
+  <br><br>
+  ❌ B, C, E are incorrect for reasons explained above.
+</div>
+</div>
+
+<!-- ================= Q122 ================= -->
+<div class="question">
+<pre>
+<b>Question 122 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has purchased appliances from different vendors. The appliances all have IoT sensors. The sensors send status information in the vendors' proprietary formats to a legacy application that parses the information into JSON. The parsing is simple, but each vendor has a unique format.
+Once daily, the application parses all the JSON records and stores the records in a relational database for analysis.
+The company needs to design a new data analysis solution that can deliver faster results and optimize costs.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q122" value="A">
+    <span>A. Connect the IoT sensors to AWS IoT Core. Set a rule to invoke an AWS Lambda function to parse the information and save a .csv file to Amazon S3. Use AWS Glue to catalog the files. Use Amazon Athena and Amazon QuickSight for analysis.</span>
+  </label>
+  <label>
+    <input type="radio" name="q122" value="B">
+    <span>B. Migrate the application server to AWS Fargate, which will receive the information from IoT sensors and parse the information into a relational format. Save the parsed information to Amazon Redshift for analysis.</span>
+  </label>
+  <label>
+    <input type="radio" name="q122" value="C">
+    <span>C. Create an AWS Transfer for SFTP server. Update the IoT sensor code to send the information as a .csv file through SFTP to the server. Use AWS Glue to catalog the files. Use Amazon Athena for analysis.</span>
+  </label>
+  <label>
+    <input type="radio" name="q122" value="D">
+    <span>D. Use AWS Snowball Edge to collect data from the IoT sensors directly to perform local analysis. Periodically collect the data into Amazon Redshift to perform global analysis.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q122', 'A', this, exp122)">Check Answer</button>
+
+<div class="explanation" id="exp122">
+  <button class="close-explanation" onclick="hideExplanation('exp122')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use IoT Core → Lambda → S3 → Glue → Athena/QuickSight for near-real-time, serverless, cost-effective analytics. This eliminates daily batch and RDBMS costs.
+</div>
+</div>
+
+<!-- ================= Q123 ================= -->
+<div class="question">
+<pre>
+<b>Question 123 – Topic 1 (Verbatim)</b>
+
+Question:
+A company is migrating some of its applications to AWS. The company wants to migrate and modernize the applications quickly after it finalizes networking and security strategies.
+The company has set up an AWS Direct Connect connection in a central network account. The company expects to have hundreds of AWS accounts and VPCs in the near future.
+The corporate network must be able to access the resources on AWS seamlessly and also must be able to communicate with all the VPCs. The company also wants to route its cloud resources to the internet through its on-premises data center.
+
+Which combination of steps will meet these requirements? (Choose three.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q123" value="A">
+    <span>A. Create a Direct Connect gateway in the central account. In each of the accounts, create an association proposal by using the Direct Connect gateway and the account ID for every virtual private gateway.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q123" value="B">
+    <span>B. Create a Direct Connect gateway and a transit gateway in the central network account. Attach the transit gateway to the Direct Connect gateway by using a transit VIF.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q123" value="C">
+    <span>C. Provision an internet gateway. Attach the internet gateway to subnets. Allow internet traffic through the gateway.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q123" value="D">
+    <span>D. Share the transit gateway with other accounts. Attach VPCs to the transit gateway.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q123" value="E">
+    <span>E. Provision VPC peering as necessary.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q123" value="F">
+    <span>F. Provision only private subnets. Open the necessary route on the transit gateway and customer gateway to allow outbound internet traffic from AWS to flow through NAT services that run in the data center.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q123', ['B','D','F'], this, exp123)">Check Answer</button>
+
+<div class="explanation" id="exp123">
+  <button class="close-explanation" onclick="hideExplanation('exp123')">Close</button>
+  <b>✅ Correct Answers: B, D, F</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use a central DXGW + TGW (transit VIF), share TGW across accounts, and route egress via on-prem NAT — hub-and-spoke hybrid architecture that scales.
+</div>
+</div>
+
+<!-- ================= Q124 ================= -->
+<div class="question">
+<pre>
+<b>Question 124 – Topic 1 (Verbatim)</b>
+
+Question:
+A company uses AWS Organizations with all features enabled. The company wants to centralize the purchase of Reserved Instances (RIs) so that only the organization’s management account can purchase RIs.
+The company wants to prevent member accounts from purchasing Reserved Instances while still allowing them to use the RI discounts that are shared across the organization.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q124" value="A">
+    <span>A. Disable Reserved Instance sharing in the management account. Allow only the management account to purchase Reserved Instances.</span>
+  </label>
+  <label>
+    <input type="radio" name="q124" value="B">
+    <span>B. Create an AWS Identity and Access Management (IAM) policy that denies the ec2:PurchaseReservedInstancesOffering action. Attach the policy to IAM users in all member accounts.</span>
+  </label>
+  <label>
+    <input type="radio" name="q124" value="C">
+    <span>C. Create a service control policy (SCP) that denies the ec2:PurchaseReservedInstancesOffering action. Attach the SCP to all organizational units (OUs) except the management account.</span>
+  </label>
+  <label>
+    <input type="radio" name="q124" value="D">
+    <span>D. Use AWS Budgets to create a cost budget that prevents member accounts from purchasing Reserved Instances.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q124', 'C', this, exp124)">Check Answer</button>
+
+<div class="explanation" id="exp124">
+  <button class="close-explanation" onclick="hideExplanation('exp124')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use an SCP denying the purchase API in member accounts while exempting the management account; RI sharing still works.
+</div>
+</div>
+
+<!-- ================= Q125 ================= -->
+<div class="question">
+<pre>
+Question:
+A company runs applications in multiple AWS accounts and multiple AWS Regions. The company must design a solution to centrally collect and store logs from all accounts and Regions.
+The solution must meet the following requirements:
+
+Near real-time log delivery
+
+Minimal operational overhead
+
+Logs must be retained for 7 years
+
+Security teams must be able to search and analyze logs centrally
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q125" value="A">
+    <span>A. Configure Amazon CloudWatch Logs subscription filters in each account and Region to send logs to a central Amazon OpenSearch Service (Amazon Elasticsearch Service) domain. Configure the domain to use UltraWarm storage for long-term retention.</span>
+  </label>
+  <label>
+    <input type="radio" name="q125" value="B">
+    <span>B. Configure AWS CloudTrail in each account and Region to deliver logs to an Amazon S3 bucket in a centralized logging account. Enable S3 Object Lock with compliance mode for 7-year retention. Use Amazon Athena to query the logs.</span>
+  </label>
+  <label>
+    <input type="radio" name="q125" value="C">
+    <span>C. Configure Amazon CloudWatch Logs to export log data periodically to Amazon S3 Glacier Deep Archive in a centralized logging account. Use AWS Glue to catalog the data and Amazon Redshift for analysis.</span>
+  </label>
+  <label>
+    <input type="radio" name="q125" value="D">
+    <span>D. Configure Amazon Kinesis Data Streams in each account and Region to stream logs to a central Amazon Redshift cluster for analysis. Configure automated snapshots for 7-year retention.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q125', 'B', this, exp125)">Check Answer</button>
+
+<div class="explanation" id="exp125">
+  <button class="close-explanation" onclick="hideExplanation('exp125')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use CloudTrail → centralized S3 with Object Lock (compliance) for 7-year immutable retention and Athena for query — minimal ops and compliant.
+</div>
+</div>
+
+<!-- ================= Q126 ================= -->
+<div class="question">
+<pre>
+<b>Question 126 – Topic 1 (Verbatim)</b>
+
+Question:
+A company operates applications in multiple AWS accounts and multiple AWS Regions. The company’s operations team needs to monitor application performance centrally by using Amazon CloudWatch metrics.
+The solution must meet the following requirements:
+
+Centralized visibility of metrics across accounts and Regions
+
+Near real-time access to metrics
+
+Minimal operational overhead
+
+The solution must follow AWS best practices for security
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q126" value="A">
+    <span>A. Configure Amazon CloudWatch metric streams in each account to send metrics to an Amazon Kinesis Data Firehose delivery stream in a centralized account. Store the metrics in Amazon S3. Query the metrics by using Amazon Athena.</span>
+  </label>
+  <label>
+    <input type="radio" name="q126" value="B">
+    <span>B. Configure Amazon CloudWatch dashboards in each account and share the dashboards with the centralized account.</span>
+  </label>
+  <label>
+    <input type="radio" name="q126" value="C">
+    <span>C. Use Amazon CloudWatch cross-account observability to link source accounts to a monitoring account. View metrics centrally from the monitoring account.</span>
+  </label>
+  <label>
+    <input type="radio" name="q126" value="D">
+    <span>D. Export Amazon CloudWatch metrics periodically from each account to Amazon S3. Use AWS Glue to catalog the data and Amazon Athena to query the metrics.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q126', 'C', this, exp126)">Check Answer</button>
+
+<div class="explanation" id="exp126">
+  <button class="close-explanation" onclick="hideExplanation('exp126')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use CloudWatch cross-account observability to link source accounts to a monitoring account — near real-time, minimal ops, secure.
+</div>
+</div>
+
+<!-- ================= Q127 ================= -->
+<div class="question">
+<pre>
+<b>Question 127 – Topic 1 (Verbatim)</b>
+
+Question:
+A company is building a centralized data lake on AWS by using Amazon S3. The data lake stores critical business data that is accessed by analytics workloads across multiple AWS accounts.
+The company has the following requirements:
+
+The data lake must be highly available and durable.
+
+The data lake must be protected from accidental deletion or overwrites.
+
+The data lake must support cross-Region disaster recovery.
+
+The solution must have minimal operational overhead.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q127" value="A">
+    <span>A. Enable S3 Versioning on the bucket. Enable S3 Cross-Region Replication (CRR) to a secondary Region. Use bucket policies to restrict delete actions.</span>
+  </label>
+  <label>
+    <input type="radio" name="q127" value="B">
+    <span>B. Enable S3 Object Lock in compliance mode on the bucket. Enable S3 Cross-Region Replication (CRR) to a secondary Region.</span>
+  </label>
+  <label>
+    <input type="radio" name="q127" value="C">
+    <span>C. Store the data in Amazon EFS with lifecycle policies. Enable AWS Backup to copy the data to another Region.</span>
+  </label>
+  <label>
+    <input type="radio" name="q127" value="D">
+    <span>D. Store the data in Amazon Glacier Deep Archive in two Regions. Restore the data when analytics workloads need access.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q127', 'B', this, exp127)">Check Answer</button>
+
+<div class="explanation" id="exp127">
+  <button class="close-explanation" onclick="hideExplanation('exp127')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use S3 Object Lock (compliance) + CRR for immutable, cross-Region data lake with minimal ops.
+</div>
+</div>
+
+<!-- ================= Q128 ================= -->
+<div class="question">
+<pre>
+<b>Question 128 – Topic 1 (Verbatim)</b>
+
+Question:
+A company runs a customer-facing application that serves users in North America, Europe, and Asia. The application is hosted on Amazon EC2 instances behind Application Load Balancers (ALBs) in multiple AWS Regions.
+The company requires the following:
+
+Lowest possible latency for users worldwide
+
+Automatic failover between Regions
+
+No changes to the application code
+
+TCP and UDP traffic must be supported
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q128" value="A">
+    <span>A. Use Amazon CloudFront with the ALBs as origins. Configure origin failover between Regions.</span>
+  </label>
+  <label>
+    <input type="radio" name="q128" value="B">
+    <span>B. Use Amazon Route 53 latency-based routing with health checks to route traffic to the closest Region.</span>
+  </label>
+  <label>
+    <input type="radio" name="q128" value="C">
+    <span>C. Use AWS Global Accelerator with endpoints in each Region that point to the ALBs.</span>
+  </label>
+  <label>
+    <input type="radio" name="q128" value="D">
+    <span>D. Deploy a single ALB in one Region. Use Auto Scaling to scale EC2 instances globally.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q128', 'C', this, exp128)">Check Answer</button>
+
+<div class="explanation" id="exp128">
+  <button class="close-explanation" onclick="hideExplanation('exp128')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  AWS Global Accelerator provides Anycast static IPs, TCP/UDP support, global network acceleration, and automatic failover — matching all requirements.
+</div>
+</div>
+
+<!-- ================= Q129 ================= -->
+<div class="question">
+<pre>
+<b>Question 129 – Topic 1 (Verbatim)</b>
+
+Question:
+A company runs a globally distributed application that stores user session data in an Amazon DynamoDB table. The application must be able to serve traffic from multiple AWS Regions and must continue to operate if one AWS Region becomes unavailable.
+The company wants a solution that provides low-latency access, automatic conflict resolution, and minimal operational overhead.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q129" value="A">
+    <span>A. Create DynamoDB global tables to replicate the table automatically across multiple Regions.</span>
+  </label>
+  <label>
+    <input type="radio" name="q129" value="B">
+    <span>B. Enable DynamoDB Streams on the table. Use AWS Lambda to replicate data to tables in other Regions.</span>
+  </label>
+  <label>
+    <input type="radio" name="q129" value="C">
+    <span>C. Use Amazon Aurora Global Database to store the session data across Regions.</span>
+  </label>
+  <label>
+    <input type="radio" name="q129" value="D">
+    <span>D. Store session data in Amazon S3 and enable cross-Region replication.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q129', 'A', this, exp129)">Check Answer</button>
+
+<div class="explanation" id="exp129">
+  <button class="close-explanation" onclick="hideExplanation('exp129')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Use DynamoDB Global Tables for multi-Region active-active, low-latency, automatic conflict resolution with minimal ops.
+</div>
+</div>
+
+<!-- ================= Q130 ================= -->
+<div class="question">
+<pre>
+<b>Question 130 – Topic 1 (Verbatim)</b>
+
+Question:
+A company runs a mission-critical application that uses an Amazon Aurora MySQL database. The database is deployed in a single AWS Region.
+The company must meet the following requirements:
+
+Recover to a separate AWS Region in the event of a Regional outage
+
+No data loss is allowed
+
+Minimal operational overhead
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q130" value="A">
+    <span>A. Provision an Aurora Replica in a different AWS Region.</span>
+  </label>
+  <label>
+    <input type="radio" name="q130" value="B">
+    <span>B. Set up AWS DataSync for continuous replication of the data to a different AWS Region.</span>
+  </label>
+  <label>
+    <input type="radio" name="q130" value="C">
+    <span>C. Set up AWS Database Migration Service (AWS DMS) to perform continuous replication of the data to a different AWS Region.</span>
+  </label>
+  <label>
+    <input type="radio" name="q130" value="D">
+    <span>D. Use Amazon Data Lifecycle Manager (Amazon DLM) to schedule a snapshot every 5 minutes.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q130', 'A', this, exp130)">Check Answer</button>
+
+<div class="explanation" id="exp130">
+  <button class="close-explanation" onclick="hideExplanation('exp130')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  Provision a cross-Region Aurora Replica to achieve managed, near-zero RPO and minimal operational overhead; promote replica for recovery.
+</div>
+</div>
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0 20px;">
+  <a href="page13.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page15.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div>
+
+<script>
+function checkAnswer(qName, correctAnswer, btn, explanationDiv) {
+  const selected = document.querySelector(`input[name="${qName}"]:checked`);
+  if (!selected) {
+    const existingError = btn.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.textContent = 'Please select an option first!';
+    errorMsg.style.cssText = 'color: #dc2626; background: #fee2e2; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 14px; font-weight: 600; border-left: 4px solid #ef4444;';
+    btn.parentElement.insertBefore(errorMsg, btn.nextSibling);
+    setTimeout(() => errorMsg.remove(), 3000);
+    return;
+  }
+  const existingError = btn.parentElement.querySelector('.error-message');
+  if (existingError) existingError.remove();
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+  const userAnswer = selected.value;
+  const userLabel = selected.closest("label");
+  if (userAnswer === correctAnswer) {
+    userLabel.classList.add("user-correct");
+  } else {
+    userLabel.classList.add("user-wrong");
+    const correctLabel = document.querySelector(`input[name="${qName}"][value="${correctAnswer}"]`).closest("label");
+    correctLabel.classList.add("correct");
+  }
+  const explanation = document.getElementById('exp' + qName.replace('q',''));
+  explanation.style.display = "block";
+  btn.style.display = "none";
+}
+
+function hideExplanation(expId) {
+  const exp = document.getElementById(expId);
+  exp.style.display = "none";
+  const btn = exp.previousElementSibling;
+  btn.style.display = "inline-block";
+  const qName = expId.replace('exp', 'q');
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    input.checked = false;
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+}
+
+function checkAnswerMultiple(qName, correctAnswers, btn, explanationDiv) {
+  const selectedInputs = document.querySelectorAll(`input[name="${qName}"]:checked`);
+  if (selectedInputs.length === 0) {
+    const existingError = btn.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.textContent = 'Please select an option first!';
+    errorMsg.style.cssText = 'color: #dc2626; background: #fee2e2; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 14px; font-weight: 600; border-left: 4px solid #ef4444;';
+    btn.parentElement.insertBefore(errorMsg, btn.nextSibling);
+    setTimeout(() => errorMsg.remove(), 3000);
+    return;
+  }
+  const existingError = btn.parentElement.querySelector('.error-message');
+  if (existingError) existingError.remove();
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+  const userAnswers = Array.from(selectedInputs).map(input => input.value);
+  selectedInputs.forEach(input => {
+    const label = input.closest("label");
+    if (correctAnswers.includes(input.value)) {
+      label.classList.add("user-correct");
+    } else {
+      label.classList.add("user-wrong");
+    }
+  });
+  correctAnswers.forEach(answer => {
+    const input = document.querySelector(`input[name="${qName}"][value="${answer}"]`);
+    if (!input.checked) {
+      const label = input.closest("label");
+      label.classList.add("correct");
+    }
+  });
+  const explanation = document.getElementById('exp' + qName.replace('q',''));
+  explanation.style.display = "block";
+  btn.style.display = "none";
+}
+</script>
+
+</body>
+</html>

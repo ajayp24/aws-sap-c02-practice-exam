@@ -1,0 +1,2233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 13</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page12.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page14.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 13)</h1>
+
+<!-- ================= Q111 ================= -->
+<div class="question">
+<pre>
+<b>Question 111 – Topic 1 (Verbatim)</b>
+
+Question:
+A solutions architect is auditing the security setup of an AWS Lambda function for a company. The Lambda function retrieves the latest changes from an Amazon Aurora database. The Lambda function and the database run in the same VPC.
+Lambda environment variables are providing the database credentials to the Lambda function.
+The Lambda function aggregates data and makes the data available in an Amazon S3 bucket that is configured for server-side encryption with AWS KMS managed encryption keys (SSE-KMS).
+The data must not travel across the Internet. If any database credentials become compromised, the company needs a solution that minimizes the impact of the compromise.
+
+What should the solutions architect recommend to meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q111" value="A">
+    <span>A. Enable IAM database authentication on the Aurora DB cluster. Change the IAM role for the Lambda function to allow the function to access the database by using IAM database authentication. Deploy a gateway VPC endpoint for Amazon S3 in the VPC.</span>
+  </label>
+  <label>
+    <input type="radio" name="q111" value="B">
+    <span>B. Enable IAM database authentication on the Aurora DB cluster. Change the IAM role for the Lambda function to allow the function to access the database by using IAM database authentication. Enforce HTTPS on the connection to Amazon S3 during data transfers.</span>
+  </label>
+  <label>
+    <input type="radio" name="q111" value="C">
+    <span>C. Save the database credentials in AWS Systems Manager Parameter Store. Set up password rotation on the credentials in Parameter Store. Change the IAM role for the Lambda function to allow the function to access Parameter Store. Modify the Lambda function to retrieve the credentials from Parameter Store. Deploy a gateway VPC endpoint for Amazon S3 in the VPC.</span>
+  </label>
+  <label>
+    <input type="radio" name="q111" value="D">
+    <span>D. Save the database credentials in AWS Secrets Manager. Set up password rotation on the credentials in Secrets Manager. Change the IAM role for the Lambda function to allow the function to access Secrets Manager. Modify the Lambda function to retrieve the credentials from Secrets Manager. Enforce HTTPS on the connection to Amazon S3 during data transfers.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q111', 'A', this, exp111)">Check Answer</button>
+
+<div class="explanation" id="exp111">
+  <button class="close-explanation" onclick="hideExplanation('exp111')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a security + networking combo question, and it’s packed with exam signals.
+  <br><br>
+  <b>🔑 Step 1: Identify the TWO hard requirements (do not mix them up)</b>
+  <br><br>
+  There are two separate constraints:
+  <br><br>
+  1️⃣ “The data must not travel across the Internet”
+  <br><br>
+  This is a networking requirement, not an encryption requirement.
+  <br><br>
+  2️⃣ “Minimize the impact if database credentials are compromised”
+  <br><br>
+  This is an authentication / credential model requirement.
+  <br><br>
+  AWS expects you to solve both, not just one.
+  <br><br>
+  <b>🔑 Step 2: Understand why the CURRENT design is bad</b>
+  <br><br>
+  Current state:
+  <br><br>
+  Lambda uses environment variables for DB credentials
+  <br><br>
+  Problems:
+  <br><br>
+  Credentials are long-lived
+  <br>
+  If leaked → attacker has full DB access
+  <br>
+  Rotation is manual or brittle
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Environment variables with static credentials = ❌ for security-sensitive systems.
+  <br><br>
+  <b>🔑 Step 3: How do we eliminate database credentials entirely?</b>
+  <br><br>
+  AWS has one clean answer:
+  <br><br>
+  <b>IAM database authentication</b>
+  <br><br>
+  What this does:
+  <br><br>
+  No username/password stored
+  <br>
+  Lambda uses its IAM role
+  <br>
+  Short-lived auth tokens
+  <br><br>
+  If compromised → token expires quickly
+  <br><br>
+  This directly satisfies:
+  <br><br>
+  “minimize the impact of credential compromise”
+  <br><br>
+  <b>🔑 Step 4: Handle the “must not travel across the Internet” requirement</b>
+  <br><br>
+  This is where many people get tricked.
+  <br><br>
+  Important fact:
+  <br><br>
+  HTTPS does NOT mean “not using the Internet”
+  <br><br>
+  HTTPS still traverses the public AWS endpoint unless a VPC endpoint exists
+  <br><br>
+  To keep S3 traffic inside AWS’s private network, you need:
+  <br><br>
+  A gateway VPC endpoint for Amazon S3
+  <br><br>
+  This ensures:
+  <br><br>
+  No Internet Gateway
+  <br>
+  No NAT Gateway
+  <br>
+  Traffic stays on AWS backbone
+  <br><br>
+  <b>✅ Why Option A is Correct (Deep Dive)</b>
+  <br><br>
+  Option A does both required things, cleanly and minimally:
+  <br><br>
+  ✅ Solves credential compromise
+  <br><br>
+  IAM DB authentication
+  <br>
+  No stored secrets
+  <br>
+  Short-lived tokens
+  <br><br>
+  ✅ Solves “no Internet” requirement
+  <br><br>
+  Gateway VPC endpoint for S3
+  <br>
+  Private routing inside AWS
+  <br><br>
+  ✅ Minimal operational overhead
+  <br><br>
+  No secret rotation workflows
+  <br>
+  No custom credential logic
+  <br>
+  Uses native AWS integrations
+  <br><br>
+  This is textbook AWS Well-Architected security.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — IAM DB auth + HTTPS only</b>
+  <br><br>
+  Why this fails
+  <br><br>
+  HTTPS ≠ private networking
+  <br>
+  Traffic still goes over public S3 endpoints
+  <br>
+  Violates “must not travel across the Internet”
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If the question says “must not travel across the Internet” → you need a VPC endpoint, not just encryption.
+  <br><br>
+  <b>❌ Option C — Parameter Store + rotation</b>
+  <br><br>
+  Why this is inferior
+  <br><br>
+  Still uses stored credentials
+  <br>
+  Rotation ≠ elimination of credentials
+  <br>
+  More operational complexity than IAM DB auth
+  <br><br>
+  Parameter Store is good — but not best here.
+  <br><br>
+  <b>❌ Option D — Secrets Manager + rotation</b>
+  <br><br>
+  Why this looks tempting (but is wrong)
+  <br><br>
+  Secrets Manager is excellent
+  <br>
+  Rotation is great
+  <br><br>
+  But:
+  <br><br>
+  Still long-lived credentials
+  <br>
+  Does NOT eliminate credential compromise
+  <br>
+  HTTPS alone doesn’t prevent Internet traversal
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If IAM-based auth is available, AWS prefers it over stored secrets.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  IAM DB authentication &gt; Secrets Manager (when available)
+  <br>
+  HTTPS ≠ private networking
+  <br>
+  “Must not travel across Internet” = VPC endpoint
+  <br>
+  Eliminate credentials &gt; rotate credentials
+  <br>
+  Gateway VPC endpoint is required for S3 private access
+</div>
+</div>
+
+<!-- ================= Q112 ================= -->
+<div class="question">
+<pre>
+<b>Question 112 – Topic 1 (Verbatim)</b>
+
+Question:
+A large mobile gaming company has successfully migrated all of its on-premises infrastructure to the AWS Cloud. A solutions architect is reviewing the environment to ensure that it was built according to the design and that it is running in alignment with the Well-Architected Framework.
+While reviewing previous monthly costs in Cost Explorer, the solutions architect notices that the creation and subsequent termination of several large instance types account for a high proportion of the costs. The solutions architect finds out that the company’s developers are launching new Amazon EC2 instances as part of their testing and that the developers are not using the appropriate instance types.
+The solutions architect must implement a control mechanism to limit the instance types that only the developers can launch.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q112" value="A">
+    <span>A. Create a desired-instance-type managed rule in AWS Config. Configure the rule with the instance types that are allowed. Attach the rule to an event to run each time a new EC2 instance is launched.</span>
+  </label>
+  <label>
+    <input type="radio" name="q112" value="B">
+    <span>B. In the EC2 console, create a launch template that specifies the instance types that are allowed. Assign the launch template to the developers’ IAM accounts.</span>
+  </label>
+  <label>
+    <input type="radio" name="q112" value="C">
+    <span>C. Create a new IAM policy. Specify the instance types that are allowed. Attach the policy to an IAM group that contains the IAM accounts for the developers.</span>
+  </label>
+  <label>
+    <input type="radio" name="q112" value="D">
+    <span>D. Use EC2 Image Builder to create an image pipeline for the developers and assist them in the creation of a golden image.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q112', 'C', this, exp112)">Check Answer</button>
+
+<div class="explanation" id="exp112">
+  <button class="close-explanation" onclick="hideExplanation('exp112')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is about preventive controls, not monitoring, not best practices, and not documentation.
+  <br><br>
+  AWS is testing whether you know how to STOP something from happening, not just detect it.
+  <br><br>
+  <b>🔑 Step 1: Understand the real problem</b>
+  <br><br>
+  What’s happening?
+  <br><br>
+  Developers:
+  <br><br>
+  Are launching EC2 instances
+  <br>
+  Are choosing large instance types
+  <br><br>
+  Result:
+  <br><br>
+  High cost
+  <br>
+  Instances launched and terminated repeatedly
+  <br><br>
+  Requirement:
+  <br><br>
+  Limit what developers can launch
+  <br><br>
+  Must be a control mechanism
+  <br><br>
+  Key word:
+  <br><br>
+  limit
+  <br><br>
+  This immediately tells us:
+  <br><br>
+  ❌ Reporting-only solutions are insufficient
+  <br><br>
+  ❌ Detection-only solutions are insufficient
+  <br><br>
+  ✅ Must block the action
+  <br><br>
+  <b>🔑 Step 2: Understand what kind of control AWS wants</b>
+  <br><br>
+  AWS has three main control types:
+  <br><br>
+  Detective (after the fact)
+  <br>
+  → AWS Config, logs, reports
+  <br><br>
+  Preventive (before it happens)
+  <br>
+  → IAM policies, SCPs
+  <br><br>
+  Corrective (after detection)
+  <br>
+  → Lambda remediation
+  <br><br>
+  This question explicitly wants a preventive control.
+  <br><br>
+  <b>🔑 Step 3: Identify who is being restricted</b>
+  <br><br>
+  The question says:
+  <br><br>
+  “limit the instance types that only the developers can launch”
+  <br><br>
+  This tells us:
+  <br><br>
+  Restriction is role/user-based
+  <br>
+  Not organization-wide
+  <br>
+  Not account-wide
+  <br><br>
+  So:
+  <br><br>
+  SCPs would be too broad
+  <br>
+  IAM policies are the right tool
+  <br><br>
+  <b>✅ Why Option C is Correct (Deep Dive)</b>
+  <br><br>
+  Option C says:
+  <br><br>
+  Create an IAM policy that specifies allowed instance types and attach it to an IAM group for developers
+  <br><br>
+  This is the cleanest preventive control:
+  <br><br>
+  IAM supports conditions on ec2:InstanceType
+  <br><br>
+  Policy can:
+  <br><br>
+  Allow t3.micro, t3.small, etc.
+  <br><br>
+  Deny everything else
+  <br><br>
+  Applies only to developers
+  <br><br>
+  Blocks the launch before it happens
+  <br><br>
+  This:
+  <br><br>
+  Directly controls cost
+  <br>
+  Aligns with Well-Architected (Cost Optimization pillar)
+  <br>
+  Has minimal overhead
+  <br><br>
+  <b>🧠 EXAM GOLD:</b>
+  <br>
+  IAM policies are the only way here to proactively prevent the launch of specific instance types by specific users.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important Traps)</b>
+  <br><br>
+  <b>❌ Option A — AWS Config rule</b>
+  <br><br>
+  Why this fails
+  <br><br>
+  AWS Config:
+  <br><br>
+  Detects noncompliance
+  <br>
+  Does not prevent launches
+  <br><br>
+  Even with remediation:
+  <br><br>
+  Instance is already launched
+  <br>
+  Cost is already incurred
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If the question says limit / prevent, AWS Config alone is wrong.
+  <br><br>
+  <b>❌ Option B — Launch templates</b>
+  <br><br>
+  Why this fails
+  <br><br>
+  Launch templates:
+  <br><br>
+  Can restrict instance types
+  <br><br>
+  But only when they are used
+  <br><br>
+  Developers can:
+  <br><br>
+  Ignore templates
+  <br>
+  Use CLI / SDK
+  <br>
+  Launch instances directly
+  <br><br>
+  This is not enforceable.
+  <br><br>
+  <b>❌ Option D — EC2 Image Builder</b>
+  <br><br>
+  Why this is irrelevant
+  <br><br>
+  Image Builder controls:
+  <br><br>
+  AMIs
+  <br><br>
+  It does not control:
+  <br><br>
+  Instance size
+  <br>
+  Instance type
+  <br><br>
+  Developers could still launch large instances using the AMI
+  <br><br>
+  This option addresses a different problem entirely.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  Preventive controls = IAM or SCP
+  <br>
+  AWS Config = detection, not prevention
+  <br>
+  Launch templates are optional, not enforceable
+  <br>
+  IAM policies can restrict ec2:InstanceType
+  <br>
+  Cost optimization often = permission control
+</div>
+</div>
+
+<!-- ================= Q113 ================= -->
+<div class="question">
+<pre>
+<b>Question 113 – Topic 1 (Verbatim)</b>
+
+Question:
+A company is developing and hosting several projects in the AWS Cloud. The projects are developed across multiple AWS accounts under the same organization in AWS Organizations.
+The company requires the cost for cloud infrastructure to be allocated to the owning project. The team responsible for all of the AWS accounts has discovered that several Amazon EC2 instances are lacking the Project tag used for cost allocation.
+
+Which actions should a solutions architect take to resolve the problem and prevent it from happening in the future? (Choose three.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q113" value="A">
+    <span>A. Create an AWS Config rule in each account to find resources with missing tags.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q113" value="B">
+    <span>B. Create an SCP in the organization with a deny action for ec2:RunInstances if the Project tag is missing.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q113" value="C">
+    <span>C. Use Amazon Inspector in the organization to find resources with missing tags.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q113" value="D">
+    <span>D. Create an IAM policy in each account with a deny action for ec2:RunInstances if the Project tag is missing.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q113" value="E">
+    <span>E. Create an AWS Config aggregator for the organization to collect a list of EC2 instances with the missing Project tag.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q113" value="F">
+    <span>F. Use AWS Security Hub to aggregate a list of EC2 instances with the missing Project tag.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q113', ['A','B','E'], this, exp113)">Check Answer</button>
+
+<div class="explanation" id="exp113">
+  <button class="close-explanation" onclick="hideExplanation('exp113')">Close</button>
+  <b>✅ Correct Answers: A, B, E</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is about governance at scale.
+  <br>
+  AWS is testing whether you understand how to combine detection + prevention + centralized visibility.
+  <br><br>
+  You must do three things:
+  <br><br>
+  Find existing problems
+  <br>
+  Prevent future problems
+  <br>
+  See everything centrally across accounts
+  <br><br>
+  Each selected option must clearly map to one of these goals.
+  <br><br>
+  <b>🔑 Step 1: Break the requirement into three buckets</b>
+  <br><br>
+  Let’s translate the question into architecture language.
+  <br><br>
+  Requirement 1:
+  <br><br>
+  “several EC2 instances are lacking the Project tag”
+  <br><br>
+  ➡ We need detection of missing tags.
+  <br><br>
+  Requirement 2:
+  <br><br>
+  “prevent it from happening in the future”
+  <br><br>
+  ➡ We need prevention, not just alerts.
+  <br><br>
+  Requirement 3:
+  <br><br>
+  “multiple AWS accounts under an organization”
+  <br><br>
+  ➡ We need centralized, org-wide visibility.
+  <br><br>
+  <b>🔑 Step 2: Map AWS services to each requirement</b>
+  <br><br>
+  Requirement	AWS Capability
+  <br><br>
+  Detect missing tags	AWS Config
+  <br><br>
+  Prevent untagged launches	SCP
+  <br><br>
+  Centralized view	Config Aggregator
+  <br><br>
+  Once you see this mapping, the answer becomes very clear.
+  <br><br>
+  <b>✅ Why A, B, and E are CORRECT</b>
+  <br><br>
+  <b>✅ Option A — AWS Config rule (Detection)</b>
+  <br><br>
+  Create an AWS Config rule to find resources with missing tags
+  <br><br>
+  Why this is required
+  <br><br>
+  AWS Config:
+  <br><br>
+  Continuously evaluates resource configuration
+  <br>
+  Can detect missing or incorrect tags
+  <br><br>
+  This addresses existing EC2 instances
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  AWS Config = detect &amp; evaluate, not prevent.
+  <br><br>
+  <b>✅ Option B — SCP deny on RunInstances (Prevention)</b>
+  <br><br>
+  Deny ec2:RunInstances if Project tag is missing
+  <br><br>
+  Why this is critical
+  <br><br>
+  SCPs:
+  <br><br>
+  Apply across the organization
+  <br>
+  Cannot be bypassed
+  <br><br>
+  Prevents:
+  <br><br>
+  Untagged EC2 launches
+  <br>
+  Cost leakage
+  <br><br>
+  Enforces tagging before the instance is created
+  <br><br>
+  <b>🧠 EXAM GOLD:</b>
+  <br>
+  Tag enforcement at creation time = SCP, not IAM alone.
+  <br><br>
+  <b>✅ Option E — AWS Config Aggregator (Centralized visibility)</b>
+  <br><br>
+  Aggregate compliance results across accounts
+  <br><br>
+  Why this is necessary
+  <br><br>
+  Company has multiple accounts
+  <br><br>
+  Without an aggregator:
+  <br><br>
+  You must check each account manually
+  <br><br>
+  Aggregator provides:
+  <br><br>
+  Single-pane-of-glass view
+  <br>
+  Organization-wide compliance reporting
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Multi-account visibility = Config Aggregator.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important Exam Traps)</b>
+  <br><br>
+  <b>❌ Option C — Amazon Inspector</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  Inspector is for:
+  <br><br>
+  Vulnerabilities
+  <br>
+  CVEs
+  <br>
+  Runtime risk
+  <br><br>
+  It does not evaluate tags
+  <br><br>
+  Wrong tool, wrong problem.
+  <br><br>
+  <b>❌ Option D — IAM policy deny in each account</b>
+  <br><br>
+  Why this is inferior to SCP
+  <br><br>
+  IAM policies:
+  <br><br>
+  Are account-specific
+  <br>
+  Can be overridden
+  <br><br>
+  SCPs:
+  <br><br>
+  Are organization-wide
+  <br>
+  Cannot be bypassed
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Organization-wide enforcement = SCP &gt; IAM.
+  <br><br>
+  <b>❌ Option F — AWS Security Hub</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  Security Hub:
+  <br><br>
+  Aggregates security findings
+  <br><br>
+  Not tagging compliance
+  <br><br>
+  Tags are cost governance, not security posture
+  <br><br>
+  Another “sounds enterprise” trap.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  Detection = AWS Config
+  <br>
+  Prevention = SCP
+  <br>
+  Multi-account visibility = Config Aggregator
+  <br>
+  IAM policies are weaker than SCPs for governance
+  <br>
+  Tag enforcement is a cost + governance problem, not security
+</div>
+</div>
+
+<!-- ================= Q114 ================= -->
+<div class="question">
+<pre>
+<b>Question 114 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has an on-premises monitoring solution using a PostgreSQL database for persistence of events. The database is unable to scale due to heavy ingestion and it frequently runs out of storage.
+The company wants to create a hybrid solution and has already set up a VPN connection between its network and AWS. The solution should include the following attributes:
+
+Managed AWS services to minimize operational complexity
+
+A buffer that automatically scales to match the throughput of data and requires no ongoing administration
+
+A visualization tool to create dashboards to observe events in near-real time
+
+Support for semi-structured JSON data and dynamic schemas
+
+Which combination of components will enable the company to create a monitoring solution that will satisfy these requirements? (Choose two.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q114" value="A">
+    <span>A. Use Amazon Kinesis Data Firehose to buffer events. Create an AWS Lambda function to process and transform events.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q114" value="B">
+    <span>B. Create an Amazon Kinesis data stream to buffer events. Create an AWS Lambda function to process and transform events.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q114" value="C">
+    <span>C. Configure an Amazon Aurora PostgreSQL DB cluster to receive events. Use Amazon QuickSight to read from the database and create near-real-time visualizations and dashboards.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q114" value="D">
+    <span>D. Configure Amazon Elasticsearch Service (Amazon ES) to receive events. Use the Kibana endpoint deployed with Amazon ES to create near-real-time visualizations and dashboards.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q114" value="E">
+    <span>E. Configure an Amazon Neptune DB instance to receive events. Use Amazon QuickSight to read from the database and create near-real-time visualizations and dashboards.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q114', ['A','D'], this, exp114)">Check Answer</button>
+
+<div class="explanation" id="exp114">
+  <button class="close-explanation" onclick="hideExplanation('exp114')">Close</button>
+  <b>✅ Correct Answers: A and D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a streaming + analytics architecture question, not a database question.
+  <br><br>
+  AWS is testing whether you understand:
+  <br><br>
+  Streaming ingestion
+  <br>
+  Managed buffering
+  <br>
+  Near real-time analytics
+  <br>
+  Schema flexibility
+  <br><br>
+  <b>🔑 Step 1: Understand why the current system is failing</b>
+  <br><br>
+  On-prem system:
+  <br><br>
+  PostgreSQL database
+  <br><br>
+  Used as:
+  <br><br>
+  Event store
+  <br>
+  Ingestion buffer
+  <br>
+  Analytics backend
+  <br><br>
+  Why it fails:
+  <br><br>
+  Databases are not ingestion buffers
+  <br>
+  Heavy write volume
+  <br>
+  Storage exhaustion
+  <br>
+  Schema rigidity
+  <br><br>
+  AWS wants you to:
+  <br><br>
+  Stop using a relational database as a streaming buffer
+  <br><br>
+  <b>🔑 Step 2: Decode the MOST IMPORTANT requirement</b>
+  <br><br>
+  The most decisive bullet point is:
+  <br><br>
+  “A buffer that automatically scales to match the throughput of data and requires no ongoing administration”
+  <br><br>
+  This single line kills half the options.
+  <br><br>
+  What AWS services auto-scale with zero shard management?
+  <br><br>
+  ❌ Kinesis Data Streams (you manage shards unless on-demand)
+  <br><br>
+  ❌ Databases
+  <br><br>
+  ❌ Neptune
+  <br><br>
+  ✅ Kinesis Data Firehose
+  <br><br>
+  <b>🧠 Exam rule (VERY IMPORTANT):</b>
+  <br>
+  If the question says “no ongoing administration”, AWS prefers Firehose over Streams.
+  <br><br>
+  <b>🔑 Step 3: Understand “near-real-time dashboards + JSON + dynamic schema”</b>
+  <br><br>
+  This requirement screams:
+  <br><br>
+  Semi-structured data
+  <br>
+  Search + aggregation
+  <br>
+  Real-time dashboards
+  <br><br>
+  Which AWS service is built for this?
+  <br><br>
+  Amazon Elasticsearch Service (now Amazon OpenSearch Service)
+  <br><br>
+  With:
+  <br><br>
+  JSON documents
+  <br>
+  Dynamic schemas
+  <br>
+  Kibana dashboards
+  <br>
+  Near-real-time indexing
+  <br><br>
+  <b>✅ Why Option A is Correct</b>
+  <br><br>
+  Option A: Kinesis Data Firehose + Lambda
+  <br><br>
+  Why Firehose?
+  <br><br>
+  Fully managed
+  <br>
+  Auto-scales ingestion
+  <br>
+  No shard management
+  <br>
+  Built-in buffering (size + time)
+  <br>
+  Native integration with downstream analytics
+  <br><br>
+  Why Lambda?
+  <br><br>
+  Lightweight transformation
+  <br>
+  JSON enrichment
+  <br>
+  Schema normalization
+  <br><br>
+  This solves:
+  <br><br>
+  Buffering
+  <br>
+  Scaling
+  <br>
+  Operational simplicity
+  <br><br>
+  <b>✅ Why Option D is Correct</b>
+  <br><br>
+  Option D: Amazon Elasticsearch Service + Kibana
+  <br><br>
+  Why OpenSearch/Elasticsearch?
+  <br><br>
+  Near-real-time indexing
+  <br>
+  JSON-native
+  <br>
+  Dynamic schemas
+  <br>
+  Aggregations at scale
+  <br><br>
+  Kibana = dashboards out of the box
+  <br><br>
+  This solves:
+  <br><br>
+  Visualization
+  <br>
+  Analytics
+  <br>
+  Schema flexibility
+  <br><br>
+  <b>🔗 How the final architecture looks (important to visualize)</b>
+  <br><br>
+  On-prem → VPN → Kinesis Data Firehose
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Lambda (transform)
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Amazon OpenSearch (Elasticsearch)
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓
+  <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Kibana dashboards
+  <br><br>
+  This is a canonical AWS monitoring pipeline.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — Kinesis Data Streams</b>
+  <br><br>
+  Why this fails the requirement
+  <br><br>
+  Requires shard management
+  <br>
+  Requires capacity planning (unless explicitly stated on-demand)
+  <br>
+  More operational overhead than Firehose
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Firehose &gt; Streams when simplicity is required.
+  <br><br>
+  <b>❌ Option C — Aurora + QuickSight</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  Aurora is still a relational DB
+  <br><br>
+  Not designed for:
+  <br><br>
+  Streaming ingestion
+  <br>
+  Near-real-time dashboards
+  <br>
+  Schema rigidity remains
+  <br><br>
+  This repeats the original problem.
+  <br><br>
+  <b>❌ Option E — Neptune</b>
+  <br><br>
+  Why this is irrelevant
+  <br><br>
+  Neptune = graph database
+  <br><br>
+  Used for:
+  <br><br>
+  Relationships
+  <br>
+  Traversals
+  <br><br>
+  Not event ingestion
+  <br>
+  Not monitoring dashboards
+  <br><br>
+  Classic “sounds fancy” distractor.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  Streaming ingestion ≠ relational databases
+  <br>
+  Firehose = auto-scale, zero admin
+  <br>
+  Streams = more control, more ops
+  <br>
+  Near-real-time dashboards = OpenSearch
+  <br>
+  JSON + dynamic schema = document store, not RDBMS
+</div>
+</div>
+
+<!-- ================= Q115 ================= -->
+<div class="question">
+<pre>
+<b>Question 115 – Topic 1 (Verbatim)</b>
+
+Question:
+A team collects and routes behavioral data for an entire company. The company runs a Multi-AZ VPC environment with public subnets, private subnets, and an internet gateway. Each public subnet also contains a NAT gateway.
+Most of the company’s applications read from and write to Amazon Kinesis Data Streams. Most of the workloads run in private subnets.
+A solutions architect must review the infrastructure. The solutions architect needs to reduce costs and maintain the function of the applications. The solutions architect uses Cost Explorer and notices that the cost in the EC2-Other category is consistently high. A further review shows that NatGateway-Bytes charges are increasing the cost in the EC2-Other category.
+
+What should the solutions architect do to meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q115" value="A">
+    <span>A. Enable VPC Flow Logs. Use Amazon Athena to analyze the logs for traffic that can be removed. Ensure that security groups are blocking traffic that is responsible for high costs.</span>
+  </label>
+  <label>
+    <input type="radio" name="q115" value="B">
+    <span>B. Add an interface VPC endpoint for Kinesis Data Streams to the VPC. Ensure that applications have the correct IAM permissions to use the interface VPC endpoint.</span>
+  </label>
+  <label>
+    <input type="radio" name="q115" value="C">
+    <span>C. Enable VPC Flow Logs and Amazon Detective. Review Detective findings for traffic that is not related to Kinesis Data Streams. Configure security groups to block that traffic.</span>
+  </label>
+  <label>
+    <input type="radio" name="q115" value="D">
+    <span>D. Add an interface VPC endpoint for Kinesis Data Streams to the VPC. Ensure that the VPC endpoint policy allows traffic from the applications.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q115', 'B', this, exp115)">Check Answer</button>
+
+<div class="explanation" id="exp115">
+  <button class="close-explanation" onclick="hideExplanation('exp115')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is a classic cost-optimization + networking pattern that shows up a lot in SAP-C02.
+  <br><br>
+  AWS wants to know if you can:
+  <br><br>
+  Read a billing signal
+  <br>
+  Map it to a networking cause
+  <br>
+  Apply the correct private connectivity solution
+  <br><br>
+  <b>🔑 Step 1: Understand the billing clue (VERY IMPORTANT)</b>
+  <br><br>
+  The key billing phrase is:
+  <br><br>
+  EC2-Other → NatGateway-Bytes
+  <br><br>
+  This tells you:
+  <br><br>
+  Traffic is flowing from private subnets
+  <br>
+  Out through NAT gateways
+  <br>
+  To reach an AWS public endpoint
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If you see NatGateway-Bytes, the problem is almost always private subnet → AWS service over the public internet.
+  <br><br>
+  <b>🔑 Step 2: Understand the traffic pattern</b>
+  <br><br>
+  Given facts:
+  <br><br>
+  Applications are in private subnets
+  <br>
+  Applications talk to Kinesis Data Streams
+  <br><br>
+  Kinesis is an AWS service with a public endpoint
+  <br><br>
+  Without a VPC endpoint:
+  <br><br>
+  Traffic goes:
+  <br><br>
+  Private subnet → NAT Gateway → Internet → Kinesis public endpoint
+  <br><br>
+  You pay:
+  <br><br>
+  NAT hourly cost
+  <br>
+  NAT data processing cost
+  <br><br>
+  That explains the EC2-Other cost spike.
+  <br><br>
+  <b>🔑 Step 3: What AWS expects you to do</b>
+  <br><br>
+  When:
+  <br><br>
+  Private workloads talk heavily to AWS services
+  <br>
+  NAT costs increase
+  <br>
+  Functionality must remain the same
+  <br><br>
+  AWS expects you to use:
+  <br><br>
+  VPC endpoints
+  <br><br>
+  Specifically:
+  <br><br>
+  Interface VPC endpoints for Kinesis
+  <br><br>
+  <b>✅ Why Option B is Correct (Deep Dive)</b>
+  <br><br>
+  Option B says:
+  <br><br>
+  Add an interface VPC endpoint for Kinesis Data Streams
+  <br>
+  Ensure applications have the correct IAM permissions
+  <br><br>
+  This solves everything:
+  <br><br>
+  ✅ Eliminates NAT traffic
+  <br><br>
+  Traffic stays inside the AWS network
+  <br><br>
+  No NAT gateway usage
+  <br><br>
+  Immediate cost reduction
+  <br><br>
+  ✅ Maintains application behavior
+  <br><br>
+  Same APIs
+  <br>
+  Same SDK calls
+  <br>
+  No code changes
+  <br><br>
+  ✅ Uses the correct security model
+  <br><br>
+  IAM permissions still control access
+  <br>
+  Endpoint policies are optional, not required
+  <br><br>
+  <b>🧠 Important exam nuance:</b>
+  <br>
+  For most AWS services (including Kinesis), IAM permissions are what actually authorize access, not endpoint policies.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important Traps)</b>
+  <br><br>
+  <b>❌ Option A — Flow Logs + Athena</b>
+  <br><br>
+  Why this fails
+  <br><br>
+  Flow Logs help you observe
+  <br><br>
+  They do not:
+  <br><br>
+  Reduce NAT usage
+  <br>
+  Change routing
+  <br><br>
+  Blocking traffic would break the application
+  <br><br>
+  This diagnoses the problem but does not fix it.
+  <br><br>
+  <b>❌ Option C — Flow Logs + Detective</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  Detective is for:
+  <br><br>
+  Security investigations
+  <br>
+  Threat analysis
+  <br><br>
+  This is a cost issue, not a security issue
+  <br><br>
+  Wrong service category.
+  <br><br>
+  <b>❌ Option D — Endpoint policy focus</b>
+  <br><br>
+  This is a very subtle exam trap.
+  <br><br>
+  Why this is not the best answer:
+  <br><br>
+  VPC endpoint policies are:
+  <br><br>
+  Optional
+  <br>
+  Default policy already allows traffic
+  <br><br>
+  Applications still require IAM permissions
+  <br><br>
+  AWS exams almost always emphasize:
+  <br><br>
+  IAM permissions &gt; endpoint policies
+  <br><br>
+  Option D focuses on the wrong control plane.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  NatGateway-Bytes = private subnet → public endpoint
+  <br>
+  AWS service traffic ≠ Internet traffic (use endpoints)
+  <br>
+  Kinesis uses interface VPC endpoints
+  <br>
+  IAM permissions authorize access, not endpoint policies
+  <br>
+  Cost optimization often starts with network routing
+</div>
+</div>
+
+<!-- ================= Q116 ================= -->
+<div class="question">
+<pre>
+<b>Question 116 – Topic 1 (Verbatim)</b>
+
+Question:
+A retail company has an on-premises data center in Europe. The company also has a multi-Region AWS presence that includes the eu-west-1 and us-east-1 Regions.
+The company wants to be able to route network traffic from its on-premises infrastructure into VPCs in either of those Regions. The company also needs to support traffic that is routed directly between VPCs in those Regions.
+No single points of failure can exist on the network.
+
+The company already has created two 1 Gbps AWS Direct Connect connections from its on-premises data center. Each connection goes into a separate Direct Connect location in Europe for high availability. These two locations are named DX-A and DX-B, respectively.
+Each Region has a single AWS Transit Gateway that is configured to route all inter-VPC traffic within that Region.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q116" value="A">
+    <span>A. Create a private VIF from the DX-A connection into a Direct Connect gateway. Create a private VIF from the DX-B connection into the same Direct Connect gateway for high availability. Associate both the eu-west-1 and us-east-1 transit gateways with the Direct Connect gateway. Peer the transit gateways with each other to support cross-Region routing.</span>
+  </label>
+  <label>
+    <input type="radio" name="q116" value="B">
+    <span>B. Create a transit VIF from the DX-A connection into a Direct Connect gateway. Associate the eu-west-1 transit gateway with this Direct Connect gateway. Create a transit VIF from the DX-B connection into a separate Direct Connect gateway. Associate the us-east-1 transit gateway with this separate Direct Connect gateway. Peer the Direct Connect gateways with each other to support high availability and cross-Region routing.</span>
+  </label>
+  <label>
+    <input type="radio" name="q116" value="C">
+    <span>C. Create a transit VIF from the DX-A connection into a Direct Connect gateway. Create a transit VIF from the DX-B connection into the same Direct Connect gateway for high availability. Associate both the eu-west-1 and us-east-1 transit gateways with this Direct Connect gateway. Configure the Direct Connect gateway to route traffic between the transit gateways.</span>
+  </label>
+  <label>
+    <input type="radio" name="q116" value="D">
+    <span>D. Create a transit VIF from the DX-A connection into a Direct Connect gateway. Create a transit VIF from the DX-B connection into the same Direct Connect gateway for high availability. Associate both the eu-west-1 and us-east-1 transit gateways with this Direct Connect gateway. Peer the transit gateways with each other to support cross-Region routing.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q116', 'D', this, exp116)">Check Answer</button>
+
+<div class="explanation" id="exp116">
+  <button class="close-explanation" onclick="hideExplanation('exp116')">Close</button>
+  <b>✅ Correct Answer: D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a heavy enterprise networking question.
+  <br>
+  AWS is testing whether you truly understand:
+  <br><br>
+  Direct Connect Gateway
+  <br>
+  Transit Gateway
+  <br>
+  Transit VIF vs Private VIF
+  <br>
+  Cross-Region routing
+  <br>
+  High availability design
+  <br><br>
+  This is core SAP-C02 networking.
+  <br><br>
+  <b>🔑 Step 1: Restate the requirements in plain English</b>
+  <br><br>
+  The company needs:
+  <br><br>
+  On-prem → VPCs in eu-west-1 and us-east-1
+  <br>
+  VPC ↔ VPC traffic across Regions
+  <br>
+  No single points of failure
+  <br><br>
+  Already has two DX connections (HA)
+  <br><br>
+  This is not a simple DX + VGW setup.
+  <br><br>
+  <b>🔑 Step 2: Identify the ONLY VIF type that works with Transit Gateway</b>
+  <br><br>
+  This is where many people fail.
+  <br><br>
+  Important fact (EXAM GOLD):
+  <br><br>
+  Transit Gateway requires a transit VIF
+  <br><br>
+  Private VIF works only with VGW, not TGW
+  <br><br>
+  So immediately:
+  <br><br>
+  ❌ Any option using private VIF is suspicious
+  <br><br>
+  This alone should make you wary of Option A.
+  <br><br>
+  <b>🔑 Step 3: Understand the role of Direct Connect Gateway (DXGW)</b>
+  <br><br>
+  A Direct Connect Gateway:
+  <br><br>
+  Is global
+  <br><br>
+  Can connect on-prem to multiple Regions
+  <br><br>
+  Can associate with multiple Transit Gateways
+  <br><br>
+  This is exactly what we need.
+  <br><br>
+  <b>🔑 Step 4: How do we enable VPC-to-VPC traffic across Regions?</b>
+  <br><br>
+  Very important exam concept:
+  <br><br>
+  Direct Connect Gateway does NOT route traffic between Transit Gateways
+  <br><br>
+  DXGW only routes:
+  <br><br>
+  On-prem ↔ TGW
+  <br><br>
+  To allow:
+  <br><br>
+  eu-west-1 VPC ↔ us-east-1 VPC
+  <br><br>
+  You must:
+  <br><br>
+  Peer the Transit Gateways
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  Cross-Region VPC traffic always requires Transit Gateway peering.
+  <br><br>
+  <b>✅ Why Option D is Correct (Deep Dive)</b>
+  <br><br>
+  Option D does all the right things:
+  <br><br>
+  ✅ Uses transit VIFs (correct)
+  <br><br>
+  Required for Transit Gateway
+  <br><br>
+  ✅ Uses a single DXGW with two DX connections
+  <br><br>
+  DX-A + DX-B → high availability
+  <br><br>
+  No single point of failure
+  <br><br>
+  ✅ Associates both regional Transit Gateways
+  <br><br>
+  On-prem can reach both Regions
+  <br><br>
+  ✅ Peers the Transit Gateways
+  <br><br>
+  Enables cross-Region VPC routing
+  <br><br>
+  This design:
+  <br><br>
+  Is AWS reference architecture
+  <br>
+  Meets all requirements
+  <br>
+  Is highly available
+  <br>
+  Scales cleanly
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Critical Exam Traps)</b>
+  <br><br>
+  <b>❌ Option A — Private VIF (Fatal mistake)</b>
+  <br><br>
+  Why this fails
+  <br><br>
+  Private VIF cannot attach to Transit Gateway
+  <br><br>
+  Private VIF works with VGW only
+  <br><br>
+  <b>🧠 EXAM GOLD:</b>
+  <br>
+  If TGW is involved → you need transit VIF, not private VIF.
+  <br><br>
+  <b>❌ Option B — Multiple DX Gateways</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  Direct Connect Gateways are:
+  <br><br>
+  Global
+  <br><br>
+  Highly available
+  <br><br>
+  Creating multiple DXGWs:
+  <br><br>
+  Adds complexity
+  <br>
+  Provides no real benefit
+  <br><br>
+  DXGWs cannot be peered
+  <br><br>
+  This option invents unnecessary architecture.
+  <br><br>
+  <b>❌ Option C — DXGW routing between TGWs</b>
+  <br><br>
+  Why this fails
+  <br><br>
+  DXGW cannot route traffic between Transit Gateways
+  <br><br>
+  Only TGW peering enables cross-Region routing
+  <br><br>
+  This is a very subtle but common exam trap.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  Transit Gateway requires transit VIF
+  <br>
+  Private VIF ≠ Transit Gateway
+  <br>
+  Direct Connect Gateway is global
+  <br>
+  DXGW does NOT route between TGWs
+  <br>
+  Cross-Region VPC traffic = TGW peering
+</div>
+</div>
+
+<!-- ================= Q117 ================= -->
+<div class="question">
+<pre>
+<b>Question 117 – Topic 1 (Verbatim)</b>
+
+Question:
+A company is running an application in the AWS Cloud. The company's security team must approve the creation of all new IAM users. When a new IAM user is created, all access for the user must be removed automatically. The security team must then receive a notification to approve the user.
+The company has a multi-Region AWS CloudTrail trail in the AWS account.
+
+Which combination of steps will meet these requirements? (Choose three.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q117" value="A">
+    <span>A. Create an Amazon EventBridge (Amazon CloudWatch Events) rule. Define a pattern with the detail-type value set to AWS API Call via CloudTrail and an eventName of CreateUser.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q117" value="B">
+    <span>B. Configure CloudTrail to send a notification for the CreateUser event to an Amazon Simple Notification Service (Amazon SNS) topic.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q117" value="C">
+    <span>C. Invoke a container that runs in Amazon Elastic Container Service (Amazon ECS) with AWS Fargate technology to remove access.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q117" value="D">
+    <span>D. Invoke an AWS Step Functions state machine to remove access.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q117" value="E">
+    <span>E. Use Amazon Simple Notification Service (Amazon SNS) to notify the security team.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q117" value="F">
+    <span>F. Use Amazon Pinpoint to notify the security team.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q117', ['A','D','E'], this, exp117)">Check Answer</button>
+
+<div class="explanation" id="exp117">
+  <button class="close-explanation" onclick="hideExplanation('exp117')">Close</button>
+  <b>✅ Correct Answers: A, D, E</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a security automation workflow question.
+  <br>
+  AWS is testing whether you understand event-driven security controls, not manual approvals.
+  <br><br>
+  You must build a system that:
+  <br><br>
+  Detects IAM user creation
+  <br><br>
+  Automatically removes access immediately
+  <br><br>
+  Notifies the security team for approval
+  <br><br>
+  All three must happen, and they must be automated.
+  <br><br>
+  <b>🔑 Step 1: Understand the trigger (THIS DECIDES THE ARCHITECTURE)</b>
+  <br><br>
+  The key event is:
+  <br><br>
+  IAM user creation
+  <br><br>
+  How does AWS expose IAM API activity?
+  <br><br>
+  👉 AWS CloudTrail
+  <br><br>
+  And how do you react to CloudTrail events in real time?
+  <br><br>
+  👉 Amazon EventBridge
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  CloudTrail + real-time reaction = EventBridge
+  <br><br>
+  <b>🔑 Step 2: Detecting the CreateUser API call</b>
+  <br><br>
+  Option A does exactly this:
+  <br><br>
+  EventBridge rule
+  <br><br>
+  Pattern:
+  <br><br>
+  detail-type = AWS API Call via CloudTrail
+  <br><br>
+  eventName = CreateUser
+  <br><br>
+  This ensures:
+  <br><br>
+  Every IAM user creation event is detected
+  <br><br>
+  Across all Regions (multi-Region trail)
+  <br><br>
+  Without this, nothing else can happen.
+  <br><br>
+  <b>🔑 Step 3: Removing access automatically</b>
+  <br><br>
+  Once the event is detected, access must be removed immediately.
+  <br><br>
+  Important nuance:
+  <br><br>
+  The question does not specify how access is removed
+  <br><br>
+  It only says “all access must be removed automatically”
+  <br><br>
+  This implies:
+  <br><br>
+  Multiple steps may be needed:
+  <br><br>
+  Detach policies
+  <br><br>
+  Disable console login
+  <br><br>
+  Delete access keys
+  <br><br>
+  This is workflow orchestration, not a single API call.
+  <br><br>
+  👉 AWS Step Functions is designed exactly for this.
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  If multiple security actions must happen in sequence → Step Functions, not Lambda alone.
+  <br><br>
+  <b>🔑 Step 4: Notifying the security team</b>
+  <br><br>
+  After access is removed, the security team must be notified.
+  <br><br>
+  AWS’s default, exam-approved notification service:
+  <br><br>
+  👉 Amazon SNS
+  <br><br>
+  Email
+  <br><br>
+  SMS
+  <br><br>
+  HTTP
+  <br><br>
+  Integrates natively with EventBridge and Step Functions
+  <br><br>
+  <b>✅ Why A, D, and E are CORRECT</b>
+  <br><br>
+  <b>✅ Option A — EventBridge rule</b>
+  <br><br>
+  Detects CreateUser in real time
+  <br><br>
+  Works across Regions
+  <br><br>
+  No polling
+  <br><br>
+  No log parsing
+  <br><br>
+  <b>✅ Option D — Step Functions</b>
+  <br><br>
+  Orchestrates:
+  <br><br>
+  Detach policies
+  <br><br>
+  Disable login profile
+  <br><br>
+  Delete keys
+  <br><br>
+  Reliable
+  <br><br>
+  Auditable
+  <br><br>
+  Retryable
+  <br><br>
+  <b>✅ Option E — SNS</b>
+  <br><br>
+  Sends approval notification
+  <br><br>
+  Simple
+  <br><br>
+  Secure
+  <br><br>
+  Enterprise-ready
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Critical Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — CloudTrail → SNS directly</b>
+  <br><br>
+  Why this is insufficient
+  <br><br>
+  CloudTrail SNS notifications:
+  <br><br>
+  Notify when logs are delivered
+  <br><br>
+  NOT when an API call happens in real time
+  <br><br>
+  No automation trigger
+  <br><br>
+  No access removal
+  <br><br>
+  <b>🧠 Exam rule:</b>
+  <br>
+  CloudTrail SNS ≠ real-time automation.
+  <br><br>
+  <b>❌ Option C — ECS Fargate</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  ECS is:
+  <br><br>
+  Heavy
+  <br><br>
+  Slow to start
+  <br><br>
+  Overkill
+  <br><br>
+  No reason to run containers for IAM API calls
+  <br><br>
+  AWS exams strongly prefer serverless for security automation.
+  <br><br>
+  <b>❌ Option F — Amazon Pinpoint</b>
+  <br><br>
+  Why this is wrong
+  <br><br>
+  Pinpoint is for:
+  <br><br>
+  Marketing
+  <br><br>
+  Campaigns
+  <br><br>
+  User engagement
+  <br><br>
+  Not for security notifications
+  <br><br>
+  Classic “sounds useful” distractor.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  IAM events = CloudTrail
+  <br>
+  Real-time reaction = EventBridge
+  <br>
+  Multi-step automation = Step Functions
+  <br>
+  Notifications = SNS
+  <br>
+  CloudTrail SNS ≠ automation trigger
+</div>
+</div>
+
+<!-- ================= Q118 ================= -->
+<div class="question">
+<pre>
+<b>Question 118 – Topic 1 (Verbatim)</b>
+
+Question:
+A company wants to migrate to AWS. The company wants to use a multi-account structure with centrally managed access to all accounts and applications. The company also wants to keep the traffic on a private network.
+Multi-factor authentication (MFA) is required at login, and specific roles are assigned to user groups.
+
+The company must create separate accounts for development, staging, production, and shared network.
+
+The production account and the shared network account must have connectivity to all accounts.
+
+The development account and the staging account must have access only to each other.
+
+Which combination of steps should a solutions architect take to meet these requirements? (Choose three.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q118" value="A">
+    <span>A. Deploy a landing zone environment by using AWS Control Tower. Enroll accounts and invite existing accounts into the resulting organization in AWS Organizations.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q118" value="B">
+    <span>B. Enable AWS Security Hub in all accounts to manage cross-account access. Collect findings through AWS CloudTrail to force MFA login.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q118" value="C">
+    <span>C. Create transit gateways and transit gateway VPC attachments in each account. Configure appropriate route tables.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q118" value="D">
+    <span>D. Set up and enable AWS IAM Identity Center (AWS Single Sign-On). Create appropriate permission sets with required MFA for existing accounts.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q118" value="E">
+    <span>E. Enable AWS Control Tower in all accounts to manage routing between accounts. Collect findings through AWS CloudTrail to force MFA login.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q118" value="F">
+    <span>F. Create IAM users and groups. Configure MFA for all users. Set up Amazon Cognito user pools and identity pools to manage access to accounts and between accounts.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q118', ['A','C','D'], this, exp118)">Check Answer</button>
+
+<div class="explanation" id="exp118">
+  <button class="close-explanation" onclick="hideExplanation('exp118')">Close</button>
+  <b>✅ Correct Answers: A, C, D</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a foundational enterprise landing-zone question.
+  <br>
+  AWS is testing whether you can design a proper multi-account AWS foundation, not just individual services.
+  <br><br>
+  Think of this question as:
+  <br><br>
+  “How would AWS consultants design your first AWS environment?”
+  <br><br>
+  <b>🔑 Step 1: Break the problem into THREE distinct requirements</b>
+  <br><br>
+  Requirement 1: Multi-account foundation
+  <br><br>
+  Separate accounts (dev, stage, prod, shared)
+  <br><br>
+  Central governance
+  <br><br>
+  👉 This is landing zone territory.
+  <br><br>
+  Requirement 2: Centralized identity with MFA and roles
+  <br><br>
+  Centrally managed access
+  <br><br>
+  MFA required
+  <br><br>
+  Role-based access
+  <br><br>
+  👉 This is identity federation, not IAM users.
+  <br><br>
+  Requirement 3: Private network connectivity with segmentation
+  <br><br>
+  Prod + shared → access all
+  <br><br>
+  Dev ↔ stage only
+  <br><br>
+  No internet routing between accounts
+  <br><br>
+  👉 This is Transit Gateway + routing control.
+  <br><br>
+  <b>🔑 Step 2: Map each requirement to AWS’s recommended service</b>
+  <br><br>
+  Requirement	AWS Service
+  <br><br>
+  Landing zone &amp; org setup	AWS Control Tower
+  <br><br>
+  Central identity + MFA + roles	IAM Identity Center (SSO)
+  <br><br>
+  Private multi-account networking	Transit Gateway
+  <br><br>
+  Once you see this mapping, the answer becomes obvious.
+  <br><br>
+  <b>✅ Why A, C, and D are CORRECT</b>
+  <br><br>
+  <b>✅ Option A — AWS Control Tower (Landing Zone)</b>
+  <br><br>
+  Control Tower:
+  <br><br>
+  Creates AWS Organizations
+  <br><br>
+  Sets up:
+  <br><br>
+  Separate accounts
+  <br>
+  Guardrails
+  <br>
+  Central logging
+  <br><br>
+  Is AWS’s official landing zone solution
+  <br><br>
+  <b>🧠 EXAM GOLD:</b>
+  <br>
+  If the question says “multi-account structure” → Control Tower is almost always part of the answer.
+  <br><br>
+  <b>✅ Option C — Transit Gateway + attachments</b>
+  <br><br>
+  Transit Gateway:
+  <br><br>
+  Enables hub-and-spoke networking
+  <br><br>
+  Allows:
+  <br><br>
+  Prod &amp; shared → full access
+  <br><br>
+  Dev ↔ stage only
+  <br><br>
+  Routing tables enforce segmentation
+  <br><br>
+  Keeps traffic private
+  <br><br>
+  <b>🧠 EXAM RULE:</b>
+  <br>
+  Multi-account private connectivity = Transit Gateway, not VPC peering.
+  <br><br>
+  <b>✅ Option D — IAM Identity Center (SSO)</b>
+  <br><br>
+  Identity Center:
+  <br><br>
+  Centralizes authentication
+  <br><br>
+  Integrates with IdPs
+  <br><br>
+  Enforces MFA
+  <br><br>
+  Uses permission sets (role-based access)
+  <br><br>
+  Eliminates IAM users
+  <br><br>
+  This perfectly matches:
+  <br><br>
+  “centrally managed access”
+  <br><br>
+  “MFA required”
+  <br><br>
+  “roles assigned to groups”
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Important Exam Traps)</b>
+  <br><br>
+  <b>❌ Option B — Security Hub for access control</b>
+  <br><br>
+  Security Hub:
+  <br><br>
+  Aggregates security findings
+  <br><br>
+  Does not manage access
+  <br><br>
+  Does not enforce MFA
+  <br><br>
+  Wrong service category.
+  <br><br>
+  <b>❌ Option E — Control Tower for routing &amp; MFA</b>
+  <br><br>
+  This option mixes unrelated services:
+  <br><br>
+  Control Tower does not manage routing
+  <br><br>
+  CloudTrail does not enforce MFA
+  <br><br>
+  This is a “keyword soup” distractor.
+  <br><br>
+  <b>❌ Option F — IAM users + Cognito</b>
+  <br><br>
+  Why this is wrong:
+  <br><br>
+  IAM users do not scale
+  <br><br>
+  Cognito is for application users, not AWS admins
+  <br><br>
+  AWS strongly discourages IAM users in large orgs
+  <br><br>
+  <b>🧠 EXAM RULE:</b>
+  <br>
+  Enterprise access = federation + SSO, not IAM users.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  Landing zone = Control Tower
+  <br>
+  Enterprise identity = IAM Identity Center
+  <br>
+  Private multi-account networking = Transit Gateway
+  <br>
+  Cognito ≠ AWS admin access
+  <br>
+  Security Hub ≠ access control
+</div>
+</div>
+
+<!-- ================= Q120 ================= -->
+<div class="question">
+<pre>
+<b>Question 120 – Topic 1 (Verbatim)</b>
+
+Question:
+A company is building a software-as-a-service (SaaS) solution on AWS. The company has deployed an Amazon API Gateway REST API with AWS Lambda integration in multiple AWS Regions and in the same production account.
+The company offers tiered pricing that gives customers the ability to pay for the capacity to make a certain number of API calls per second. The premium tier offers up to 3,000 calls per second, and customers are identified by a unique API key.
+Several premium tier customers in various Regions report that they receive error responses of 429 Too Many Requests from multiple API methods during peak usage hours. Logs indicate that the Lambda function is never invoked.
+
+What could be the cause of the error messages for these customers?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q120" value="A">
+    <span>A. The Lambda function reached its concurrency limit.</span>
+  </label>
+  <label>
+    <input type="radio" name="q120" value="B">
+    <span>B. The Lambda function hit its Region limit for concurrency.</span>
+  </label>
+  <label>
+    <input type="radio" name="q120" value="C">
+    <span>C. The company reached its API Gateway account limit for calls per second.</span>
+  </label>
+  <label>
+    <input type="radio" name="q120" value="D">
+    <span>D. The company reached its API Gateway default per-method limit for calls per second.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q120', 'C', this, exp120)">Check Answer</button>
+
+<div class="explanation" id="exp120">
+  <button class="close-explanation" onclick="hideExplanation('exp120')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is all about where throttling occurs and who is doing the throttling.
+  <br><br>
+  AWS is testing whether you understand:
+  <br><br>
+  API Gateway throttling layers
+  <br>
+  Account-level vs method-level limits
+  <br>
+  The difference between API Gateway throttling and Lambda throttling
+  <br><br>
+  <b>🔑 Step 1: Lock onto the most important clue</b>
+  <br><br>
+  The single most important sentence in the question is:
+  <br><br>
+  “Logs indicate that the Lambda function is never invoked.”
+  <br><br>
+  This immediately tells us:
+  <br><br>
+  ❌ Lambda is NOT the source of throttling
+  <br><br>
+  ❌ Lambda concurrency limits are irrelevant
+  <br><br>
+  ✅ Throttling is happening before Lambda
+  <br><br>
+  <b>🧠 EXAM GOLD:</b>
+  <br>
+  If Lambda is never invoked → the problem is upstream.
+  <br><br>
+  <b>🔑 Step 2: Identify where throttling can occur BEFORE Lambda</b>
+  <br><br>
+  Before a request reaches Lambda, it passes through:
+  <br><br>
+  API Gateway
+  <br><br>
+  Usage plans (API keys)
+  <br><br>
+  Throttling limits
+  <br><br>
+  API Gateway enforces throttling at:
+  <br><br>
+  Account level
+  <br><br>
+  Stage level
+  <br><br>
+  Method level
+  <br><br>
+  Usage plan level
+  <br><br>
+  <b>🔑 Step 3: Understand API Gateway limits (very important)</b>
+  <br><br>
+  Key API Gateway limits (REST API):
+  <br><br>
+  Account-level limit:
+  <br><br>
+  ~10,000 requests per second per Region (default)
+  <br><br>
+  Per-method default limit:
+  <br><br>
+  ~1,000 requests per second
+  <br><br>
+  Usage plan limits:
+  <br><br>
+  Rate + burst, per API key
+  <br><br>
+  <b>🔑 Step 4: Why the account-level limit is the real culprit</b>
+  <br><br>
+  Important clues:
+  <br><br>
+  Multiple API methods are affected
+  <br><br>
+  Multiple Regions
+  <br><br>
+  Premium customers (high throughput)
+  <br><br>
+  Same production account
+  <br><br>
+  This tells us:
+  <br><br>
+  Traffic from many customers
+  <br><br>
+  Summed across methods
+  <br><br>
+  Summed across APIs
+  <br><br>
+  All within the same account
+  <br><br>
+  That points to:
+  <br><br>
+  API Gateway account-level throttling
+  <br><br>
+  <b>✅ Why Option C is Correct (Deep Dive)</b>
+  <br><br>
+  Option C says:
+  <br><br>
+  The company reached its API Gateway account limit for calls per second
+  <br><br>
+  This perfectly matches the symptoms:
+  <br><br>
+  Throttling occurs before Lambda
+  <br><br>
+  Affects multiple methods
+  <br><br>
+  Happens during peak usage
+  <br><br>
+  Customers see 429 errors
+  <br><br>
+  API Gateway blocks the request and never forwards it to Lambda → exactly what the logs show.
+  <br><br>
+  <b>❌ Why the Other Options Are WRONG (Critical Exam Traps)</b>
+  <br><br>
+  <b>❌ Option A — Lambda concurrency limit</b>
+  <br><br>
+  Why this fails:
+  <br><br>
+  If Lambda concurrency were exceeded:
+  <br><br>
+  Lambda would still be invoked
+  <br><br>
+  Logs would show invocation attempts
+  <br><br>
+  The question explicitly says Lambda is never invoked
+  <br><br>
+  Immediate elimination.
+  <br><br>
+  <b>❌ Option B — Lambda Regional concurrency limit</b>
+  <br><br>
+  Same reasoning as Option A:
+  <br><br>
+  Lambda must be invoked for concurrency limits to apply
+  <br><br>
+  Throttling here would be after API Gateway
+  <br><br>
+  Wrong layer.
+  <br><br>
+  <b>❌ Option D — Per-method API Gateway limit</b>
+  <br><br>
+  Why this is tempting but wrong:
+  <br><br>
+  Per-method limit affects one method
+  <br><br>
+  The question says:
+  <br><br>
+  “multiple API methods”
+  <br><br>
+  <b>🧠 EXAM RULE:</b>
+  <br>
+  If multiple methods are failing → it’s not a per-method limit.
+  <br><br>
+  <b>🧠 Key SAP-C02 Takeaways</b>
+  <br><br>
+  429 before Lambda = API Gateway throttling
+  <br>
+  Lambda concurrency ≠ API Gateway throttling
+  <br>
+  Multiple methods failing = account-level limit
+  <br>
+  API Gateway blocks requests before Lambda
+  <br><br>
+  Always locate where the failure occurs in the request path
+</div>
+</div>
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0 20px;">
+  <a href="page12.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page14.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div>
+
+<script>
+function checkAnswer(qName, correctAnswer, btn, explanationDiv) {
+  const selected = document.querySelector(`input[name="${qName}"]:checked`);
+  if (!selected) {
+    // Remove any existing error message
+    const existingError = btn.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+    
+    // Create and show error message
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.textContent = 'Please select an option first!';
+    errorMsg.style.cssText = 'color: #dc2626; background: #fee2e2; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 14px; font-weight: 600; border-left: 4px solid #ef4444;';
+    btn.parentElement.insertBefore(errorMsg, btn.nextSibling);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => errorMsg.remove(), 3000);
+    return;
+  }
+
+  // Remove error message if exists
+  const existingError = btn.parentElement.querySelector('.error-message');
+  if (existingError) existingError.remove();
+
+  const labels = document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+
+  const userAnswer = selected.value;
+  const userLabel = selected.closest("label");
+
+  if (userAnswer === correctAnswer) {
+    userLabel.classList.add("user-correct");
+  } else {
+    userLabel.classList.add("user-wrong");
+    const correctLabel = document.querySelector(`input[name="${qName}"][value="${correctAnswer}"]`).closest("label");
+    correctLabel.classList.add("correct");
+  }
+
+  explanationDiv.style.display = "block";
+  btn.style.display = "none";
+}
+
+function hideExplanation(expId) {
+  const exp = document.getElementById(expId);
+  exp.style.display = "none";
+  const btn = exp.previousElementSibling;
+  btn.style.display = "inline-block";
+
+  // Reset options
+  const qName = expId.replace('exp', 'q');
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    input.checked = false;
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+}
+
+function checkAnswerMultiple(qName, correctAnswers, btn, explanationDiv) {
+  const selectedInputs = document.querySelectorAll(`input[name="${qName}"]:checked`);
+  
+  if (selectedInputs.length === 0) {
+    // Remove any existing error message
+    const existingError = btn.parentElement.querySelector('.error-message');
+    if (existingError) existingError.remove();
+    
+    // Create and show error message
+    const errorMsg = document.createElement('div');
+    errorMsg.className = 'error-message';
+    errorMsg.textContent = 'Please select an option first!';
+    errorMsg.style.cssText = 'color: #dc2626; background: #fee2e2; padding: 10px 14px; border-radius: 6px; margin-top: 10px; font-size: 14px; font-weight: 600; border-left: 4px solid #ef4444;';
+    btn.parentElement.insertBefore(errorMsg, btn.nextSibling);
+    
+    // Auto-remove after 3 seconds
+    setTimeout(() => errorMsg.remove(), 3000);
+    return;
+  }
+
+  // Remove error message if exists
+  const existingError = btn.parentElement.querySelector('.error-message');
+  if (existingError) existingError.remove();
+
+  // Reset all labels
+  document.querySelectorAll(`input[name="${qName}"]`).forEach(input => {
+    const label = input.closest("label");
+    label.classList.remove("user-correct", "user-wrong", "correct");
+  });
+
+  // Get user's selected answers
+  const userAnswers = Array.from(selectedInputs).map(input => input.value);
+
+  // Check each selected answer
+  selectedInputs.forEach(input => {
+    const label = input.closest("label");
+    if (correctAnswers.includes(input.value)) {
+      label.classList.add("user-correct");
+    } else {
+      label.classList.add("user-wrong");
+    }
+  });
+
+  // Mark unselected correct answers
+  correctAnswers.forEach(answer => {
+    const input = document.querySelector(`input[name="${qName}"][value="${answer}"]`);
+    if (!input.checked) {
+      const label = input.closest("label");
+      label.classList.add("correct");
+    }
+  });
+
+  explanationDiv.style.display = "block";
+  btn.style.display = "none";
+}
+</script>
+
+</body>
+</html>
