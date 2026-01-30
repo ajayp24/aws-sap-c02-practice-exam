@@ -1,0 +1,2067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AWS Solution Architect Practice Test – Page 15</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+<div class="container">
+
+<!-- ================= Navigation Top ================= -->
+<div style="text-align:center; margin: 20px 0;">
+  <a href="page14.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page16.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+<h1>AWS Solution Architect – Practice Test (Page 15)</h1>
+
+<!-- ================= Q131 ================= -->
+<div class="question">
+<pre>
+<b>Question 131 – Topic 1 (Verbatim)</b>
+
+Question:
+A company runs development and test environments on Amazon EC2 instances in multiple AWS accounts. These environments are used only during business hours (8 a.m. to 6 p.m., Monday through Friday).
+The company wants to reduce costs by ensuring that the EC2 instances are automatically stopped outside business hours and started again before the next business day.
+The solution must meet the following requirements:
+
+Minimal operational overhead
+
+Centralized management across accounts
+
+No changes to existing applications
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q131" value="A">
+    <span>A. Use AWS Cost Explorer to identify idle EC2 instances. Create AWS Budgets with alerts to notify administrators to stop the instances manually.</span>
+  </label>
+  <label>
+    <input type="radio" name="q131" value="B">
+    <span>B. Use Amazon EventBridge scheduled rules to invoke AWS Lambda functions that stop and start EC2 instances based on tags.</span>
+  </label>
+  <label>
+    <input type="radio" name="q131" value="C">
+    <span>C. Create AWS Systems Manager Automation documents to stop and start EC2 instances. Manually execute the Automation documents on a schedule.</span>
+  </label>
+  <label>
+    <input type="radio" name="q131" value="D">
+    <span>D. Use AWS Auto Scaling scheduled actions to scale the EC2 Auto Scaling groups to zero capacity outside business hours.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q131', 'B', this, exp131)">Check Answer</button>
+
+<div class="explanation" id="exp131">
+  <button class="close-explanation" onclick="hideExplanation('exp131')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a predictable-schedule cost optimization problem.
+  AWS is testing whether you can recognize:
+  <br><br>
+  • Predictable usage patterns
+  <br>
+  • Native scheduling capabilities
+  <br>
+  • Event-driven automation
+  <br><br>
+  🔑 Step 1: Identify the usage pattern
+  <br><br>
+  Key phrase:
+  <br><br>
+  "only during business hours"
+  <br><br>
+  This tells us:
+  <br><br>
+  • The schedule is known and predictable
+  <br>
+  • No machine learning
+  <br>
+  • No manual review required
+  <br><br>
+  🧠 EXAM RULE:
+  <br>
+  If usage follows a predictable schedule → schedule-based automation.
+  <br><br>
+  🔑 Step 2: Identify the control mechanism AWS prefers
+  <br><br>
+  AWS has a very clean, serverless pattern for this:
+  <br><br>
+  EventBridge (cron)
+  <br>
+     ↓
+  <br>
+  Lambda
+  <br>
+     ↓
+  <br>
+  EC2 Stop/Start (tag-based)
+  <br><br>
+  Why this is preferred:
+  <br><br>
+  • Fully serverless
+  <br>
+  • No servers to manage
+  <br>
+  • Easy to extend across accounts
+  <br>
+  • Tag-driven (safe and selective)
+  <br><br>
+  🔑 Step 3: Why tagging matters (important nuance)
+  <br><br>
+  Using tags:
+  <br><br>
+  • Prevents stopping production instances
+  <br>
+  • Allows per-team control
+  <br>
+  • Enables centralized governance
+  <br><br>
+  This matches:
+  <br><br>
+  "centralized management across accounts"
+  <br><br>
+  ✅ Why Option B is Correct (Deep Dive)
+  <br><br>
+  Option B gives:
+  <br><br>
+  ✅ Minimal operational overhead
+  <br>
+  • No EC2
+  <br>
+  • No cron servers
+  <br>
+  • No manual execution
+  <br><br>
+  ✅ Centralized control
+  <br>
+  • One Lambda per account or centralized via cross-account roles
+  <br>
+  • Consistent behavior everywhere
+  <br><br>
+  ✅ No app changes
+  <br>
+  • Stop/start is infrastructure-only
+  <br><br>
+  This is the canonical AWS solution for scheduled EC2 cost optimization.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option A — Cost Explorer + Budgets
+  <br><br>
+  Why this fails:
+  <br><br>
+  Budgets:
+  <br>
+  • Alert only
+  <br>
+  • Do not take action
+  <br>
+  • Manual intervention required
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  If the question says "automatically", alert-only solutions are wrong.
+  <br><br>
+  ❌ Option C — SSM Automation (manual)
+  <br><br>
+  Why this is inferior:
+  <br><br>
+  Automation documents are useful
+  <br><br>
+  But:
+  <br>
+  • Manual execution adds overhead
+  <br>
+  • Scheduling still required elsewhere
+  <br><br>
+  AWS prefers EventBridge-native scheduling.
+  <br><br>
+  ❌ Option D — Auto Scaling scheduled actions
+  <br><br>
+  Why this is risky:
+  <br><br>
+  Works only for:
+  <br>
+  • Auto Scaling groups
+  <br><br>
+  May:
+  <br>
+  • Terminate instances
+  <br>
+  • Lose state
+  <br><br>
+  Not all dev/test workloads use ASGs
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  If instances must be restarted intact → stop/start, not scale-to-zero.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 131)
+  <br><br>
+  • Predictable schedules → EventBridge cron
+  <br>
+  • Automation → Lambda
+  <br>
+  • Tag-based control prevents accidents
+  <br>
+  • Budgets ≠ automation
+  <br>
+  • Stop/start ≠ scale-to-zero
+</div>
+</div>
+
+<!-- ================= Q132 ================= -->
+<div class="question">
+<pre>
+<b>Question 132 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has hundreds of AWS accounts that are managed by using AWS Organizations with all features enabled. The company wants to ensure that all Amazon EBS volumes are encrypted at rest for current and future EC2 instances.
+The solution must meet the following requirements:
+
+Enforce encryption (not just detect it)
+
+Apply automatically to existing and new accounts
+
+Minimal operational overhead
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q132" value="A">
+    <span>A. Enable EBS encryption by default in all AWS accounts. Use AWS Config rules to detect unencrypted EBS volumes.</span>
+  </label>
+  <label>
+    <input type="radio" name="q132" value="B">
+    <span>B. Create an AWS Config rule to detect unencrypted EBS volumes. Create an AWS Lambda function to encrypt unencrypted volumes automatically.</span>
+  </label>
+  <label>
+    <input type="radio" name="q132" value="C">
+    <span>C. Create a service control policy (SCP) that denies the creation of unencrypted EBS volumes. Attach the SCP to all organizational units.</span>
+  </label>
+  <label>
+    <input type="radio" name="q132" value="D">
+    <span>D. Use AWS Security Hub to enforce EBS encryption standards across all accounts.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q132', 'C', this, exp132)">Check Answer</button>
+
+<div class="explanation" id="exp132">
+  <button class="close-explanation" onclick="hideExplanation('exp132')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is all about the difference between:
+  <br><br>
+  • Detection
+  <br>
+  • Correction
+  <br>
+  • Prevention
+  <br><br>
+  AWS is explicitly asking for enforcement, not alerts and not cleanup.
+  <br><br>
+  🔑 Step 1: Identify the strongest keyword
+  <br><br>
+  The most important word in the question is:
+  <br><br>
+  "ensure" and "enforce encryption"
+  <br><br>
+  This immediately tells us:
+  <br><br>
+  ❌ Detection-only solutions are insufficient
+  <br>
+  ❌ Post-creation remediation is insufficient
+  <br>
+  ✅ The resource must be blocked at creation time if noncompliant
+  <br><br>
+  🧠 EXAM RULE:
+  <br>
+  If the question says ensure / enforce / prevent → SCP or IAM, not Config.
+  <br><br>
+  🔑 Step 2: Understand how EBS encryption works in AWS
+  <br><br>
+  Important facts:
+  <br><br>
+  • EBS encryption is set at volume creation
+  <br>
+  • You cannot encrypt an existing unencrypted volume in place
+  <br><br>
+  EBS encryption by default:
+  <br>
+  • Helps
+  <br>
+  • But is account-scoped
+  <br>
+  • Can be turned off by admins
+  <br><br>
+  🔑 Step 3: Why SCP is the correct tool
+  <br><br>
+  Service Control Policies (SCPs):
+  <br><br>
+  Apply to:
+  <br>
+  • All accounts in OUs
+  <br>
+  • Including future accounts
+  <br><br>
+  • Cannot be bypassed
+  <br>
+  • Are evaluated before IAM permissions
+  <br><br>
+  An SCP that denies:
+  <br><br>
+  • ec2:CreateVolume
+  <br>
+  • ec2:RunInstances
+  <br><br>
+  without encryption parameters
+  <br><br>
+  → guarantees encryption always
+  <br><br>
+  ✅ Why Option C is Correct (Deep Dive)
+  <br><br>
+  Option C says:
+  <br><br>
+  Create an SCP that denies the creation of unencrypted EBS volumes
+  <br><br>
+  This gives:
+  <br><br>
+  ✅ True enforcement
+  <br>
+  • Unencrypted volumes cannot be created
+  <br>
+  • Period
+  <br><br>
+  ✅ Automatic coverage
+  <br>
+  • Existing accounts
+  <br>
+  • New accounts added later
+  <br><br>
+  ✅ Minimal ops
+  <br>
+  • No Lambda
+  <br>
+  • No monitoring
+  <br>
+  • No remediation jobs
+  <br><br>
+  This is enterprise-grade preventive security.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option A — Encryption by default + Config
+  <br><br>
+  Why this is insufficient:
+  <br><br>
+  Encryption by default:
+  <br>
+  • Is per-account
+  <br>
+  • Can be disabled
+  <br><br>
+  Config:
+  <br>
+  • Detects after creation
+  <br>
+  • Violates "enforce"
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  Defaults help, but they are not enforcement.
+  <br><br>
+  ❌ Option B — Config + Lambda remediation
+  <br><br>
+  Why AWS dislikes this:
+  <br><br>
+  • Volume is created unencrypted first
+  <br>
+  • Data may already be written
+  <br><br>
+  Requires:
+  <br>
+  • Snapshots
+  <br>
+  • New volumes
+  <br>
+  • High operational overhead
+  <br><br>
+  Detection + fix ≠ prevention.
+  <br><br>
+  ❌ Option D — Security Hub
+  <br><br>
+  Why this fails:
+  <br><br>
+  Security Hub:
+  <br>
+  • Aggregates findings
+  <br>
+  • Does not block actions
+  <br>
+  • No enforcement capability
+  <br><br>
+  Wrong service category.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 132)
+  <br><br>
+  • Encryption must be enforced at creation time
+  <br>
+  • Prevention > detection > remediation
+  <br>
+  • SCPs are the strongest governance tool
+  <br>
+  • Defaults are not guarantees
+  <br>
+  • Security Hub ≠ enforcement
+</div>
+</div>
+
+<!-- ================= Q133 ================= -->
+<div class="question">
+<pre>
+<b>Question 133 – Topic 1 (Verbatim)</b>
+
+Question:
+A company runs a serverless application in a single AWS Region. The application accesses external URLs and extracts metadata from those sites.
+The company uses an Amazon Simple Notification Service (Amazon SNS) topic to publish URLs to an Amazon Simple Queue Service (Amazon SQS) queue. An AWS Lambda function uses the queue as an event source and processes the URLs from the queue. Results are saved to an Amazon S3 bucket.
+
+The company wants to process each URL in other AWS Regions to compare possible differences in site localization.
+
+URLs must be published from the existing Region.
+
+Results must be written to the existing S3 bucket in the current Region.
+
+Which combination of changes will produce a multi-Region deployment that meets these requirements? (Choose two.)
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="checkbox" name="q133" value="A">
+    <span>A. Deploy the SQS queue with the Lambda function to other Regions.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q133" value="B">
+    <span>B. Subscribe the SNS topic in each Region to the SQS queue.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q133" value="C">
+    <span>C. Subscribe the SQS queue in each Region to the SNS topic.</span>
+  </label>
+  <label>
+    <input type="checkbox" name="q133" value="D">
+    <span>D. Configure the SQS queue to publish URLs to SNS topics in each Region.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswerMultiple('q133', ['A','C'], this, exp133)">Check Answer</button>
+
+<div class="explanation" id="exp133">
+  <button class="close-explanation" onclick="hideExplanation('exp133')">Close</button>
+  <b>✅ Correct Answers: A and C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is a pure fan-out architecture problem.
+  AWS wants to see if you understand who publishes, who subscribes, and how cross-Region messaging works.
+  <br><br>
+  🔑 Step 1: Identify the invariant (what must NOT change)
+  <br><br>
+  The question clearly states:
+  <br><br>
+  "URLs must be published from the existing Region."
+  <br><br>
+  That means:
+  <br><br>
+  ❌ We cannot move or replicate the SNS topic
+  <br>
+  ❌ We cannot change the publisher logic
+  <br>
+  ✅ SNS remains centralized
+  <br><br>
+  🧠 EXAM RULE:
+  <br>
+  If the publisher must remain in one Region → fan-out must happen downstream.
+  <br><br>
+  🔑 Step 2: Understand SNS vs SQS roles
+  <br><br>
+  Important fundamentals (MEMORIZE):
+  <br><br>
+  • SNS = publisher / fan-out
+  <br>
+  • SQS = consumer buffer
+  <br><br>
+  SNS can publish to:
+  <br>
+  • SQS
+  <br>
+  • Lambda
+  <br>
+  • HTTP/S
+  <br><br>
+  • SNS supports cross-Region delivery
+  <br>
+  • SQS does not fan-out by itself
+  <br><br>
+  🔑 Step 3: Correct multi-Region fan-out pattern
+  <br><br>
+  The AWS-approved pattern looks like this:
+  <br><br>
+  Region A (publisher)
+  <br>
+    SNS Topic
+  <br>
+       ↓
+  <br>
+    SQS (Region A) → Lambda (Region A)
+  <br>
+    SQS (Region B) → Lambda (Region B)
+  <br>
+    SQS (Region C) → Lambda (Region C)
+  <br><br>
+  Each Region:
+  <br>
+  • Processes the same message
+  <br>
+  • Writes results back to the same S3 bucket
+  <br><br>
+  ✅ Why Option A is Correct
+  <br><br>
+  A. Deploy the SQS queue with the Lambda function to other Regions
+  <br><br>
+  Why this is required:
+  <br><br>
+  Each Region needs:
+  <br>
+  • Its own queue
+  <br>
+  • Its own Lambda
+  <br><br>
+  Enables:
+  <br>
+  • Parallel processing
+  <br>
+  • Region-specific execution
+  <br>
+  • Keeps compute local to each Region
+  <br><br>
+  Without this, there is nowhere for regional processing to happen.
+  <br><br>
+  ✅ Why Option C is Correct
+  <br><br>
+  C. Subscribe the SQS queue in each Region to the SNS topic
+  <br><br>
+  This is the fan-out mechanism.
+  <br><br>
+  • SNS publishes once
+  <br>
+  • Each regional SQS queue receives a copy
+  <br>
+  • Cross-Region delivery is handled natively by SNS
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  Multi-Region fan-out = SNS → multiple SQS queues (cross-Region).
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Classic Exam Traps)
+  <br><br>
+  ❌ Option B — Subscribe SNS topics in each Region
+  <br><br>
+  Why this fails:
+  <br><br>
+  • SNS topics would need to be created in each Region
+  <br><br>
+  Violates:
+  <br>
+  • "URLs must be published from the existing Region"
+  <br><br>
+  Wrong direction of subscription.
+  <br><br>
+  ❌ Option D — SQS publishing to SNS
+  <br><br>
+  Why this is incorrect:
+  <br><br>
+  • SQS does not publish messages
+  <br>
+  • SQS is a pull-based queue
+  <br>
+  • This reverses the correct SNS/SQS relationship
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  SNS publishes, SQS subscribes — never the other way around.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 133)
+  <br><br>
+  • SNS = fan-out, SQS = buffer
+  <br>
+  • SNS supports cross-Region delivery
+  <br>
+  • Multi-Region processing = regional consumers
+  <br>
+  • Publisher stays centralized
+  <br>
+  • SQS never publishes to SNS
+</div>
+</div>
+
+<!-- ================= Q134 ================= -->
+<div class="question">
+<pre>
+<b>Question 134 – Topic 1 (Verbatim)</b>
+
+Question:
+A company runs a proprietary stateless ETL application on Amazon EC2 Linux instances. The application is a Linux binary, and the source code cannot be modified. The application is single-threaded, uses 2 GB of RAM, and is highly CPU intensive.
+The application is scheduled to run every 4 hours and runs for up to 20 minutes. A solutions architect wants to revise the architecture for the solution.
+
+Which strategy should the solutions architect use?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q134" value="A">
+    <span>A. Use AWS Lambda to run the application. Use Amazon CloudWatch Logs to invoke the Lambda function every 4 hours.</span>
+  </label>
+  <label>
+    <input type="radio" name="q134" value="B">
+    <span>B. Use AWS Batch to run the application. Use an AWS Step Functions state machine to invoke the AWS Batch job every 4 hours.</span>
+  </label>
+  <label>
+    <input type="radio" name="q134" value="C">
+    <span>C. Use AWS Fargate to run the application. Use Amazon EventBridge (Amazon CloudWatch Events) to invoke the Fargate task every 4 hours.</span>
+  </label>
+  <label>
+    <input type="radio" name="q134" value="D">
+    <span>D. Use Amazon EC2 Spot Instances to run the application. Use AWS CodeDeploy to deploy and run the application every 4 hours.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q134', 'C', this, exp134)">Check Answer</button>
+
+<div class="explanation" id="exp134">
+  <button class="close-explanation" onclick="hideExplanation('exp134')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a "pick the right compute for a scheduled job" question.
+  AWS is testing whether you understand runtime limits, scheduling, and operational overhead.
+  <br><br>
+  🔑 Step 1: Immediately eliminate Lambda (VERY IMPORTANT)
+  <br><br>
+  The application:
+  <br>
+  • Runs up to 20 minutes
+  <br><br>
+  AWS Lambda:
+  <br>
+  • Max execution time = 15 minutes
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  If runtime > 15 minutes → Lambda is impossible.
+  <br><br>
+  So:
+  <br>
+  ❌ Option A is immediately wrong
+  <br><br>
+  🔑 Step 2: Understand the workload characteristics
+  <br><br>
+  Workload is:
+  <br>
+  • Stateless
+  <br>
+  • CPU intensive
+  <br>
+  • Runs on a schedule
+  <br>
+  • No code changes allowed
+  <br><br>
+  This points to:
+  <br>
+  • Containers
+  <br>
+  • Serverless container execution
+  <br>
+  • No long-lived infrastructure
+  <br><br>
+  🔑 Step 3: Why AWS Fargate is preferred here
+  <br><br>
+  AWS Fargate:
+  <br>
+  • Runs containers without managing servers
+  <br>
+  • Supports CPU-heavy workloads
+  <br>
+  • Supports long-running tasks
+  <br>
+  • Integrates natively with EventBridge scheduling
+  <br><br>
+  This fits perfectly.
+  <br><br>
+  ✅ Why Option C is Correct (Deep Dive)
+  <br><br>
+  Option C says:
+  <br><br>
+  Use AWS Fargate + EventBridge scheduling
+  <br><br>
+  This gives:
+  <br><br>
+  ✅ No code changes
+  <br>
+  • Package binary in a container
+  <br><br>
+  ✅ Serverless execution
+  <br>
+  • No EC2 management
+  <br>
+  • No patching
+  <br>
+  • No capacity planning
+  <br><br>
+  ✅ Native scheduling
+  <br>
+  • EventBridge cron rules
+  <br>
+  • Reliable execution
+  <br><br>
+  ✅ Scales cleanly
+  <br>
+  • Each run is isolated
+  <br>
+  • No leftover instances
+  <br><br>
+  This is the canonical AWS solution for scheduled container jobs.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option B — AWS Batch
+  <br><br>
+  Why this is tempting:
+  <br>
+  • Batch workloads
+  <br>
+  • CPU intensive
+  <br><br>
+  Why AWS rejects it here:
+  <br><br>
+  AWS Batch:
+  <br>
+  • Is more complex
+  <br>
+  • Requires compute environments
+  <br>
+  • Adds operational overhead
+  <br><br>
+  The question asks for least complexity
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  If Fargate works, AWS Batch is usually overkill.
+  <br><br>
+  ❌ Option D — Spot Instances + CodeDeploy
+  <br><br>
+  Why this fails:
+  <br><br>
+  Spot instances:
+  <br>
+  • Can be interrupted
+  <br>
+  • Not guaranteed to run every 4 hours
+  <br><br>
+  CodeDeploy:
+  <br>
+  • Not a scheduler
+  <br>
+  • High operational burden
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 134)
+  <br><br>
+  • Lambda max runtime = 15 minutes
+  <br>
+  • Scheduled jobs > 15 min → containers
+  <br>
+  • Fargate = serverless containers
+  <br>
+  • EventBridge = scheduling
+  <br>
+  • Batch = only when Fargate is insufficient
+</div>
+</div>
+
+<!-- ================= Q135 ================= -->
+<div class="question">
+<pre>
+<b>Question 135 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has a central shared services VPC that hosts internal APIs. The APIs are exposed by using Network Load Balancers (NLBs) in the shared services account.
+Multiple application teams run workloads in separate AWS accounts and VPCs. The application teams need to privately access the internal APIs.
+The company must meet the following requirements:
+
+Traffic must not traverse the public internet
+
+Overlapping CIDR ranges exist between some VPCs
+
+Minimal operational overhead
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q135" value="A">
+    <span>A. Create VPC peering connections between the shared services VPC and each application VPC. Update route tables to allow connectivity.</span>
+  </label>
+  <label>
+    <input type="radio" name="q135" value="B">
+    <span>B. Create an AWS PrivateLink endpoint service in the shared services account. Create interface VPC endpoints in the application VPCs.</span>
+  </label>
+  <label>
+    <input type="radio" name="q135" value="C">
+    <span>C. Create a Transit Gateway in the shared services account. Attach all application VPCs to the Transit Gateway. Update route tables to allow connectivity.</span>
+  </label>
+  <label>
+    <input type="radio" name="q135" value="D">
+    <span>D. Create Site-to-Site VPN connections between the shared services VPC and each application VPC.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q135', 'B', this, exp135)">Check Answer</button>
+
+<div class="explanation" id="exp135">
+  <button class="close-explanation" onclick="hideExplanation('exp135')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is a classic PrivateLink vs Transit Gateway vs Peering decision problem.
+  <br><br>
+  AWS is testing whether you recognize the three key signals that immediately eliminate other options.
+  <br><br>
+  🔑 Step 1: Lock onto the CIDR overlap requirement
+  <br><br>
+  The question explicitly says:
+  <br><br>
+  "Overlapping CIDR ranges exist between some VPCs"
+  <br><br>
+  This is a hard constraint.
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  If CIDRs overlap → VPC peering and Transit Gateway are invalid.
+  <br><br>
+  Why?
+  <br>
+  • Both require unique, non-overlapping CIDRs
+  <br>
+  • Routing becomes impossible otherwise
+  <br><br>
+  So:
+  <br>
+  ❌ Option A (VPC peering) is out
+  <br>
+  ❌ Option C (Transit Gateway) is out
+  <br><br>
+  🔑 Step 2: Lock onto the "no public internet" requirement
+  <br><br>
+  Traffic must:
+  <br>
+  • Stay private
+  <br>
+  • Use AWS backbone
+  <br>
+  • Not require NAT or IGW
+  <br><br>
+  This eliminates:
+  <br>
+  ❌ VPNs (they traverse public internet, even if encrypted)
+  <br><br>
+  🔑 Step 3: Identify the AWS service designed for THIS exact use case
+  <br><br>
+  Remaining option:
+  <br><br>
+  AWS PrivateLink
+  <br><br>
+  What PrivateLink gives you:
+  <br>
+  • Private connectivity
+  <br>
+  • No CIDR overlap issues
+  <br>
+  • No route table complexity
+  <br>
+  • NLB-based service exposure
+  <br>
+  • Scales to many VPCs/accounts
+  <br><br>
+  🧠 EXAM RULE:
+  <br>
+  PrivateLink ignores CIDR overlap entirely.
+  <br><br>
+  ✅ Why Option B is Correct (Deep Dive)
+  <br><br>
+  Option B uses:
+  <br>
+  • PrivateLink endpoint service (provider side)
+  <br>
+  • Interface VPC endpoints (consumer side)
+  <br><br>
+  This provides:
+  <br><br>
+  ✅ Private connectivity
+  <br>
+  • Traffic stays on AWS network
+  <br>
+  • No IGW
+  <br>
+  • No NAT
+  <br><br>
+  ✅ CIDR overlap support
+  <br>
+  • No routing required
+  <br>
+  • No IP visibility between VPCs
+  <br><br>
+  ✅ Minimal operational overhead
+  <br>
+  • No route table management
+  <br>
+  • No mesh networking
+  <br>
+  • Simple permissions-based access
+  <br><br>
+  This is the canonical AWS shared services pattern.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option A — VPC peering
+  <br><br>
+  Why this fails:
+  <br>
+  • Requires non-overlapping CIDRs
+  <br>
+  • Requires route table management
+  <br>
+  • Becomes unmanageable at scale
+  <br><br>
+  ❌ Option C — Transit Gateway
+  <br><br>
+  Why this fails:
+  <br>
+  • Does not support overlapping CIDRs
+  <br>
+  • Overkill for simple service exposure
+  <br>
+  • Higher cost and complexity
+  <br><br>
+  ❌ Option D — Site-to-Site VPN
+  <br><br>
+  Why this fails:
+  <br>
+  • Traverses public internet
+  <br>
+  • High operational overhead
+  <br>
+  • Poor scalability
+  <br>
+  • Latency
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  VPN is almost never the answer for intra-AWS connectivity.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 135)
+  <br><br>
+  • Overlapping CIDRs = PrivateLink
+  <br>
+  • PrivateLink works with NLB
+  <br>
+  • No routing required with PrivateLink
+  <br>
+  • Transit Gateway ≠ overlapping CIDRs
+  <br>
+  • VPN ≠ private AWS-only traffic
+</div>
+</div>
+
+<!-- ================= Q136 ================= -->
+<div class="question">
+<pre>
+<b>Question 136 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has an on-premises website application that provides real estate information for potential renters and buyers. The website uses a Java backend and a NoSQL MongoDB database to store subscriber data.
+The company needs to migrate the entire application to AWS with a similar structure. The application must be deployed for high availability, and the company cannot make changes to the application.
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q136" value="A">
+    <span>A. Use an Amazon Aurora DB cluster as the database for the subscriber data. Deploy Amazon EC2 instances in an Auto Scaling group across multiple Availability Zones for the Java backend application.</span>
+  </label>
+  <label>
+    <input type="radio" name="q136" value="B">
+    <span>B. Use MongoDB on Amazon EC2 instances as the database for the subscriber data. Deploy EC2 instances in an Auto Scaling group in a single Availability Zone for the Java backend application.</span>
+  </label>
+  <label>
+    <input type="radio" name="q136" value="C">
+    <span>C. Configure Amazon DocumentDB (with MongoDB compatibility) with appropriately sized instances in multiple Availability Zones as the database for the subscriber data. Deploy Amazon EC2 instances in an Auto Scaling group across multiple Availability Zones for the Java backend application.</span>
+  </label>
+  <label>
+    <input type="radio" name="q136" value="D">
+    <span>D. Configure Amazon DocumentDB (with MongoDB compatibility) in on-demand capacity mode in multiple Availability Zones as the database for the subscriber data. Deploy Amazon EC2 instances in an Auto Scaling group across multiple Availability Zones for the Java backend application.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q136', 'C', this, exp136)">Check Answer</button>
+
+<div class="explanation" id="exp136">
+  <button class="close-explanation" onclick="hideExplanation('exp136')">Close</button>
+  <b>✅ Correct Answer: C</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is about choosing the right managed database when code changes are not allowed.
+  <br><br>
+  AWS is testing whether you understand:
+  <br>
+  • Data model compatibility
+  <br>
+  • Managed service trade-offs
+  <br>
+  • High availability requirements
+  <br><br>
+  🔑 Step 1: Lock onto the strongest constraint
+  <br><br>
+  The most important phrase is:
+  <br><br>
+  "cannot make changes to the application"
+  <br><br>
+  This immediately tells us:
+  <br><br>
+  ❌ We cannot change the database engine semantics
+  <br>
+  ❌ We cannot rewrite queries
+  <br>
+  ❌ We cannot refactor data access logic
+  <br><br>
+  So the target database must be MongoDB-compatible.
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  If code changes are not allowed → preserve the data model and API.
+  <br><br>
+  🔑 Step 2: Identify AWS's MongoDB-compatible managed service
+  <br><br>
+  AWS offers exactly one service for this:
+  <br><br>
+  Amazon DocumentDB (with MongoDB compatibility)
+  <br><br>
+  DocumentDB:
+  <br>
+  • Uses MongoDB wire protocol
+  <br>
+  • Supports MongoDB drivers
+  <br>
+  • Is fully managed
+  <br>
+  • Supports Multi-AZ high availability
+  <br><br>
+  🔑 Step 3: Eliminate options that violate HA or compatibility
+  <br><br>
+  ❌ Option A — Aurora
+  <br>
+  • Aurora is relational
+  <br>
+  • MongoDB is document-based
+  <br>
+  • Requires code changes
+  <br>
+  • Immediate elimination.
+  <br><br>
+  ❌ Option B — MongoDB on EC2 (Single AZ)
+  <br>
+  • Self-managed
+  <br>
+  • Single AZ = not highly available
+  <br>
+  • Violates HA requirement
+  <br><br>
+  AWS exams strongly prefer managed services when HA is required.
+  <br><br>
+  ❌ Option D — "On-demand capacity mode"
+  <br><br>
+  This is a wording trap.
+  <br><br>
+  Important nuance:
+  <br><br>
+  DocumentDB does NOT have "on-demand capacity mode"
+  <br><br>
+  That term applies to:
+  <br>
+  • DynamoDB
+  <br><br>
+  Not to DocumentDB
+  <br><br>
+  🧠 EXAM RULE:
+  <br>
+  If an option invents a feature that doesn't exist → it's wrong.
+  <br><br>
+  ✅ Why Option C is Correct (Deep Dive)
+  <br><br>
+  Option C provides:
+  <br><br>
+  ✅ MongoDB compatibility
+  <br>
+  • No code changes
+  <br>
+  • Same drivers
+  <br>
+  • Same API semantics
+  <br><br>
+  ✅ High availability
+  <br>
+  • Multi-AZ cluster
+  <br>
+  • Managed failover
+  <br><br>
+  ✅ Managed service
+  <br>
+  • No patching
+  <br>
+  • No backups to manage
+  <br>
+  • No replica management
+  <br><br>
+  ✅ Scales appropriately
+  <br>
+  • Suitable for web workloads
+  <br>
+  • Predictable performance
+  <br><br>
+  This is the exact AWS migration path for MongoDB workloads when code cannot change.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 136)
+  <br><br>
+  • No code changes → preserve DB engine
+  <br>
+  • MongoDB → Amazon DocumentDB
+  <br>
+  • Managed services preferred for HA
+  <br>
+  • Single AZ = not HA
+  <br>
+  • Watch for fake features in answer choices
+</div>
+</div>
+
+<!-- ================= Q137 ================= -->
+<div class="question">
+<pre>
+<b>Question 137 – Topic 1 (Verbatim)</b>
+
+Question:
+A company wants to monitor and analyze network traffic that flows between Amazon EC2 instances in a VPC. The company needs to send a copy of the traffic to a third-party monitoring appliance for inspection.
+The solution must meet the following requirements:
+
+Near real-time visibility into network traffic
+
+No impact on application performance
+
+No changes to application code
+
+Minimal operational overhead
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q137" value="A">
+    <span>A. Enable VPC Flow Logs and analyze the logs by using Amazon Athena.</span>
+  </label>
+  <label>
+    <input type="radio" name="q137" value="B">
+    <span>B. Use VPC Traffic Mirroring to mirror traffic from the EC2 instances to the monitoring appliance.</span>
+  </label>
+  <label>
+    <input type="radio" name="q137" value="C">
+    <span>C. Deploy the monitoring appliance behind an Application Load Balancer and route traffic through the appliance.</span>
+  </label>
+  <label>
+    <input type="radio" name="q137" value="D">
+    <span>D. Use AWS Network Firewall to inspect traffic between the EC2 instances.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q137', 'B', this, exp137)">Check Answer</button>
+
+<div class="explanation" id="exp137">
+  <button class="close-explanation" onclick="hideExplanation('exp137')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is all about observability vs inline enforcement.
+  <br><br>
+  AWS is testing whether you understand:
+  <br>
+  • Passive traffic analysis
+  <br>
+  • Inline traffic inspection
+  <br>
+  • Performance impact
+  <br><br>
+  🔑 Step 1: Identify the MOST important constraint
+  <br><br>
+  The phrase that decides everything is:
+  <br><br>
+  "No impact on application performance"
+  <br><br>
+  This tells us:
+  <br><br>
+  ❌ We cannot put anything inline
+  <br>
+  ❌ We cannot add hops to the traffic path
+  <br>
+  ✅ We must copy traffic, not redirect it
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  If traffic must be analyzed without affecting performance → mirror it, don't route it.
+  <br><br>
+  🔑 Step 2: Understand the difference between GWLB and Traffic Mirroring
+  <br><br>
+  <table border="1" cellpadding="5">
+  <tr><th>Feature</th><th>Gateway Load Balancer</th><th>Traffic Mirroring</th></tr>
+  <tr><td>Inline traffic</td><td>✅ Yes</td><td>❌ No</td></tr>
+  <tr><td>Passive copy</td><td>❌ No</td><td>✅ Yes</td></tr>
+  <tr><td>Performance impact</td><td>Possible</td><td>Minimal</td></tr>
+  <tr><td>Use case</td><td>Firewall / IPS</td><td>Monitoring / analysis</td></tr>
+  </table>
+  <br>
+  This question clearly asks for monitoring, not enforcement.
+  <br><br>
+  🔑 Step 3: Why VPC Traffic Mirroring is purpose-built here
+  <br><br>
+  VPC Traffic Mirroring:
+  <br>
+  • Copies ENI traffic
+  <br>
+  • Sends a copy to:
+  <br>
+    - EC2
+  <br>
+    - NLB
+  <br>
+    - Third-party appliances
+  <br>
+  • Works in near real time
+  <br>
+  • Does not modify or delay traffic
+  <br><br>
+  This is exactly what the requirement describes.
+  <br><br>
+  ✅ Why Option B is Correct (Deep Dive)
+  <br><br>
+  Option B says:
+  <br><br>
+  Use VPC Traffic Mirroring
+  <br><br>
+  This provides:
+  <br><br>
+  ✅ Near real-time visibility
+  <br>
+  • Packets are mirrored immediately
+  <br><br>
+  ✅ No performance impact
+  <br>
+  • Original traffic path unchanged
+  <br><br>
+  ✅ No code changes
+  <br>
+  • Network-level feature
+  <br><br>
+  ✅ Minimal ops
+  <br>
+  • No routing changes
+  <br>
+  • No scaling logic
+  <br><br>
+  This is the canonical AWS solution for passive traffic inspection.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option A — VPC Flow Logs
+  <br><br>
+  Why this fails:
+  <br><br>
+  Flow Logs:
+  <br>
+  • Metadata only
+  <br>
+  • No packet payload
+  <br><br>
+  Cannot:
+  <br>
+  • Inspect content
+  <br>
+  • Analyze protocols
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  Flow Logs = traffic metadata, not traffic content.
+  <br><br>
+  ❌ Option C — ALB routing
+  <br><br>
+  Why this is wrong:
+  <br>
+  • Forces traffic through appliance
+  <br>
+  • Adds latency
+  <br>
+  • Violates "no impact on performance"
+  <br><br>
+  ❌ Option D — AWS Network Firewall
+  <br><br>
+  Why this fails:
+  <br>
+  • Network Firewall is inline
+  <br><br>
+  Designed for:
+  <br>
+  • Policy enforcement
+  <br>
+  • Blocking
+  <br><br>
+  • Adds latency
+  <br>
+  • Violates requirement
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 137)
+  <br><br>
+  • Traffic Mirroring = passive inspection
+  <br>
+  • Gateway Load Balancer = inline enforcement
+  <br>
+  • Flow Logs ≠ packet inspection
+  <br>
+  • Performance-neutral monitoring → mirror, don't route
+  <br>
+  • Choose tools based on traffic path impact
+</div>
+</div>
+
+<!-- ================= Q138 ================= -->
+<div class="question">
+<pre>
+<b>Question 138 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has a central AWS account that builds and stores container images in Amazon Elastic Container Registry (Amazon ECR).
+Multiple application teams run workloads in separate AWS accounts. These workloads must pull container images from the central ECR repository.
+The company must meet the following requirements:
+
+Do not duplicate container images
+
+Least operational overhead
+
+Secure access across accounts
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q138" value="A">
+    <span>A. Configure cross-account IAM roles in the application accounts. Allow the roles to assume a role in the central account that has permissions to pull images from Amazon ECR.</span>
+  </label>
+  <label>
+    <input type="radio" name="q138" value="B">
+    <span>B. Create an Amazon ECR repository policy that allows the application accounts to pull images from the repository.</span>
+  </label>
+  <label>
+    <input type="radio" name="q138" value="C">
+    <span>C. Use AWS Resource Access Manager (AWS RAM) to share the ECR repository with the application accounts.</span>
+  </label>
+  <label>
+    <input type="radio" name="q138" value="D">
+    <span>D. Replicate the container images from the central ECR repository into ECR repositories in each application account.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q138', 'B', this, exp138)">Check Answer</button>
+
+<div class="explanation" id="exp138">
+  <button class="close-explanation" onclick="hideExplanation('exp138')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question is about resource sharing vs identity sharing.
+  AWS wants to see if you know which AWS services support resource-based policies and when to use them.
+  <br><br>
+  🔑 Step 1: Identify the resource type and sharing model
+  <br><br>
+  The resource is:
+  <br><br>
+  Amazon ECR repository
+  <br><br>
+  Key AWS fact (EXAM GOLD):
+  <br><br>
+  ECR supports resource-based policies
+  <br><br>
+  That means:
+  <br>
+  • The resource itself (ECR repo) can grant access
+  <br>
+  • No role assumption is required
+  <br>
+  • No credentials need to be passed around
+  <br><br>
+  🔑 Step 2: Match requirements to the simplest AWS-native mechanism
+  <br><br>
+  Requirements:
+  <br><br>
+  ❌ No duplication → replication is out
+  <br>
+  ❌ Least operational overhead → avoid role choreography
+  <br>
+  ✅ Secure, cross-account access
+  <br><br>
+  This points directly to:
+  <br><br>
+  ECR repository policies
+  <br><br>
+  ✅ Why Option B is Correct (Deep Dive)
+  <br><br>
+  Option B says:
+  <br><br>
+  Create an ECR repository policy that allows the application accounts to pull images
+  <br><br>
+  This provides:
+  <br><br>
+  ✅ No image duplication
+  <br>
+  • Single source of truth
+  <br>
+  • Central image lifecycle management
+  <br><br>
+  ✅ Least operational overhead
+  <br>
+  • One policy on the repository
+  <br>
+  • No roles to create per account
+  <br>
+  • No trust relationships to maintain
+  <br><br>
+  ✅ Secure access
+  <br><br>
+  Fine-grained permissions:
+  <br>
+  • ecr:GetDownloadUrlForLayer
+  <br>
+  • ecr:BatchGetImage
+  <br><br>
+  Account-level or role-level principals
+  <br><br>
+  This is the AWS-recommended pattern for ECR sharing.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option A — Cross-account role assumption
+  <br><br>
+  Why this is inferior:
+  <br><br>
+  Works technically
+  <br><br>
+  But:
+  <br>
+  • Requires role creation in every account
+  <br>
+  • Requires trust policies
+  <br>
+  • Higher operational overhead
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  If a resource supports resource-based policies, AWS prefers them over role assumption.
+  <br><br>
+  ❌ Option C — AWS RAM
+  <br><br>
+  Why this fails:
+  <br><br>
+  RAM does not support ECR repositories
+  <br><br>
+  RAM is for:
+  <br>
+  • TGWs
+  <br>
+  • Subnets
+  <br>
+  • License Manager
+  <br>
+  • Some service catalogs
+  <br><br>
+  🧠 EXAM TRAP:
+  <br>
+  If RAM is mentioned, check whether the resource is actually shareable via RAM.
+  <br><br>
+  ❌ Option D — Replication to each account
+  <br><br>
+  Why this is bad design:
+  <br>
+  • Image duplication
+  <br>
+  • Sync complexity
+  <br>
+  • Higher storage cost
+  <br>
+  • Violates "least operational overhead"
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 138)
+  <br><br>
+  • ECR supports resource-based policies
+  <br>
+  • Resource-based policies > role assumption when available
+  <br>
+  • RAM does NOT share ECR
+  <br>
+  • Avoid duplicating container images
+  <br>
+  • Central image repo = single source of truth
+</div>
+</div>
+
+<!-- ================= Q139 ================= -->
+<div class="question">
+<pre>
+<b>Question 139 – Topic 1 (Verbatim)</b>
+
+Question:
+A company is designing a messaging solution by using Amazon Simple Queue Service (Amazon SQS). The solution must meet the following requirements:
+
+Highly available
+
+Durable
+
+Encrypted at rest
+
+Minimal operational overhead
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q139" value="A">
+    <span>A. Create a standard SQS queue. Enable server-side encryption (SSE) by using an AWS Key Management Service (AWS KMS) customer managed key.</span>
+  </label>
+  <label>
+    <input type="radio" name="q139" value="B">
+    <span>B. Create a FIFO SQS queue. Enable server-side encryption by using an AWS KMS customer managed key.</span>
+  </label>
+  <label>
+    <input type="radio" name="q139" value="C">
+    <span>C. Create a standard SQS queue. Configure the application to encrypt messages before sending them to the queue.</span>
+  </label>
+  <label>
+    <input type="radio" name="q139" value="D">
+    <span>D. Create an Amazon MQ queue. Enable encryption by using an AWS KMS key.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q139', 'A', this, exp139)">Check Answer</button>
+
+<div class="explanation" id="exp139">
+  <button class="close-explanation" onclick="hideExplanation('exp139')">Close</button>
+  <b>✅ Correct Answer: A</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This question looks simple, but it hides a classic SAP-C02 trap:
+  <br><br>
+  "Don't add features that weren't asked for."
+  <br><br>
+  AWS wants you to pick the simplest service that already meets the requirements.
+  <br><br>
+  🔑 Step 1: Evaluate each requirement one by one
+  <br><br>
+  Let's map requirements to SQS capabilities:
+  <br><br>
+  <table border="1" cellpadding="5">
+  <tr><th>Requirement</th><th>SQS Standard</th></tr>
+  <tr><td>Highly available</td><td>✅ Multi-AZ</td></tr>
+  <tr><td>Durable</td><td>✅ Stored redundantly</td></tr>
+  <tr><td>Encrypted at rest</td><td>❌ (must enable)</td></tr>
+  <tr><td>Minimal overhead</td><td>✅ Fully managed</td></tr>
+  </table>
+  <br>
+  So we need:
+  <br>
+  • SQS Standard
+  <br>
+  • SSE enabled
+  <br><br>
+  🔑 Step 2: Understand SQS encryption options
+  <br><br>
+  SQS supports:
+  <br><br>
+  Server-side encryption (SSE) using:
+  <br>
+  • AWS-managed KMS key
+  <br>
+  • Customer managed KMS key
+  <br><br>
+  The question explicitly says:
+  <br><br>
+  "Encrypted at rest"
+  <br><br>
+  So encryption must be:
+  <br>
+  • At the service level
+  <br>
+  • Transparent to the application
+  <br><br>
+  🧠 EXAM RULE:
+  <br>
+  If the question does not require client-side encryption → use SSE.
+  <br><br>
+  🔑 Step 3: Why FIFO is NOT required here
+  <br><br>
+  FIFO provides:
+  <br>
+  • Exactly-once processing
+  <br>
+  • Ordered delivery
+  <br><br>
+  But the question:
+  <br>
+  • Does NOT mention ordering
+  <br>
+  • Does NOT mention deduplication
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  Never choose FIFO unless ordering or deduplication is explicitly required.
+  <br><br>
+  ✅ Why Option A is Correct (Deep Dive)
+  <br><br>
+  Option A gives:
+  <br><br>
+  ✅ High availability
+  <br>
+  • SQS standard queues are multi-AZ
+  <br><br>
+  ✅ Durability
+  <br>
+  • Messages stored redundantly across AZs
+  <br><br>
+  ✅ Encryption at rest
+  <br>
+  • SSE-KMS with customer managed key
+  <br><br>
+  ✅ Minimal operational overhead
+  <br>
+  • No encryption logic in application
+  <br>
+  • No brokers
+  <br>
+  • No cluster management
+  <br><br>
+  This is exactly what the question asks for — nothing more, nothing less.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Exam Traps)
+  <br><br>
+  ❌ Option B — FIFO queue
+  <br><br>
+  Why this is wrong:
+  <br><br>
+  Adds:
+  <br>
+  • Throughput limits
+  <br>
+  • Complexity
+  <br>
+  • Provides features not requested
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  Extra features = extra risk = wrong answer.
+  <br><br>
+  ❌ Option C — Client-side encryption
+  <br><br>
+  Why AWS rejects this:
+  <br>
+  • Application complexity
+  <br>
+  • Key management burden
+  <br>
+  • Higher operational overhead
+  <br><br>
+  The question explicitly asks for minimal operational overhead.
+  <br><br>
+  ❌ Option D — Amazon MQ
+  <br><br>
+  Why this is wrong:
+  <br><br>
+  Requires:
+  <br>
+  • Broker management
+  <br>
+  • Maintenance
+  <br>
+  • Overkill for simple messaging
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  If SQS meets requirements → do NOT use MQ.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 139)
+  <br><br>
+  • SQS Standard is HA and durable by default
+  <br>
+  • Enable SSE-KMS for encryption at rest
+  <br>
+  • FIFO only when ordering/deduplication is required
+  <br>
+  • Client-side encryption ≠ minimal overhead
+  <br>
+  • Amazon MQ = heavy, not serverless
+</div>
+</div>
+
+<!-- ================= Q140 ================= -->
+<div class="question">
+<pre>
+<b>Question 140 – Topic 1 (Verbatim)</b>
+
+Question:
+A company has an application that uses AWS Lambda to process requests. The Lambda function must connect to an Amazon RDS MySQL database that runs in a private subnet in a VPC.
+The company has the following requirements:
+
+No database credentials can be stored in the Lambda function code or environment variables
+
+Access must be secure and auditable
+
+Minimal operational overhead
+
+Which solution will meet these requirements?
+
+Options (Verbatim)
+</pre>
+
+<div class="options">
+  <label>
+    <input type="radio" name="q140" value="A">
+    <span>A. Store the database credentials in AWS Secrets Manager. Grant the Lambda execution role permission to retrieve the secret. Configure automatic rotation for the credentials.</span>
+  </label>
+  <label>
+    <input type="radio" name="q140" value="B">
+    <span>B. Enable IAM database authentication for the RDS MySQL instance. Grant the Lambda execution role permission to connect to the database by using IAM authentication.</span>
+  </label>
+  <label>
+    <input type="radio" name="q140" value="C">
+    <span>C. Store the database credentials in AWS Systems Manager Parameter Store as a SecureString. Grant the Lambda execution role permission to retrieve the parameter.</span>
+  </label>
+  <label>
+    <input type="radio" name="q140" value="D">
+    <span>D. Store the database credentials in an encrypted Amazon S3 bucket. Grant the Lambda execution role permission to retrieve the credentials.</span>
+  </label>
+</div>
+
+<button onclick="checkAnswer('q140', 'B', this, exp140)">Check Answer</button>
+
+<div class="explanation" id="exp140">
+  <button class="close-explanation" onclick="hideExplanation('exp140')">Close</button>
+  <b>✅ Correct Answer: B</b>
+  <br>
+  <b>🧠 Trainer-Level Explanation</b>
+  <br><br>
+  This is a secure-access design question, not a secrets-storage question.
+  AWS is testing whether you understand when to eliminate credentials entirely instead of just protecting them.
+  <br><br>
+  🔑 Step 1: Lock onto the strongest constraint
+  <br><br>
+  The most important requirement is:
+  <br><br>
+  "No database credentials can be stored"
+  <br><br>
+  This immediately tells us:
+  <br><br>
+  ❌ Secrets Manager is not ideal
+  <br>
+  ❌ Parameter Store is not ideal
+  <br>
+  ❌ S3 is absolutely wrong
+  <br><br>
+  Why?
+  <br>
+  All three still involve stored credentials
+  <br><br>
+  🧠 EXAM GOLD:
+  <br>
+  If the question says no credentials can be stored → eliminate credentials, don't rotate them.
+  <br><br>
+  🔑 Step 2: Identify AWS's credential-less database access feature
+  <br><br>
+  AWS provides one clean solution:
+  <br><br>
+  IAM Database Authentication
+  <br><br>
+  What this does:
+  <br>
+  • Uses temporary IAM credentials
+  <br>
+  • No usernames/passwords stored
+  <br>
+  • Tokens are short-lived
+  <br>
+  • Fully auditable via CloudTrail
+  <br><br>
+  This is exactly what the requirement describes.
+  <br><br>
+  🔑 Step 3: Why IAM DB Auth works perfectly with Lambda
+  <br><br>
+  Lambda already:
+  <br>
+  • Has an execution role
+  <br>
+  • Uses temporary credentials
+  <br>
+  • Integrates natively with IAM
+  <br><br>
+  With IAM DB auth:
+  <br>
+  • Lambda generates a token
+  <br>
+  • Token is valid for minutes
+  <br>
+  • Database verifies IAM role
+  <br><br>
+  No secrets, no rotation, no storage.
+  <br><br>
+  ✅ Why Option B is Correct (Deep Dive)
+  <br><br>
+  Option B says:
+  <br><br>
+  Enable IAM database authentication and grant the Lambda execution role permission
+  <br><br>
+  This gives:
+  <br><br>
+  ✅ No stored credentials
+  <br>
+  • No secrets anywhere
+  <br><br>
+  ✅ Secure & auditable
+  <br>
+  • IAM policies
+  <br>
+  • CloudTrail logs
+  <br><br>
+  ✅ Minimal operational overhead
+  <br>
+  • No rotation logic
+  <br>
+  • No secret lifecycle management
+  <br>
+  • No application changes beyond auth config
+  <br><br>
+  This is AWS's preferred best practice when supported.
+  <br><br>
+  ❌ Why the Other Options Are WRONG (Classic Exam Traps)
+  <br><br>
+  ❌ Option A — Secrets Manager
+  <br><br>
+  Why this looks good:
+  <br>
+  • Secure
+  <br>
+  • Rotatable
+  <br>
+  • AWS-managed
+  <br><br>
+  Why it fails:
+  <br>
+  • Credentials are still stored
+  <br>
+  • Violates explicit requirement
+  <br><br>
+  🧠 Exam rule:
+  <br>
+  If IAM auth is available, AWS prefers it over Secrets Manager.
+  <br><br>
+  ❌ Option C — Parameter Store
+  <br><br>
+  Why this is worse:
+  <br>
+  • Manual rotation (or custom)
+  <br>
+  • Credentials still stored
+  <br>
+  • More operational overhead than Secrets Manager
+  <br><br>
+  ❌ Option D — Encrypted S3
+  <br><br>
+  Why this is completely wrong:
+  <br>
+  • Static secrets
+  <br>
+  • No rotation
+  <br>
+  • Poor access control model
+  <br><br>
+  Immediate elimination.
+  <br><br>
+  🧠 Key SAP-C02 Takeaways (Question 140)
+  <br><br>
+  • Eliminate credentials whenever possible
+  <br>
+  • IAM DB Authentication > Secrets Manager (when supported)
+  <br>
+  • Lambda integrates naturally with IAM auth
+  <br>
+  • Stored secrets = higher risk + overhead
+  <br>
+  • "Secure" ≠ "credential-less"
+</div>
+</div>
+
+<!-- ================= Navigation Bottom ================= -->
+<div style="text-align:center; margin: 40px 0;">
+  <a href="page14.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+      margin-right:10px;
+  ">
+    ← Previous Page
+  </a>
+  <a href="page16.html" style="
+      display:inline-block;
+      padding: 12px 28px;
+      background:#6b7280;
+      color:#fff;
+      font-size:15px;
+      font-weight:600;
+      border-radius:8px;
+      text-decoration:none;
+  ">
+    Next Page →
+  </a>
+</div>
+
+</div> <!-- container -->
+
+<script>
+function checkAnswer(qName, correctAns, btn, expDiv) {
+  const selected = document.querySelector('input[name="' + qName + '"]:checked');
+  if (!selected) {
+    alert("Please select an answer.");
+    return;
+  }
+  const labels = document.querySelectorAll('input[name="' + qName + '"]');
+  labels.forEach(radio => {
+    const label = radio.closest("label");
+    if (radio.value === correctAns) {
+      label.classList.add("correct");
+    } else if (radio.checked) {
+      label.classList.add("incorrect");
+    }
+    radio.disabled = true;
+  });
+  expDiv.style.display = "block";
+  btn.style.display = "none";
+}
+
+function checkAnswerMultiple(qName, correctAnswers, btn, expDiv) {
+  const checkboxes = document.querySelectorAll('input[name="' + qName + '"]');
+  const selected = Array.from(checkboxes).filter(cb => cb.checked);
+  if (selected.length === 0) {
+    alert("Please select at least one answer.");
+    return;
+  }
+  checkboxes.forEach(cb => {
+    const label = cb.closest("label");
+    const isCorrect = correctAnswers.includes(cb.value);
+    if (isCorrect && cb.checked) {
+      label.classList.add("correct");
+    } else if (!isCorrect && cb.checked) {
+      label.classList.add("incorrect");
+    } else if (isCorrect && !cb.checked) {
+      label.classList.add("correct");
+    }
+    cb.disabled = true;
+  });
+  expDiv.style.display = "block";
+  btn.style.display = "none";
+}
+
+function hideExplanation(expId) {
+  document.getElementById(expId).style.display = "none";
+}
+</script>
+
+</body>
+</html>
