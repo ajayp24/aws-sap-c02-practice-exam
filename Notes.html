@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS SAP-C02 Study Guide</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #FF9900;
+            border-bottom: 3px solid #FF9900;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #232F3E;
+            margin-top: 30px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-left: 4px solid #FF9900;
+        }
+        h3 {
+            color: #146eb4;
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 40px;
+        }
+        .rule {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .pattern {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .instant-answer {
+            background-color: #d4edda;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        .trap {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        ul li:before {
+            content: "▸ ";
+            color: #FF9900;
+            font-weight: bold;
+        }
+        .code-block {
+            background-color: #f4f4f4;
+            border-left: 3px solid #FF9900;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th {
+            background-color: #232F3E;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>AWS SAP-C02 Certification Study Guide</h1>
+
+    <div class="section">
+        <h2>1️⃣ Cross-Account Access (S3, ECR, APIs, Auditors, CI/CD)</h2>
+        
+        <h3>Core AWS Rule</h3>
+        <div class="rule">The account that OWNS the resource controls access</div>
+
+        <h3>AWS-Preferred Patterns</h3>
+        <div class="pattern">
+            <strong>Cross-account IAM roles (AssumeRole) for:</strong>
+            <ul>
+                <li>Auditors</li>
+                <li>CI/CD pipelines</li>
+                <li>Secure admin access</li>
+            </ul>
+            <strong>Resource-based policies when supported:</strong>
+            <ul>
+                <li>S3 bucket policy</li>
+                <li>ECR repository policy</li>
+                <li>SNS topic policy</li>
+            </ul>
+        </div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"external auditor"</li>
+            <li>"no long-lived credentials"</li>
+            <li>"secure cross-account access"</li>
+            <li>"least operational overhead"</li>
+        </ul>
+
+        <h3>Instant Answer</h3>
+        <div class="instant-answer">
+            👉 IAM role assumption (often with external ID)<br>
+            👉 Resource policy > role when available
+        </div>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ IAM users<br>
+            ❌ Secrets Manager for cross-account access<br>
+            ❌ AWS RAM for identities (RAM ≠ IAM)
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣ Prevent vs Detect vs Recover (Security & Governance)</h2>
+        
+        <h3>Control Hierarchy (MEMORIZE)</h3>
+        <table>
+            <tr>
+                <th>Goal</th>
+                <th>AWS Tool</th>
+            </tr>
+            <tr>
+                <td>Prevent</td>
+                <td>SCP / IAM policy</td>
+            </tr>
+            <tr>
+                <td>Detect</td>
+                <td>AWS Config</td>
+            </tr>
+            <tr>
+                <td>Recover</td>
+                <td>Native service feature</td>
+            </tr>
+        </table>
+
+        <h3>Key Patterns</h3>
+        <ul>
+            <li>Prevent creation → SCP</li>
+            <li>Detect drift → Config</li>
+            <li>Undo mistakes → PITR / Object Lock</li>
+        </ul>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"ensure"</li>
+            <li>"enforce"</li>
+            <li>"must prevent"</li>
+            <li>"all accounts / future accounts"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Config when prevention is required<br>
+            ❌ Security Hub for enforcement<br>
+            ❌ Lambda remediation when native prevention exists
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>3️⃣ Accidental Deletion & Data Protection</h2>
+        
+        <h3>Native Safety Nets</h3>
+        <ul>
+            <li>DynamoDB → PITR</li>
+            <li>S3 immutability → Object Lock (Compliance mode)</li>
+            <li>EBS/RDS/EFS backups → AWS Backup</li>
+        </ul>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"accidental deletion"</li>
+            <li>"human error"</li>
+            <li>"ability to recover"</li>
+        </ul>
+
+        <h3>Instant Answer</h3>
+        <div class="instant-answer">👉 Native recovery feature (not IAM denies)</div>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Deny Delete APIs<br>
+            ❌ Custom Lambda backups<br>
+            ❌ Manual snapshots
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>4️⃣ Networking: Private Access & Overlapping CIDRs</h2>
+        
+        <h3>Golden Rules</h3>
+        <ul>
+            <li>Overlapping CIDRs → PrivateLink</li>
+            <li>Private subnet egress → NAT Gateway</li>
+            <li>Hundreds of VPCs → Transit Gateway</li>
+            <li>Third-party inline inspection → Gateway Load Balancer</li>
+            <li>Passive inspection → Traffic Mirroring</li>
+        </ul>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"overlapping CIDR"</li>
+            <li>"private access only"</li>
+            <li>"no internet"</li>
+            <li>"third-party firewall"</li>
+        </ul>
+
+        <h3>Instant Answer</h3>
+        <div class="instant-answer">
+            Overlap + private service → PrivateLink<br>
+            Outbound only → NAT Gateway<br>
+            Inline inspection → GWLB<br>
+            Observe only → Traffic Mirroring
+        </div>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ VPC peering at scale<br>
+            ❌ VPN for intra-AWS traffic<br>
+            ❌ ALB for packet inspection
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>5️⃣ Hybrid Networking (On-Prem ↔ AWS at Scale)</h2>
+        
+        <h3>AWS Reference Architecture</h3>
+        <div class="code-block">
+On-Prem<br>
+ → Direct Connect<br>
+ → Direct Connect Gateway<br>
+ → Transit Gateway<br>
+ → Shared across accounts
+        </div>
+
+        <h3>Must-Know Rules</h3>
+        <ul>
+            <li>Transit Gateway requires Transit VIF</li>
+            <li>DX Gateway does not route between TGWs</li>
+            <li>Cross-Region VPC traffic → TGW peering</li>
+            <li>Centralized egress → on-prem NAT</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Private VIF with TGW<br>
+            ❌ VPC peering for hundreds of VPCs<br>
+            ❌ Internet Gateway when on-prem egress is required
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>6️⃣ Compute Selection (Lambda vs Containers vs Batch)</h2>
+        
+        <h3>Runtime Limits (EXAM GOLD)</h3>
+        <table>
+            <tr>
+                <th>Service</th>
+                <th>Limit</th>
+            </tr>
+            <tr>
+                <td>Lambda</td>
+                <td>15 minutes</td>
+            </tr>
+            <tr>
+                <td>Fargate</td>
+                <td>Hours</td>
+            </tr>
+            <tr>
+                <td>Batch</td>
+                <td>Hours</td>
+            </tr>
+        </table>
+
+        <h3>Patterns</h3>
+        <ul>
+            <li>15 min + scheduled + no code change → Fargate + EventBridge</li>
+            <li>VM-based Java/.NET → App2Container + ECS</li>
+            <li>Batch complexity only if Fargate is insufficient</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Lambda beyond 15 minutes<br>
+            ❌ Spot for guaranteed schedules<br>
+            ❌ Batch when Fargate works
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>7️⃣ Event-Driven Architectures (Fan-out & Reliability)</h2>
+        
+        <h3>Canonical Fan-Out Pattern</h3>
+        <div class="code-block">
+Producer<br>
+ → SNS<br>
+ → SQS (per consumer)<br>
+ → Lambda
+        </div>
+
+        <h3>Why AWS Loves This</h3>
+        <ul>
+            <li>Decoupling</li>
+            <li>Guaranteed delivery</li>
+            <li>Independent scaling</li>
+            <li>Retry isolation</li>
+        </ul>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"multiple consumers"</li>
+            <li>"no event loss"</li>
+            <li>"fan-out"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ One SQS queue with many Lambdas<br>
+            ❌ Direct Lambda invocation<br>
+            ❌ Kinesis unless streaming semantics are required
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>8️⃣ Storage Selection Patterns</h2>
+        
+        <h3>Quick Mapping (MEMORIZE)</h3>
+        <table>
+            <tr>
+                <th>Requirement</th>
+                <th>Service</th>
+            </tr>
+            <tr>
+                <td>Shared files across EC2</td>
+                <td>EFS</td>
+            </tr>
+            <tr>
+                <td>Immutable artifacts</td>
+                <td>S3</td>
+            </tr>
+            <tr>
+                <td>CI/CD artifacts</td>
+                <td>S3 + CRR</td>
+            </tr>
+            <tr>
+                <td>Session data</td>
+                <td>DynamoDB</td>
+            </tr>
+            <tr>
+                <td>MongoDB compatibility</td>
+                <td>DocumentDB</td>
+            </tr>
+        </table>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ EBS for shared storage<br>
+            ❌ S3 as POSIX filesystem<br>
+            ❌ EFS across Regions
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>9️⃣ Databases: HA, DR, and Global Access</h2>
+        
+        <h3>Key Patterns</h3>
+        <ul>
+            <li>DynamoDB multi-Region active-active → Global Tables</li>
+            <li>Aurora cross-Region DR → Aurora Replica</li>
+            <li>MongoDB no code change → DocumentDB</li>
+            <li>Reporting = read-heavy → Read replicas</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ DMS for steady-state DR<br>
+            ❌ Aurora for key-value/session data<br>
+            ❌ DIY replication
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>🔟 Security & Identity (Secrets, TLS, Auth)</h2>
+        
+        <h3>Golden Rules</h3>
+        <ul>
+            <li>Eliminate credentials > rotate credentials</li>
+            <li>TLS enforced at the edge, not in code</li>
+            <li>Native security controls > WAF for basic needs</li>
+        </ul>
+
+        <h3>Key Patterns</h3>
+        <ul>
+            <li>RDS + Lambda + no secrets → IAM DB Authentication</li>
+            <li>API Gateway TLS → Custom domain TLS policy</li>
+            <li>Secrets only when IAM auth is unavailable</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Lambda checking TLS<br>
+            ❌ Custom authorizers for TLS<br>
+            ❌ Secrets Manager when IAM auth exists
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣1️⃣ Observability & Logging</h2>
+        
+        <h3>Clear Separation</h3>
+        <table>
+            <tr>
+                <th>Data</th>
+                <th>Service</th>
+            </tr>
+            <tr>
+                <td>Logs (compliance)</td>
+                <td>CloudTrail → S3 + Object Lock</td>
+            </tr>
+            <tr>
+                <td>Metrics (ops)</td>
+                <td>CloudWatch cross-account observability</td>
+            </tr>
+            <tr>
+                <td>Traffic metadata</td>
+                <td>Flow Logs</td>
+            </tr>
+            <tr>
+                <td>Packet inspection</td>
+                <td>Traffic Mirroring</td>
+            </tr>
+        </table>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ OpenSearch for 7-year retention<br>
+            ❌ S3 exports for near-real-time metrics
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣2️⃣ Cost Optimization Patterns</h2>
+        
+        <h3>Common Signals</h3>
+        <ul>
+            <li>"business hours only"</li>
+            <li>"predictable schedule"</li>
+            <li>"high NAT cost"</li>
+        </ul>
+
+        <h3>Instant Answers</h3>
+        <div class="instant-answer">
+            Scheduled EC2 → EventBridge + Lambda<br>
+            NAT cost spike → VPC endpoint<br>
+            RI governance → SCP
+        </div>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Budgets for enforcement<br>
+            ❌ Manual processes<br>
+            ❌ EC2 proxies when NAT exists
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣3️⃣ Backup & Cross-Region Disaster Recovery (Multi-Service)</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Centralized, policy-based backups across accounts and Regions</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="pattern">
+            <strong>AWS Backup</strong>
+            <ul>
+                <li>Backup plans</li>
+                <li>Cross-Region copy</li>
+                <li>AWS Organizations integration</li>
+            </ul>
+        </div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"EBS + RDS + EFS"</li>
+            <li>"centralized backup"</li>
+            <li>"cross-Region DR"</li>
+            <li>"minimal operational overhead"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ DLM (EBS only)<br>
+            ❌ Per-service backups<br>
+            ❌ Custom Lambda snapshot scripts
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣4️⃣ Shared File Storage Across AZs</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Multiple EC2 instances need the same files</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">Amazon EFS</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"shared files"</li>
+            <li>"multiple AZs"</li>
+            <li>"POSIX access"</li>
+            <li>"many small files"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ EBS (single-attach, single-AZ)<br>
+            ❌ S3 mounted as filesystem<br>
+            ❌ Instance store (ephemeral)
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣5️⃣ Data Sovereignty & Geographic Access Control</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Restrict where data can be accessed from, without moving it</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">S3 bucket policy with IP-based conditions</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"data sovereignty"</li>
+            <li>"country-specific access"</li>
+            <li>"no replication"</li>
+            <li>"must enforce"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ CloudTrail (monitoring only)<br>
+            ❌ KMS Region controls<br>
+            ❌ CRR (duplicates data)
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣6️⃣ CI/CD Artifact Storage</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Immutable build artifacts, read globally</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">Amazon S3 + Cross-Region Replication</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"CI/CD"</li>
+            <li>"build artifacts"</li>
+            <li>"multi-Region access"</li>
+            <li>"high durability"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ EFS (regional, expensive)<br>
+            ❌ EBS snapshots<br>
+            ❌ Instance store
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣7️⃣ TLS Enforcement for APIs</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">TLS must be enforced before requests reach application code</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">API Gateway custom domain TLS policy (TLS 1.2+)</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"TLS 1.2 or higher"</li>
+            <li>"external clients"</li>
+            <li>"minimal operational overhead"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Lambda logic<br>
+            ❌ Custom authorizers<br>
+            ❌ WAF for basic TLS enforcement
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣8️⃣ Secure Multi-Account CI/CD Deployments</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Deploy across accounts without sharing credentials</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">Cross-account IAM roles + STS AssumeRole</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"central pipeline"</li>
+            <li>"target accounts"</li>
+            <li>"no long-lived credentials"</li>
+            <li>"least privilege"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ IAM users<br>
+            ❌ Secrets Manager for access keys<br>
+            ❌ AWS RAM
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>1️⃣9️⃣ Event-Driven Fan-Out (Reliability Focused)</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Each consumer must receive every event</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="code-block">
+Producer → SNS → multiple SQS queues → Lambda
+        </div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"multiple consumers"</li>
+            <li>"fan-out"</li>
+            <li>"no event loss"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ One SQS queue with many Lambdas<br>
+            ❌ Direct Lambda invocation<br>
+            ❌ Kinesis when not required
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣0️⃣ Private Subnet Internet Egress</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Outbound-only internet access, no inbound exposure</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">NAT Gateway (one per AZ)</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"private subnet"</li>
+            <li>"outbound internet"</li>
+            <li>"no inbound access"</li>
+            <li>"high availability"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ Internet Gateway<br>
+            ❌ EC2 proxy<br>
+            ❌ VPC peering
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣1️⃣ Third-Party Auditor Access</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Temporary, auditable, least-privilege third-party access</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">Cross-account IAM role with external ID</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"external auditor"</li>
+            <li>"temporary access"</li>
+            <li>"no credentials shared"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ IAM users<br>
+            ❌ Secrets Manager<br>
+            ❌ AWS RAM
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2️⃣2️⃣ Accidental DynamoDB Deletion Protection</h2>
+        
+        <h3>Core Pattern</h3>
+        <div class="rule">Undo mistakes, don't block valid operations</div>
+
+        <h3>AWS-Intended Solution</h3>
+        <div class="instant-answer">DynamoDB Point-in-Time Recovery (PITR)</div>
+
+        <h3>Exam Signals</h3>
+        <ul>
+            <li>"accidental deletion"</li>
+            <li>"recover data"</li>
+            <li>"minimal overhead"</li>
+        </ul>
+
+        <h3>Traps</h3>
+        <div class="trap">
+            ❌ IAM deny DeleteItem<br>
+            ❌ Streams + Lambda<br>
+            ❌ Manual backups
+        </div>
+    </div>
+
+</body>
+</html>
